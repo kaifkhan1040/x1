@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html class="loading dark-layout" lang="en" data-layout="dark-layout" data-textdirection="ltr">
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,minimal-ui">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <title>Login Page - Aquince Accommodation Ltd</title>
+    <link rel="apple-touch-icon" href="{% static 'app-assets/images/ico/apple-icon-120.png' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'app-assets/images/ico/favicon.ico' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
+
+    <!-- BEGIN: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/vendors.min.css' %}">
+    <!-- END: Vendor CSS-->
+
+    <!-- BEGIN: Theme CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/bootstrap-extended.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/colors.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/components.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/themes/dark-layout.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/themes/bordered-layout.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/themes/semi-dark-layout.css' %}">
+
+    <!-- BEGIN: Page CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/core/menu/menu-types/vertical-menu.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/pages/authentication.css' %}">
+    <!-- END: Page CSS-->
+
+    <!-- BEGIN: Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    <!-- END: Custom CSS-->
+
+</head>
+<!-- END: Head-->
+
+<!-- BEGIN: Body-->
+
+<body class="vertical-layout vertical-menu-modern blank-page navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="blank-page">
+    <!-- BEGIN: Content-->
+    <div class="app-content content ">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper">
+            <div class="content-header row">
+            </div>
+            <div class="content-body">
+                <div class="auth-wrapper auth-cover">
+                    <div class="auth-inner row m-0">
+                        <!-- Brand logo-->
+                        {% comment %} <img src="{% static 'app-assets/images/ticketing_logo/LOGO.png' %}" width="10px" height="40px"> {% endcomment %}
+                        <a class="brand-logo" href="index.html">
+
+                        </a>
+                        <!-- /Brand logo-->
+                        <!-- Left Text-->
+                        <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
+                            <div class="w-100 d-lg-flex align-items-center justify-content-center px-5"><img class="img-fluid" src="{% static 'app-assets/images/pages/login-v2.svg' %}" alt="Login V2" /></div>
+                        </div>
+                        <!-- /Left Text-->
+                        <!-- Login-->
+                        <div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-5">
+                            <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
+                                <h2 class="card-title fw-bold">Welcome to Aquince Accommodation Ltd</h2>
+                                {% comment %} <p class="card-text mb-2">Please sign-in to your account and start the adventure</p> {% endcomment %}
+
+                                <form class="auth-login-form mt-2" action="" method="POST">{% csrf_token %}
+                                    <div class="mb-1">
+                                        <label class="form-label" for="login-email">Email</label>
+                                        <input class="form-control" id="login-email" type="text" value="{{ email }}" required value="{{cookies1}}" name="email" placeholder="john@example.com" aria-describedby="login-email" autofocus="" tabindex="1" />
+                                    </div>
+                                    <div class="mb-1">
+                                        <div class="d-flex justify-content-between">
+                                            <label class="form-label" for="login-password">Password</label><a href="{% url 'user:forgetpassword' %}"><small>Forgot Password?</small></a>
+                                        </div>
+                                        <div class="input-group input-group-merge form-password-toggle">
+                                            <input class="form-control form-control-merge" value="{{cookies2}}" id="login-password" type="password" name="password" placeholder="············" aria-describedby="login-password" tabindex="2" /><span class="input-group-text cursor-pointer"><i data-feather="eye"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-1">
+                                        <div class="d-flex justify-content-between">
+                                            <label class="form-label" for="login_as">Login As</label>
+                                        </div>
+                                        <div class="input-group input-group-merge form-password-toggle">
+                                            <select id="login_as" name="login_as" class="form-select"  required tabindex="3">
+                                                <option value="" disabled selected>Select</option>
+                                                <option value="landload" {% if role == "landload" %}selected{% endif %}>Landlord</option>
+                                                <option value="tenant" {% if role == "tenant" %}selected{% endif %}>Tenant</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="mb-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" name="remember_me" id="remember-me" type="checkbox" tabindex="3" />
+                                            <label class="form-check-label" for="remember-me"> Remember Me</label>
+                                        </div>
+                                    </div> -->
+                                    {% comment %} <div class="input-group" style="margin-bottom: 15px;">
+                <label for="login_as" style="display: block; margin-bottom: 5px;">Login As:</label>
+                <select id="login_as" name="login_as" class="form-select" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="landload" {% if role == "landload" %}selected{% endif %}>Landlord</option>
+                    <option value="tenant" {% if role == "tenant" %}selected{% endif %}>Tenant</option>
+                </select>
+            </div> {% endcomment %}
+                                    <button class="btn btn-primary w-100" tabindex="4">Sign in</button>
+                                </form>
+                                <p class="text-center mt-2"><span>New on our platform?</span><a href="{% url 'user:signup' %}"><span>&nbsp;Create an account</span></a></p>
+                                {% if messages %}
+                            {% for message in messages %}
+                                {% if message.tags == 'error' %}
+                            <div class="alert alert-danger" role="alert">
+                                {{message|safe}}
+                            </div>
+                                {% else %}
+                            <div class="alert alert-{{ message.tags }}" role="alert">
+                                {{message|safe}}
+                            </div>
+                                {% endif %}
+                            {% endfor %}{% endif %}
+                            </div>
+                        </div>
+                        <!-- /Login-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END: Content-->
+
+
+    <!-- BEGIN: Vendor JS-->
+    <script src="{% static 'app-assets/vendors/js/vendors.min.js' %}"></script>
+    <!-- BEGIN Vendor JS-->
+
+    <!-- BEGIN: Page Vendor JS-->
+    <script src="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+    <!-- END: Page Vendor JS-->
+
+    <!-- BEGIN: Theme JS-->
+    <script src="{% static 'app-assets/js/core/app-menu.js' %}"></script>
+    <script src="{% static 'app-assets/js/core/app.js' %}"></script>
+    <!-- END: Theme JS-->
+
+    <!-- BEGIN: Page JS-->
+    <script src="{% static 'app-assets/js/scripts/pages/auth-login.js' %}"></script>
+    <!-- END: Page JS-->
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% comment %} {% if messages %}
+    <script>
+        {% for message in messages %}
+            let messageType = "{{ message.tags }}";  // Django message type (error, success, etc.)
+            let title = "Notification";  // Default title
+            let icon = "info";  // Default icon
+
+            // Set title and icon based on message type
+            if (messageType.includes("error")) {
+                title = "Error!";
+                icon = "error";
+            } else if (messageType.includes("success")) {
+                title = "Success!";
+                icon = "success";
+            } else if (messageType.includes("warning")) {
+                title = "Warning!";
+                icon = "warning";
+            } else if (messageType.includes("info")) {
+                title = "Information!";
+                icon = "info";
+            }
+
+            Swal.fire({
+                title: title,
+                text: "{{ message|striptags }}",  
+                icon: icon,
+                background: '#1e1e1e',   
+                color: '#ffffff'
+            });
+        {% endfor %}
+    </script>
+{% endif %} {% endcomment %}
+    <script>
+        $(window).on('load', function() {
+            if (feather) {
+                feather.replace({
+                    width: 14,
+                    height: 14
+                });
+            }
+        })
+    </script>
+</body>
+<!-- END: Body-->
+
+</html>

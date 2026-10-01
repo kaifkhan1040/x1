@@ -1,0 +1,483 @@
+{% extends 'customadmin/basic.html' %} 
+{% load static %}
+{% block style %}
+
+
+    <!-- BEGIN: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/responsive.bootstrap5.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/rowGroup.bootstrap5.min.css' %}">
+    <!-- END: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/core/menu/menu-types/vertical-menu.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+    <!-- END: Page CSS-->
+
+    <!-- BEGIN: Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    <!-- END: Custom CSS-->
+
+{% endblock style %}
+{% block content %}
+
+
+    <!-- BEGIN: Content-->
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper container-xxl p-0">
+            <div class="content-header row">
+            </div>
+            <div class="content-body">
+                <!-- users list start -->
+                <section class="app-user-list">
+                    <div class="row">
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="card">
+                                <div class="card-body d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h3 class="fw-bolder mb-75">{{all_user}}</h3>
+                                        <span>Total Users</span>
+                                    </div>
+                                    <div class="avatar bg-light-primary p-50">
+                                        <span class="avatar-content">
+                                            <i data-feather="user" class="font-medium-4"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="card">
+                                <div class="card-body d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h3 class="fw-bolder mb-75">{{landload}}</h3>
+                                        <span>Total Landload</span>
+                                    </div>
+                                    <div class="avatar bg-light-danger p-50">
+                                        <span class="avatar-content">
+                                            <i data-feather="user-plus" class="font-medium-4"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="card">
+                                <div class="card-body d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h3 class="fw-bolder mb-75">{{landload_request}}</h3>
+                                        <span>Landload Request</span>
+                                    </div>
+                                    <div class="avatar bg-light-success p-50">
+                                        <span class="avatar-content">
+                                            <i data-feather="user-check" class="font-medium-4"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="card">
+                                <div class="card-body d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h3 class="fw-bolder mb-75">{{tenet}}</h3>
+                                        <span>Tenent</span>
+                                    </div>
+                                    <div class="avatar bg-light-warning p-50">
+                                        <span class="avatar-content">
+                                            <i data-feather="user-x" class="font-medium-4"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- list and filter start -->
+                    <div class="card">
+                        <div class="card-body border-bottom">
+                            <h4 class="card-title">Search & Filter</h4>
+
+                            <div class="row">
+                                <div class="col-md-4 user_role">
+                                  <form id="search001" method="get" >
+                                  <select class="form-select" name="search" aria-label="Default select example">
+                                    <option value="watting">Watting</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">rejected</option>
+                                    <option selected> All</option>
+                                  </select>
+                                  <!-- <button class="btn btn-primary w-80 waves-effect waves-float waves-light" >Search</button> -->
+
+                                </form>
+                                </div>
+                                <div class="col-md-4 user_plan">
+                                  <button id="searchbtn001" class="btn btn-primary w-80 waves-effect waves-float waves-light" >Filter</button>
+                                </div>
+                                <div class="col-md-4 user_status"></div>
+                            </div>
+                        </div>
+                        <div class="card-datatable table-responsive pt-0">
+                            <table class="user-list-table table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sn.</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in data %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td><a href="{% url 'customadmin:payment_token' pk=i.id %}">{{i.first_name}}</a></td>
+                                        <td>{{i.last_name}}</td>
+                                        <td>{{i.email}}</td>
+                                        <td>{{i.status}}</td>
+                                        <td>
+                                          {% if i.status == 'rejected' %}
+                                            <button class="btn btn-primary w-60 waves-effect waves-float waves-light" onclick="approved('{{ i.id }}','{{ i.first_name }}')">Approve</button>
+                                          {% elif i.status == 'approved' %}
+                                            <button class="btn btn-warning w-60 waves-effect waves-float waves-light" onclick="rejected_landload('{{ i.id }}','{{ i.first_name }}')">Reject</button>
+                                          {% else %}
+                                          <button class="btn btn-primary w-60 waves-effect waves-float waves-light" onclick="approved('{{ i.id }}','{{ i.first_name }}')">Approve</button>
+                                          <button class="btn btn-warning w-60 waves-effect waves-float waves-light" onclick="rejected_landload('{{ i.id }}','{{ i.first_name }}')">Reject</button>
+                                          {% endif %}
+                                            <!-- <button onclick="deletelandload('{{ i.id }}','{{ i.first_name }}')">Delete</button> -->
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Modal to add new user starts-->
+                        <div class="modal modal-slide-in new-user-modal fade" id="modals-slide-in">
+                            <div class="modal-dialog">
+                                <form class="add-new-user modal-content pt-0">
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
+                                    <div class="modal-header mb-1">
+                                        <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+                                    </div>
+                                    <div class="modal-body flex-grow-1">
+                                        <div class="mb-1">
+                                            <label class="form-label" for="basic-icon-default-fullname">Full Name</label>
+                                            <input type="text" class="form-control dt-full-name" id="basic-icon-default-fullname" placeholder="John Doe" name="user-fullname" />
+                                        </div>
+                                        <div class="mb-1">
+                                            <label class="form-label" for="basic-icon-default-uname">Username</label>
+                                            <input type="text" id="basic-icon-default-uname" class="form-control dt-uname" placeholder="Web Developer" name="user-name" />
+                                        </div>
+                                        <div class="mb-1">
+                                            <label class="form-label" for="basic-icon-default-email">Email</label>
+                                            <input type="text" id="basic-icon-default-email" class="form-control dt-email" placeholder="john.doe@example.com" name="user-email" />
+                                        </div>
+                                        <div class="mb-1">
+                                            <label class="form-label" for="basic-icon-default-contact">Contact</label>
+                                            <input type="text" id="basic-icon-default-contact" class="form-control dt-contact" placeholder="+1 (609) 933-44-22" name="user-contact" />
+                                        </div>
+                                        <div class="mb-1">
+                                            <label class="form-label" for="basic-icon-default-company">Company</label>
+                                            <input type="text" id="basic-icon-default-company" class="form-control dt-contact" placeholder="PIXINVENT" name="user-company" />
+                                        </div>
+                                        <div class="mb-1">
+                                            <label class="form-label" for="country">Country</label>
+                                            <select id="country" class="select2 form-select">
+                                                <option value="Australia">USA</option>
+                                                <option value="Bangladesh">Bangladesh</option>
+                                                <option value="Belarus">Belarus</option>
+                                                <option value="Brazil">Brazil</option>
+                                                <option value="Canada">Canada</option>
+                                                <option value="China">China</option>
+                                                <option value="France">France</option>
+                                                <option value="Germany">Germany</option>
+                                                <option value="India">India</option>
+                                                <option value="Indonesia">Indonesia</option>
+                                                <option value="Israel">Israel</option>
+                                                <option value="Italy">Italy</option>
+                                                <option value="Japan">Japan</option>
+                                                <option value="Korea">Korea, Republic of</option>
+                                                <option value="Mexico">Mexico</option>
+                                                <option value="Philippines">Philippines</option>
+                                                <option value="Russia">Russian Federation</option>
+                                                <option value="South Africa">South Africa</option>
+                                                <option value="Thailand">Thailand</option>
+                                                <option value="Turkey">Turkey</option>
+                                                <option value="Ukraine">Ukraine</option>
+                                                <option value="United Arab Emirates">United Arab Emirates</option>
+                                                <option value="United Kingdom">United Kingdom</option>
+                                                <option value="United States">United States</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-1">
+                                            <label class="form-label" for="user-role">User Role</label>
+                                            <select id="user-role" class="select2 form-select">
+                                                <option value="subscriber">Subscriber</option>
+                                                <option value="editor">Editor</option>
+                                                <option value="maintainer">Maintainer</option>
+                                                <option value="author">Author</option>
+                                                <option value="admin">Admin</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label" for="user-plan">Select Plan</label>
+                                            <select id="user-plan" class="select2 form-select">
+                                                <option value="basic">Basic</option>
+                                                <option value="enterprise">Enterprise</option>
+                                                <option value="company">Company</option>
+                                                <option value="team">Team</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary me-1 data-submit">Submit</button>
+                                        <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Modal to add new user Ends-->
+                    </div>
+                    <!-- list and filter end -->
+                </section>
+                <!-- users list ends -->
+
+            </div>
+        </div>
+{% endblock content %}
+{% block scriptjs %}
+
+    <!-- BEGIN: Footer-->
+    <!-- <footer class="footer footer-static footer-light">
+        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">COPYRIGHT &copy; 2021<a class="ms-25" href="https://1.envato.market/pixinvent_portfolio" target="_blank">Pixinvent</a><span class="d-none d-sm-inline-block">, All rights Reserved</span></span><span class="float-md-end d-none d-md-block">Hand-crafted & Made with<i data-feather="heart"></i></span></p>
+    </footer> -->
+    <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
+    <!-- END: Footer-->
+
+
+    <!-- BEGIN: Page Vendor JS-->
+    <script src="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/responsive.bootstrap5.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/datatables.buttons.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/jszip.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/pdfmake.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/vfs_fonts.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/buttons.print.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.rowGroup.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/forms/cleave/cleave.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js' %}"></script>
+    <!-- END: Page Vendor JS-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- BEGIN: Theme JS-->
+    <script src="{% static 'app-assets/js/core/app-menu.js' %}"></script>
+    <script src="{% static 'app-assets/js/core/app.js' %}"></script>
+    <!-- END: Theme JS-->
+
+    <!-- BEGIN: Page JS-->
+    <!-- <script src="{% static 'app-assets/js/scripts/pages/app-user-list.js' %}"></script> -->
+    <!-- END: Page JS-->
+
+<!-- END: Body-->
+<script>
+  document.getElementById('searchbtn001').addEventListener('click', function() {
+      document.getElementById('search001').submit();
+  });
+</script>
+<script>
+    function approved(id,name) {
+    var id =id
+    var approveLandloadUrl= "{% url 'customadmin:approve_landload' pk=0 %}".replace('0', id);
+  Swal.fire({
+
+      title: "Are you sure?",
+      text: "You want to approve "+name,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Approved"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var pk=id
+        // If user confirms, make AJAX request to delete endpoint
+        // Replace 'delete-url' with the actual URL to delete the item
+        fetch(approveLandloadUrl, {  // Use template literal
+          method: 'get',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Handle success response
+          Swal.fire({
+            title: "Approved!",
+            text: "Landload has been Approved.",
+            icon: "success"
+          }).then(() => {
+                    // Reload the page after showing the alert
+                    location.reload();
+                });
+        })
+        .catch(error => {
+          // Handle error
+          console.error('Error Approved Landload:', error);
+          Swal.fire({
+            title: "Error",
+            text: "Failed to Approved the Landload.",
+            icon: "error"
+          });
+        });
+      }
+    });
+}
+
+function rejected_landload(id,name) {
+    var id =id
+    var rejectedLandloadUrl= "{% url 'customadmin:reject_landload' pk=0 %}".replace('0', id);
+
+  Swal.fire({
+
+      title: "Are you sure?",
+      text: "You want to reject "+name,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "rejected"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var pk=id
+        // If user confirms, make AJAX request to delete endpoint
+        // Replace 'delete-url' with the actual URL to delete the item
+        fetch(rejectedLandloadUrl, {  // Use template literal
+          method: 'get',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Handle success response
+          Swal.fire({
+            title: "rejected!",
+            text: "Landload has been rejected.",
+            icon: "success"
+          }).then(() => {
+                    // Reload the page after showing the alert
+                    location.reload();
+                });
+        })
+        .catch(error => {
+          // Handle error
+          console.error('Error rejected Landload:', error);
+          Swal.fire({
+            title: "Error",
+            text: "Failed to rejected the Landload.",
+            icon: "error"
+          });
+        });
+      }
+    });
+}
+
+    /*=========================================================================================
+    File Name: app-user-list.js
+    Description: User List page
+    --------------------------------------------------------------------------------------
+    Item Name: Vuexy  - Vuejs, HTML & Laravel Admin Dashboard Template
+    Author: PIXINVENT
+    Author URL: http://www.themeforest.net/user/pixinvent
+
+==========================================================================================*/
+$(function () {
+  ('use strict');
+
+  var dtUserTable = $('.user-list-table'),
+    newUserSidebar = $('.new-user-modal'),
+    newUserForm = $('.add-new-user'),
+    select = $('.select2'),
+    dtContact = $('.dt-contact'),
+    statusObj = {
+      1: { title: 'Pending', class: 'badge-light-warning' },
+      2: { title: 'Active', class: 'badge-light-success' },
+      3: { title: 'Inactive', class: 'badge-light-secondary' }
+    };
+
+  var assetPath = "{% static 'app-assets/' %}",
+    userView = 'app-user-view-account.html';
+
+  if ($('body').attr('data-framework') === 'laravel') {
+    assetPath = $('body').attr('data-asset-path');
+    userView = assetPath + 'app/user/view/account';
+  }
+
+  select.each(function () {
+    var $this = $(this);
+    $this.wrap('<div class="position-relative"></div>');
+    $this.select2({
+      // the following code is used to disable x-scrollbar when click in select input and
+      // take 100% width in responsive also
+      dropdownAutoWidth: true,
+      width: '100%',
+      dropdownParent: $this.parent()
+    });
+  });
+
+  // Users List datatable
+  
+  // Form Validation
+  if (newUserForm.length) {
+    newUserForm.validate({
+      errorClass: 'error',
+      rules: {
+        'user-fullname': {
+          required: true
+        },
+        'user-name': {
+          required: true
+        },
+        'user-email': {
+          required: true
+        }
+      }
+    });
+
+    newUserForm.on('submit', function (e) {
+      var isValid = newUserForm.valid();
+      e.preventDefault();
+      if (isValid) {
+        newUserSidebar.modal('hide');
+      }
+    });
+  }
+
+  // Phone Number
+  if (dtContact.length) {
+    dtContact.each(function () {
+      new Cleave($(this), {
+        phone: true,
+        phoneRegionCode: 'US'
+      });
+    });
+  }
+});
+</script>
+{% endblock scriptjs %}
+</html>

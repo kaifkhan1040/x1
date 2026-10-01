@@ -1,0 +1,185 @@
+{% extends 'landload/basic.html' %} 
+{% load static %}
+
+    {% block style %}
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css' %}">
+    <!-- END: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/pickers/form-flat-pickr.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/pages/app-user.css' %}">
+    {% endblock style %}
+</head>
+<!-- END: Head-->
+
+<!-- BEGIN: Body-->
+
+<body class="vertical-layout vertical-menu-modern  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="">
+    {% block content %}
+
+
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+  
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{% url 'landload:home' %}">Home</a></li>
+                    <li class="breadcrumb-item " aria-current="page"><a href="{% url 'landload:listing' %}">Listings</a></li>
+                    <li class="breadcrumb-item active">Rooms</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="row g-6 mb-6">
+                <!-- users edit start -->
+               
+                   <div class="col-md">
+                  <div class="card">
+                                
+                                <!-- Account Tab starts -->
+                                <div class="card-header border-bottom">
+                                    <h4 class="card-title">Room</h4>
+                                </div>
+                                <div class="card-body py-2 my-25">
+                                    
+                                        <!-- upload and reset button -->
+                                    <form class="form-validate" method="POST" enctype="multipart/form-data">
+                                  
+                                        <div class="tab-pane active" id="account" aria-labelledby="account-tab" role="tabpanel" class="mb-2">
+                                            {% csrf_token %}
+                                            
+                                            {% for room in rooms %}
+                                           <input type="hidden" name="room_id" value="{{ room.id }}">
+                                            
+                                            <div class="row mb-2">
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        {% comment %} <label for="username"></label> {% endcomment %}
+                                                        {% comment %} <h4 class="mt-2">Room {{forloop.counter}}</h4> {% endcomment %}
+                                                        <label class="form-label d-block ">Room {{ forloop.counter }}</label>
+                                                        <input type="text" class="form-control"  value="{{ room.room_count }}" readonly >
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="form-label d-block " for="username">Room Type</label>
+                                                        <select name="type_of_room" class="form-select">
+                                                            <option value="Single" {% if room.type_of_room == "Single" %}selected{% endif %}>Single</option>
+                                                            <option value="Double" {% if room.type_of_room == "Double" %}selected{% endif %}>Double</option>
+                                                            <option value="Triple" {% if room.type_of_room == "Triple" %}selected{% endif %}>Triple</option>
+                                                            <option value="Studio" {% if room.type_of_room == "Studio" %}selected{% endif %}>Studio</option>
+                                                        </select>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="form-label d-block " for="username">Ensuite</label>
+                                                       <select name="ensuite" class="form-select">
+                                                            <option value="Yes" {% if room.ensuite == "Yes" %}selected{% endif %}>Yes</option>
+                                                            <option value="No" {% if room.ensuite == "No" %}selected{% endif %}>No</option>
+                                                        </select>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="form-label d-block " for="username">Max Capacity</label>
+                                                        <select name="total_capacity" class="form-select">
+                                                            {% for n in "12345" %}
+                                                            <option value="{{ n }}" {% if room.total_capacity == n %}selected{% endif %}>{{ n }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                           
+                                           
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="form-label d-block " for="username">Rent</label>
+                                                        <select name="rent" class="form-select">
+                                                            <option value="Per night" {% if room.rent == "Per night" %}selected{% endif %}>Per night</option>
+                                                            <option value="Weekly" {% if room.rent == "Weekly" %}selected{% endif %}>Weekly</option>
+                                                            <option value="Monthly" {% if room.rent == "Monthly" %}selected{% endif %}>Monthly</option>
+                                                        </select>
+                                                    </div>      
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="form-label d-block" for="username">Rent Amount {{symbol}}</label>
+                                                        <input type='number' required class="form-control" {% if room.rent_ammount %}value={{room.rent_ammount}} {% endif %} name='rent_ammount'>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                               
+                                                
+                                
+                                            
+                                             {% endfor %}
+                                                
+                                        </div>
+                                        <div class="col-12 d-flex flex-sm-row flex-column mt-2">
+                                            <button type="submit" class="btn btn-primary mb-1 mb-sm-0 mr-0 mr-sm-1 me-1">Save Changes</button>
+                                            <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                                        </div>
+                                        
+                                    </form>
+                                    
+                                </div>
+
+                       
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                <!-- users edit ends -->
+
+           
+        </div>
+    <!-- END: Content-->
+    {% endblock content %}
+    <div class="sidenav-overlay"></div>
+    <div class="drag-target"></div>
+    <script>
+        console.log('hello')
+    </script>
+
+    <!-- BEGIN Vendor JS-->
+    {% block scriptjs %}
+        
+       <!-- BEGIN: Page Vendor JS-->
+       <script href="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+       <script href="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+       <script href="{% static 'app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js' %}"></script>
+       <!-- END: Page Vendor JS-->
+   
+   
+       <!-- BEGIN: Page JS-->
+       <script href="{% static 'app-assets/js/scripts/pages/app-user-edit.js' %}"></script>
+       <script href="{% static 'app-assets/js/scripts/components/components-navs.js' %}"></script>
+       <script>
+        console.log('aaaaaa');
+        
+        </script>
+       <!-- END: Page JS-->
+    {% endblock scriptjs %}
+ 
+
+    <script>
+        $(window).on('load', function() {
+            if (feather) {
+                feather.replace({
+                    width: 14,
+                    height: 14
+                });
+            }
+        })
+    </script>
+</body>
+<!-- END: Body-->
+
+</html>

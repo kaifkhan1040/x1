@@ -1,0 +1,353 @@
+{% extends 'landload/basic.html' %} 
+{% load static %}
+{% block style %}
+
+
+    <!-- BEGIN: Vendor CSS-->
+     {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/jquery.dataTables.min.css' %}"> {% endcomment %}
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/responsive.bootstrap5.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/rowGroup.bootstrap5.min.css' %}">
+    <!-- END: Vendor CSS-->
+    {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/core/menu/menu-types/vertical-menu.css' %}"> {% endcomment %}
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+    <!-- END: Page CSS-->
+
+    <!-- BEGIN: Custom CSS-->
+    {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}"> {% endcomment %}
+    <!-- END: Custom CSS-->
+
+
+{% endblock style %}
+{% block content %}
+
+
+    <!-- BEGIN: Content-->
+        <div class="container-xxl flex-grow-1 container-p-y">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+  
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="{% url 'landload:home' %}">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Listings</li>
+        </ol>
+      </nav>
+    </div>
+             <div class="card">
+                <div class="card-datatable table-responsive pt-0">
+                  <table class="datatables-basic table">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Sr</th>
+                        <th>id</th>
+                        <th>Name</th>
+                        <th>Profit</th>
+                        <th>Dues</th>
+                        <th>Loss</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+           
+        </div>
+{% endblock content %}
+{% block scriptjs %}
+
+
+
+
+    <!-- BEGIN: Page Vendor JS-->
+    {% comment %} <script src="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/responsive.bootstrap5.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/datatables.checkboxes.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/datatables.buttons.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/jszip.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/pdfmake.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/vfs_fonts.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/buttons.print.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.rowGroup.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/forms/cleave/cleave.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js' %}"></script> {% endcomment %}
+
+     {% comment %} <script src="{% static 'v2/assets/vendor/libs/jquery/jquery.js' %}"></script>
+
+    <script src="{% static 'v2/assets/vendor/libs/popper/popper.js' %}"></script>
+    <script src="{% static 'v2/assets/vendor/js/bootstrap.js' %}"></script>
+    <script src="{% static 'v2/assets/vendor/libs/node-waves/node-waves.js' %}"></script> {% endcomment %}
+
+    <script src="{% static 'v2/assets/vendor/libs/@algolia/autocomplete-js.js' %}"></script>
+
+    <script src="{% static 'v2/assets/vendor/libs/pickr/pickr.js' %}"></script>
+
+    <script src="{% static 'v2/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+
+    <script src="{% static 'v2/assets/vendor/libs/hammer/hammer.js' %}"></script>
+
+    {% comment %} <script src="{% static 'v2/assets/vendor/libs/i18n/i18n.js' %}"></script> {% endcomment %}
+
+    {% comment %} <script src="{% static 'v2/assets/vendor/js/menu.js' %}"></script> {% endcomment %}
+
+    <!-- endbuild -->
+
+    <!-- Vendors JS -->
+    <script src="{% static 'v2/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+    <!-- Flat Picker -->
+    <script src="{% static 'v2/assets/vendor/libs/moment/moment.js' %}"></script>
+    <script src="{% static 'v2/assets/vendor/libs/flatpickr/flatpickr.js' %}"></script>
+    <!-- Form Validation -->
+    <script src="{% static 'v2/assets/vendor/libs/@form-validation/popular.js' %}"></script>
+    <script src="{% static 'v2/assets/vendor/libs/@form-validation/bootstrap5.js' %}"></script>
+    <script src="{% static 'v2/assets/vendor/libs/@form-validation/auto-focus.js' %}"></script>
+
+    <!-- Main JS -->
+
+    {% comment %} <script src="{% static 'v2/assets/js/main.js' %}"></script> {% endcomment %}
+
+    {% comment %} <script src="{% static 'app-assets/js/scripts/tables/listing-datatables.js' %}"></script> {% endcomment %}
+         <script src="{% static 'v2/assets/js/listing_datatables.js' %}"></script>
+
+    <!-- END: Page Vendor JS-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- BEGIN: Theme JS-->
+    <!-- <script src="{% static 'app-assets/js/core/app-menu.js' %}"></script>
+    <script src="{% static 'app-assets/js/core/app.js' %}"></script> -->
+    <!-- END: Theme JS-->
+
+    <!-- BEGIN: Page JS-->
+    <!-- <script src="{% static 'app-assets/js/scripts/pages/app-user-list.js' %}"></script> -->
+    <!-- END: Page JS-->
+
+<!-- END: Body-->
+<!-- <script>
+  document.getElementById('searchbtn001').addEventListener('click', function() {
+      document.getElementById('search001').submit();
+  });
+</script> -->
+
+<script>
+    function deactivate(id,name) {
+    var id =id
+    var approveLandloadUrl='/landload/deactivate_property/'+id
+  Swal.fire({
+
+      title: "Are you sure?",
+      text: "You want to approve "+name,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Approved"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var pk=id
+        // If user confirms, make AJAX request to delete endpoint
+        // Replace 'delete-url' with the actual URL to delete the item
+        fetch(approveLandloadUrl, {  // Use template literal
+          method: 'get',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Handle success response
+          Swal.fire({
+            title: "Approved!",
+            text: "Landload has been Approved.",
+            icon: "success"
+          }).then(() => {
+                    // Reload the page after showing the alert
+                    location.reload();
+                });
+        })
+        .catch(error => {
+          // Handle error
+          console.error('Error Approved Landload:', error);
+          Swal.fire({
+            title: "Error",
+            text: "Failed to Approved the Landload.",
+            icon: "error"
+          });
+        });
+      }
+    });
+}
+
+function rejected_landload(id,name) {
+    var id =id
+    var rejectedLandloadUrl='/landload/reject_landload/'+id
+  Swal.fire({
+
+      title: "Are you sure?",
+      text: "You want to reject "+name,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "rejected"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var pk=id
+        // If user confirms, make AJAX request to delete endpoint
+        // Replace 'delete-url' with the actual URL to delete the item
+        fetch(rejectedLandloadUrl, {  // Use template literal
+          method: 'get',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Handle success response
+          Swal.fire({
+            title: "rejected!",
+            text: "Landload has been rejected.",
+            icon: "success"
+          }).then(() => {
+                    // Reload the page after showing the alert
+                    location.reload();
+                });
+        })
+        .catch(error => {
+          // Handle error
+          console.error('Error rejected Landload:', error);
+          Swal.fire({
+            title: "Error",
+            text: "Failed to rejected the Landload.",
+            icon: "error"
+          });
+        });
+      }
+    });
+}
+
+    /*=========================================================================================
+    File Name: app-user-list.js
+    Description: User List page
+    --------------------------------------------------------------------------------------
+    Item Name: Vuexy  - Vuejs, HTML & Laravel Admin Dashboard Template
+    Author: PIXINVENT
+    Author URL: http://www.themeforest.net/user/pixinvent
+
+==========================================================================================*/
+$(function () {
+  ('use strict');
+
+  var dtUserTable = $('.user-list-table'),
+    newUserSidebar = $('.new-user-modal'),
+    newUserForm = $('.add-new-user'),
+    select = $('.select2'),
+    dtContact = $('.dt-contact'),
+    statusObj = {
+      1: { title: 'Pending', class: 'badge-light-warning' },
+      2: { title: 'Active', class: 'badge-light-success' },
+      3: { title: 'Inactive', class: 'badge-light-secondary' }
+    };
+
+  var assetPath = "{% static 'app-assets/' %}",
+    userView = 'app-user-view-account.html';
+
+  if ($('body').attr('data-framework') === 'laravel') {
+    assetPath = $('body').attr('data-asset-path');
+    userView = assetPath + 'app/user/view/account';
+  }
+
+  select.each(function () {
+    var $this = $(this);
+    $this.wrap('<div class="position-relative"></div>');
+    $this.select2({
+      // the following code is used to disable x-scrollbar when click in select input and
+      // take 100% width in responsive also
+      dropdownAutoWidth: true,
+      width: '100%',
+      dropdownParent: $this.parent()
+    });
+  });
+
+  // Users List datatable
+  
+  // Form Validation
+  if (newUserForm.length) {
+    newUserForm.validate({
+      errorClass: 'error',
+      rules: {
+        'user-fullname': {
+          required: true
+        },
+        'user-name': {
+          required: true
+        },
+        'user-email': {
+          required: true
+        }
+      }
+    });
+
+    newUserForm.on('submit', function (e) {
+      var isValid = newUserForm.valid();
+      e.preventDefault();
+      if (isValid) {
+        newUserSidebar.modal('hide');
+      }
+    });
+  }
+
+  // Phone Number
+  if (dtContact.length) {
+    dtContact.each(function () {
+      new Cleave($(this), {
+        phone: true,
+        phoneRegionCode: 'US'
+      });
+    });
+  }
+});
+</script>
+{% comment %} <script>
+document.getElementById('searchInput').addEventListener('input', function () {
+  const query = this.value.trim();
+
+  fetch(`/landload/listing?q=${encodeURIComponent(query)}`, {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => response.text())
+  .then(html => {
+    // Extract only the <tbody> content from the response
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const newTbody = tempDiv.querySelector('#dues-body');
+    if (newTbody) {
+      document.getElementById('dues-body').innerHTML = newTbody.innerHTML;
+    }
+  });
+});
+</script> {% endcomment %}
+
+
+{% endblock scriptjs %}
+</html>

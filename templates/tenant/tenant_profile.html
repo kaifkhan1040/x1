@@ -1,0 +1,387 @@
+{% extends 'tenant/basic.html' %} 
+{% load static %}
+
+    {% block style %}
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css' %}">
+    <!-- END: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/pickers/form-flat-pickr.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/pages/app-user.css' %}">
+    {% endblock style %}
+
+<!-- END: Head-->
+
+<!-- BEGIN: Body-->
+
+<body class="vertical-layout vertical-menu-modern  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="">
+    {% block content %}
+
+
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper container-xxl p-0">
+            <div class="content-header row">
+            </div>
+            <div class="content-body">
+                <!-- users edit start -->
+                <section class="app-user-edit">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h4 class="card-title">Tenant</h4>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3">
+                                        {% if more_fun %}
+                                        <a href="{% url 'landload:tenant_update' id=tenant_id %}"><button class="btn btn-primary w-80 waves-effect waves-float waves-light" >Edit</button></a>
+                                        
+                                        <a href="#"><button class="btn btn-danger w-80 waves-effect waves-float waves-light" onclick="deactivate('{{ tenant_id }}')">Deactivate</button></a>
+                                        {% endif %}
+                                    </div>
+                               
+                                <div class="card-body py-2 my-25">
+                                    
+                                        <!-- upload and reset button -->
+                                    <form class="form-validate" method="POST" enctype="multipart/form-data">
+                                   
+                                        <div class="tab-pane active" id="account" aria-labelledby="account-tab" role="tabpanel">
+                                            {% csrf_token %}
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="username">First Name</label>
+                                                        <input type="text" name="first_name" id="first_name" class="form-control" value="{{tenant_obj.user.first_name}}" {% if tenant_obj.user.first_name%}readonly disable{% endif %} {% if more_fun %} readonly disable {% endif %} required>
+                                                            
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="username">Middle Name</label>
+                                                        <input type="text" name="middle_name" id="middle_name" {% if tenant_obj.user.middle_name %} value="{{tenant_obj.user.middle_name}}"  {% endif %}  {% if more_fun %} readonly disable {% endif %} class="form-control" {% if tenant_obj.user.middle_name %}readonly disable{% endif %} >
+                                                        
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="username">Last name</label>
+                                                        <input type="text" name="last_name" id="last_name" value="{{tenant_obj.user.last_name}}" {% if more_fun %} readonly disable {% endif %} class="form-control" {% if tenant_obj.user.last_name %}readonly disable{% endif %}  >
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="username">Phone Number</label>
+                                                        <input type="text" name="phone_number" id="last_name" class="form-control" value="{{tenant_obj.user.phone_number}}" {% if more_fun %} readonly disable {% endif %} required {% if tenant_obj.user.phone_number %}readonly disable{% endif %} >
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="username">Email</label>
+                                                        <input type="email" name="email" id="email" class="form-control" value="{{tenant_obj.user.email}}" {% if more_fun %} readonly disable {% endif %} required {% if tenant_obj.user.email %}readonly disable{% endif %} >
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="username">Property</label>
+                                                        <select name="property" id="property_id" class="form-control" {% if more_fun %} readonly disable {% endif %} required {% if tenant_obj.property %}readonly disable{% endif %} >
+                                                            <option >select property</option>
+                                                            {% for u in property %}
+                                                                <option value="{{ u.id }}" {% if u.id == tenant_obj.property.id %}selected{% endif %}>
+                                                                    {{ u.short_name }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        {% comment %} {{form.property}} {% endcomment %}
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="username">Room</label>
+                                                        <select name="room" id="Room_id" class="form-control" {% if more_fun %} readonly disable {% endif %} required {% if tenant_obj.room %}readonly disable{% endif %} >
+                                                            {% for u in room %}
+                                                                <option value="{{ u.id }}" {% if u.id == tenant_obj.room.id %}selected{% endif %}>
+                                                                    {{ u.room_code }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        {% comment %} {{form.room}} {% endcomment %}
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="username">Rent</label>
+                                                               <input type="number" name="rent" id="id_rent" class="form-control" value="{{ form.initial.rent }}" {% if form.initial.rent %}readonly{% endif %} required {% if tenant_obj.rent %}readonly disable{% endif %} >
+
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="username">Deposite</label>
+                                                            <input type="number" name="deposit" id="id_deposit" class="form-control" value="{{ form.initial.deposit }}" {% if form.initial.deposit %}readonly{% endif %} required {% if tenant_obj.deposit %}readonly disable{% endif %} >
+                                                            
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        
+                                                            <label for="password" class="form-label">Password</label>
+                                                            <input type="password" name="password1" class="form-control" id="password" required>
+                                                       
+                                                       
+                                                           
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                         <label for="password" class="form-label">Confirm Password</label>
+                                                            <input type="password" name="password2" class="form-control" id="password" required>
+                                                       
+                                                        
+                                                    </div>
+                                                </div>
+                                               
+                                            </div>
+                                                <div class="row mt-2">
+                                                    <h3>Upload Docs</h3>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="username">Photo</label>
+                                                            {% if form.instance.photo %}
+                                                                <p>Current file: 
+                                                                    <a href="{{ form.instance.photo.url }}" target="_blank">View Uploaded ID Proof</a>
+                                                                </p>
+                                                            {% endif %}
+                                                            <input type="file" name="photo" id="id_photo" class="form-control" {% if tenant_obj.photo %} disabled{% endif %}>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                     <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="username">Id Proof</label>
+                                                            {% if form.instance.id_proof %}
+                                                                <p>Current file: 
+                                                                    <a href="{{ form.instance.id_proof.url }}" target="_blank">View Uploaded ID Proof</a>
+                                                                </p>
+                                                            {% endif %}
+                                                            <input type="file" name="id_proof" id="id_photo" class="form-control" {% if tenant_obj.id_proof %}readonly disable{% endif %}>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                     <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="username">Address Proof</label>
+                                                            {% if form.instance.address_proof %}
+                                                                <p>Current file: 
+                                                                    <a href="{{ form.instance.address_proof.url }}" target="_blank">View Uploaded ID Proof</a>
+                                                                </p>
+                                                            {% endif %}
+                                                            <input type="file" name="address_proof" id="id_address_proof" class="form-control" {% if tenant_obj.address_proof %}readonly disable{% endif %}>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            <div class="row mt-2 ">
+                                                   
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="username">Visa Copy</label>
+                                                            {% if form.instance.visa_proof %}
+                                                                <p>Current file: 
+                                                                    <a href="{{ form.instance.visa_proof.url }}" target="_blank">View Uploaded ID Proof</a>
+                                                                </p>
+                                                            {% endif %}
+                                                            <input type="file" name="visa_proof" id="id_visa_proof" class="form-control" {% if tenant_obj.visa_proof %}readonly disable{% endif %}>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                     <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="username">Bank Statement</label>
+                                                            {% if form.instance.bank_statement %}
+                                                                <p>Current file: 
+                                                                    <a href="{{ form.instance.bank_statement.url }}" target="_blank">View Uploaded ID Proof</a>
+                                                                </p>
+                                                            {% endif %}
+                                                            <input type="file" name="bank_statement" id="id_bank_statement" class="form-control" {% if tenant_obj.bank_statement %}readonly disable{% endif %}>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <div class="col-12 d-flex flex-sm-row flex-column mt-2">
+                                                <button type="submit" class="btn btn-primary mb-1 mb-sm-0 mr-0 mr-sm-1 me-1"  {% if more_fun %} disabled  readonly {% endif %} >Save Changes</button>
+                                                <button type="reset" class="btn btn-outline-secondary"  {% if more_fun %} disabled  readonly {% endif %} >Reset</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- users edit ends -->
+
+            </div>
+        </div>
+    <!-- END: Content-->
+    {% endblock content %}
+    <div class="sidenav-overlay"></div>
+    <div class="drag-target"></div>
+    <script>
+        
+
+    </script>
+
+    <!-- BEGIN Vendor JS-->
+    {% block scriptjs %}
+        
+       <!-- BEGIN: Page Vendor JS-->
+       <script href="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+       <script href="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+       <script href="{% static 'app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js' %}"></script>
+       <!-- END: Page Vendor JS-->
+   
+   
+       <!-- BEGIN: Page JS-->
+       <script href="{% static 'app-assets/js/scripts/pages/app-user-edit.js' %}"></script>
+       <script href="{% static 'app-assets/js/scripts/components/components-navs.js' %}"></script>
+       <script>
+        console.log('aaaaaa');
+        
+        </script>
+        <script>
+            $(document).ready(function () {
+    function loadRooms(propertyId, savedRoomId = null) {
+        $.ajax({
+            url: '{% url "landload:get_room" %}',
+            type: 'GET',
+            data: {
+                category_id: propertyId
+            },
+            success: function (response) {
+                let make = '<option value="">Select Room</option>';
+                response.existing_rooms.forEach(function (sub) {
+                    let selected = (savedRoomId && sub.id === savedRoomId) ? 'selected' : '';
+                    make += `<option value="${sub.id}" ${selected}>${sub.room_code}</option>`;
+                });
+                $('#Room_id').html(make);
+            }
+        });
+    }
+
+    const savedPropertyId = '{{ saved_property_id|default:"" }}';
+    const savedRoomId = {{ saved_model_id|default:"null" }};
+
+    // On change of property, load associated rooms
+    $('#property_id').change(function () {
+        const selectedProperty = $(this).val();
+        if (selectedProperty) {
+            loadRooms(selectedProperty);
+        } else {
+            $('#Room_id').html('<option value="">Select Room</option>');
+        }
+    });
+
+    // If editing existing form (update mode), trigger room load
+    {% if saved_model_id and saved_property_id %}
+    loadRooms(savedPropertyId, savedRoomId);
+    {% endif %}
+});
+
+             function deactivate(property_id) {
+                    var id =property_id
+                    var approveLandloadUrl='/landload/deactivate_tenant/'+property_id;
+                    console.log('%%%%%%%%%%%%%%%%%%%%%%',approveLandloadUrl)
+                    Swal.fire({
+
+                    title: "Are you sure?",
+                    text: "You want to deactivate tenant ",
+                    icon: "delete",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Deactivate"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        var pk=id
+                        // If user confirms, make AJAX request to delete endpoint
+                        // Replace 'delete-url' with the actual URL to delete the item
+                        fetch(approveLandloadUrl, {  // Use template literal
+                        method: 'get',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                        })
+                        .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                        })
+                        .then(data => {
+                        // Handle success response
+                        Swal.fire({
+                            title: "Deactivated!",
+                            text: "Tenant has been deactivated.",
+                            icon: "success"
+                        }).then(() => {
+                                    // Reload the page after showing the alert
+                                    window.location.href ="{% url 'landload:tenant' %}"
+                                });
+                        })
+                        .catch(error => {
+                        // Handle error
+                        console.error('Error tenant deactivation:', error);
+                        Swal.fire({
+                            title: "Error",
+                            text: "Failed to deactivate the tenant.",
+                            icon: "error"
+                        });
+                        });
+                    }
+                    });
+                }
+
+        </script>
+       <!-- END: Page JS-->
+    {% endblock scriptjs %}
+ 
+
+    <script>
+        $(window).on('load', function() {
+            if (feather) {
+                feather.replace({
+                    width: 14,
+                    height: 14
+                });
+            }
+        })
+    </script>
+</body>
+<!-- END: Body-->
+
+</html>

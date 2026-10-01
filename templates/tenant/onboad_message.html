@@ -1,0 +1,206 @@
+{% extends 'tenant/basic.html' %} 
+{% load static %}
+
+    {% block style %}
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css' %}">
+    <!-- END: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/pickers/form-flat-pickr.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/pages/app-user.css' %}">
+    {% endblock style %}
+
+<!-- END: Head-->
+
+<!-- BEGIN: Body-->
+
+<body class="vertical-layout vertical-menu-modern  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="">
+    {% block content %}
+
+
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper container-xxl p-0">
+            <div class="content-header row">
+            </div>
+            <div class="content-body">
+                <!-- users edit start -->
+                <section class="app-user-edit">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h4 class="card-title">Tenant</h4>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-3">
+                                        
+                                    </div>
+                               
+                                <div class="card-body py-2 my-25">
+                                    
+                                        <!-- upload and reset button -->
+                                    <form class="form-validate" method="POST" enctype="multipart/form-data">
+                                   
+                                        <div class="tab-pane active" id="account" aria-labelledby="account-tab" role="tabpanel">
+                                            {% csrf_token %}
+                                            <div class="warning mt-4" role="alert">
+                                                <h5 class="mb-2">We haven’t received any tenancy offers for you yet.</h5>
+                                                <p>Please check with your property agent or landlord to confirm that they have your correct email address and have initiated your tenancy profile.</p>
+                                                <button class="btn btn-primary mt-2" onclick="location.reload();">
+                                                Received your invitation? Click to refresh
+                                                </button>
+                                            </div>
+                                          
+                                        </div>
+                                    </form>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- users edit ends -->
+
+            </div>
+        </div>
+    <!-- END: Content-->
+    {% endblock content %}
+    <div class="sidenav-overlay"></div>
+    <div class="drag-target"></div>
+    <script>
+        
+
+    </script>
+
+    <!-- BEGIN Vendor JS-->
+    {% block scriptjs %}
+        
+       <!-- BEGIN: Page Vendor JS-->
+       <script href="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+       <script href="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+       <script href="{% static 'app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js' %}"></script>
+       <!-- END: Page Vendor JS-->
+   
+   
+       <!-- BEGIN: Page JS-->
+       <script href="{% static 'app-assets/js/scripts/pages/app-user-edit.js' %}"></script>
+       <script href="{% static 'app-assets/js/scripts/components/components-navs.js' %}"></script>
+       <script>
+        console.log('aaaaaa');
+        
+        </script>
+        <script>
+            $(document).ready(function () {
+    function loadRooms(propertyId, savedRoomId = null) {
+        $.ajax({
+            url: '{% url "landload:get_room" %}',
+            type: 'GET',
+            data: {
+                category_id: propertyId
+            },
+            success: function (response) {
+                let make = '<option value="">Select Room</option>';
+                response.existing_rooms.forEach(function (sub) {
+                    let selected = (savedRoomId && sub.id === savedRoomId) ? 'selected' : '';
+                    make += `<option value="${sub.id}" ${selected}>${sub.room_code}</option>`;
+                });
+                $('#Room_id').html(make);
+            }
+        });
+    }
+
+    const savedPropertyId = '{{ saved_property_id|default:"" }}';
+    const savedRoomId = {{ saved_model_id|default:"null" }};
+
+    // On change of property, load associated rooms
+    $('#property_id').change(function () {
+        const selectedProperty = $(this).val();
+        if (selectedProperty) {
+            loadRooms(selectedProperty);
+        } else {
+            $('#Room_id').html('<option value="">Select Room</option>');
+        }
+    });
+
+    // If editing existing form (update mode), trigger room load
+    {% if saved_model_id and saved_property_id %}
+    loadRooms(savedPropertyId, savedRoomId);
+    {% endif %}
+});
+
+             function deactivate(property_id) {
+                    var id =property_id
+                    var approveLandloadUrl='/landload/deactivate_tenant/'+property_id;
+                    console.log('%%%%%%%%%%%%%%%%%%%%%%',approveLandloadUrl)
+                    Swal.fire({
+
+                    title: "Are you sure?",
+                    text: "You want to deactivate tenant ",
+                    icon: "delete",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Deactivate"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        var pk=id
+                        // If user confirms, make AJAX request to delete endpoint
+                        // Replace 'delete-url' with the actual URL to delete the item
+                        fetch(approveLandloadUrl, {  // Use template literal
+                        method: 'get',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                        })
+                        .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                        })
+                        .then(data => {
+                        // Handle success response
+                        Swal.fire({
+                            title: "Deactivated!",
+                            text: "Tenant has been deactivated.",
+                            icon: "success"
+                        }).then(() => {
+                                    // Reload the page after showing the alert
+                                    window.location.href ="{% url 'landload:tenant' %}"
+                                });
+                        })
+                        .catch(error => {
+                        // Handle error
+                        console.error('Error tenant deactivation:', error);
+                        Swal.fire({
+                            title: "Error",
+                            text: "Failed to deactivate the tenant.",
+                            icon: "error"
+                        });
+                        });
+                    }
+                    });
+                }
+
+        </script>
+       <!-- END: Page JS-->
+    {% endblock scriptjs %}
+ 
+
+    <script>
+        $(window).on('load', function() {
+            if (feather) {
+                feather.replace({
+                    width: 14,
+                    height: 14
+                });
+            }
+        })
+    </script>
+</body>
+<!-- END: Body-->
+
+</html>

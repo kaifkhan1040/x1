@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+
+# If using environment variables or secrets
+.env
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# pipenv
+Pipfile.lock
+
+# virtualenv
+venv/
+ENV/
+env/
+
+# Migrations (optional, if you want to ignore them)
+**/migrations/
+!**/migrations/__init__.py
+
+# Pytest
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+
+# mypy
+.mypy_cache/
+
+# Node modules (if using npm/yarn for frontend)
+node_modules/
+
+# JetBrains IDEs
+.idea/

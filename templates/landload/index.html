@@ -1,0 +1,1303 @@
+{% extends 'landload/basic.html' %} 
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'v2/assets/vendor/libs/chartjs/chartjs.css' %}" />
+{% endblock style %}
+{% block content %}
+ <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="content-header row">
+    </div>
+    {% comment %} <div class="content-body"> {% endcomment %}
+        
+        <!-- users list start -->
+        
+            <div class="row g-6">
+                {% comment %} <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="mb-1 fw-bold text-center">Revenue</h5>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-1">
+                                    <span class="text-muted">Total Earned:</span>
+                                    <span class="fw-bold text-success float-end">100</span>
+                                </li>
+                                <li class="mb-1">
+                                    <span class="text-muted">Total Spend:</span>
+                                    <span class="fw-bold text-danger float-end">20</span>
+                                </li>
+                                <li class="mb-1">
+                                    <span class="text-muted">Net Revenue:</span>
+                                    <span class="fw-bold text-dark float-end">80</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="mb-1 fw-bold text-center">Listings </h5>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-1">
+                                    <span class="text-muted">Total listed:</span>
+                                    <span class="fw-bold text-success float-end">10</span>
+                                </li>
+                                <li class="mb-1">
+                                    <span class="text-muted">Occupied:</span>
+                                    <span class="fw-bold text-danger float-end">2</span>
+                                </li>
+                                <li class="mb-1">
+                                    <span class="text-muted">Empty:</span>
+                                    <span class="fw-bold text-dark float-end">8</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="mb-1 fw-bold text-center">Dues </h5>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-1">
+                                    <span class="text-muted">Total Dues:</span>
+                                    <span class="fw-bold text-success float-end">1000</span>
+                                </li>
+                                <li class="mb-1">
+                                    <span class="text-muted">Longest Dues:</span>
+                                    <span class="fw-bold text-danger float-end">200</span>
+                                </li>
+                                <li class="mb-1">
+                                    <span class="text-muted">Highest Dues:</span>
+                                    <span class="fw-bold text-dark float-end">800</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+                 <div class="col-lg-3 col-sm-6">
+                  <div class="card card-border-shadow-primary h-100">
+                    <div class="card-body">
+                      <div class="d-flex  align-items-center mb-2">
+                        <div class="avatar me-4">
+                          <span class="avatar-initial rounded bg-label-primary"
+                            ><i class="icon-base ti tabler-currency-dollar icon-28px"></i
+                          ></span>
+                        </div>
+                        <h4 class="mb-0">REVENUE</h4>
+                      </div>
+                        <div class=" d-flex justify-content-center justify-content-between">
+                            <span class="text-heading fw-medium">Net Revenue</span>
+                            <small class="text-body-secondary">{{symbol|safe}} {{profit}}</small>
+                        </div>
+
+                        <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Earnings</span>
+                            <small class="text-body-secondary">{{symbol|safe}} {{total_earnings}}</small>
+                        </div>
+
+                        <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Expenses</span>
+                            <small class="text-body-secondary">{{symbol|safe}} {{total_expenses}}</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Losses</span>
+                            <small class="text-body-secondary">{{symbol|safe}} 00</small>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="card card-border-shadow-warning h-100">
+                    <div class="card-body">
+                      <div class="d-flex align-items-center mb-2">
+                        <div class="avatar me-4">
+                          <span class="avatar-initial rounded bg-label-warning"
+                            ><i class="icon-base ti tabler-alert-triangle icon-28px"></i
+                          ></span>
+                        </div>
+                        <h4 class="mb-0">DUES</h4>
+                      </div>
+                      
+                      <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Total Dues</span>
+                            <small class="text-body-secondary">{{symbol|safe}} 00</small>
+                        </div>
+
+                        <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Longest</span>
+                            <small class="text-body-secondary">pending</small>
+                        </div>
+
+                        <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Highest</span>
+                            <small class="text-body-secondary">pending</small>
+                        </div>
+
+                       
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="card card-border-shadow-danger h-100">
+                    <div class="card-body">
+                      <div class="d-flex align-items-center mb-2">
+                        <div class="avatar me-4">
+                          <span class="avatar-initial rounded bg-label-danger"
+                            ><i class="icon-base ti tabler-git-fork icon-28px"></i
+                          ></span>
+                        </div>
+                        <h4 class="mb-0">LISTINGS</h4>
+                      </div>
+                      
+                       <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Total Listed</span>
+                            <small class="text-body-secondary">{{listing}}</small>
+                        </div>
+
+                        <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Occupied</span>
+                            <small class="text-body-secondary">{{occupied}}</small>
+                        </div>
+
+                        <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Empty</span>
+                            <small class="text-body-secondary">{{empty}}</small>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="card card-border-shadow-info h-100">
+                    <div class="card-body">
+                      <div class="d-flex align-items-center mb-2">
+                        <div class="avatar me-4">
+                          <span class="avatar-initial rounded bg-label-info"
+                            ><i class="icon-base ti tabler-clock icon-28px"></i
+                          ></span>
+                        </div>
+                        <h4 class="mb-0 ">Tickets</h4>
+                      </div>
+                      <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Total Tickets</span>
+                            <small class="text-body-secondary">00</small>
+                        </div>
+
+                        <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">In Progress</span>
+                            <small class="text-body-secondary">00</small>
+                        </div>
+
+                        <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Resolved</span>
+                            <small class="text-body-secondary">00</small>
+                        </div>
+                        <div class=" d-flex justify-content-between">
+                            <span class="text-heading fw-medium">Longest Open</span>
+                            <small class="text-body-secondary">00</small>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="col-xxl-8 col-12">
+                  <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between">
+                      <div class="card-title m-0">
+                        <h5 class="mb-1">Earning Reports</h5>
+                        <p class="card-subtitle">Yearly Earnings Overview</p>
+                      </div>
+                      <div>
+                      <select name="year" id="year_id" class="form-select form-select-sm" required>
+                        <option value="">Select Year</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                      </select>
+                    </div>
+                      {% comment %} <div class="dropdown">
+                        <button
+                          class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1"
+                          type="button"
+                          id="earningReportsTabsId"
+                          data-bs-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                          <i class="icon-base ti tabler-dots-vertical icon-md text-body-secondary"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="earningReportsTabsId">
+                          <a class="dropdown-item" href="javascript:void(0);">View More</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+                        </div>
+                      </div> {% endcomment %}
+                    </div>
+                    <div class="card-body">
+                      <ul class="nav nav-tabs widget-nav-tabs pb-8 gap-4 mx-1 d-flex flex-nowrap" role="tablist">
+                        <li class="nav-item">
+                          <a
+                            href="javascript:void(0);"
+                            class="nav-link btn active d-flex flex-column align-items-center justify-content-center"
+                            role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-orders-id"
+                            aria-controls="navs-orders-id"
+                            aria-selected="true">
+                            <div class="badge bg-label-secondary rounded p-2">
+                              <i class="icon-base ti tabler-shopping-cart icon-md"></i>
+                            </div>
+                            <h6 class="tab-widget-title mb-0 mt-2">Profit</h6>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a
+                            href="javascript:void(0);"
+                            class="nav-link btn d-flex flex-column align-items-center justify-content-center"
+                            role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-sales-id"
+                            aria-controls="navs-sales-id"
+                            aria-selected="false">
+                            <div class="badge bg-label-secondary rounded p-2">
+                              <i class="icon-base ti tabler-chart-bar-popular icon-md"></i>
+                            </div>
+                            <h6 class="tab-widget-title mb-0 mt-2">Loss</h6>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a
+                            href="javascript:void(0);"
+                            class="nav-link btn d-flex flex-column align-items-center justify-content-center"
+                            role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-profit-id"
+                            aria-controls="navs-profit-id"
+                            aria-selected="false">
+                            <div class="badge bg-label-secondary rounded p-2">
+                              <i class="icon-base ti tabler-currency-dollar icon-md"></i>
+                            </div>
+                            <h6 class="tab-widget-title mb-0 mt-2">Spend vs<br> Earned</h6>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a
+                            href="javascript:void(0);"
+                            class="nav-link btn d-flex flex-column align-items-center justify-content-center"
+                            role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-income-id"
+                            aria-controls="navs-income-id"
+                            aria-selected="false">
+                            <div class="badge bg-label-secondary rounded p-2">
+                              <i class="icon-base ti tabler-chart-pie-2 icon-md"></i>
+                            </div>
+                            <h6 class="tab-widget-title mb-0 mt-2">Maintenance</h6>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a
+                            href="javascript:void(0);"
+                            class="nav-link btn d-flex align-items-center justify-content-center flex-column "
+                            role="tab"
+                            data-bs-toggle="tab"
+                            aria-selected="false">
+                            <div class="badge bg-label-secondary rounded p-2">
+                               <i class="icon-base ti tabler-file-invoice icon-md"></i>
+                            </div>
+                            <h6 class="tab-widget-title mb-0 mt-2">Bills</h6>
+                          </a>
+                        </li>
+                      </ul>
+                      <div class="tab-content p-0 ms-0 ms-sm-2">
+                        <div class="tab-pane fade show active" id="navs-orders-id" role="tabpanel">
+                          <div id="earningReportsTabsOrders"></div>
+                        </div>
+                        <div class="tab-pane fade" id="navs-sales-id" role="tabpanel">
+                          <div id="earningReportsTabsSales"></div>
+                        </div>
+                        <div class="tab-pane fade" id="navs-profit-id" role="tabpanel">
+                          <div id="earningReportsTabsProfit"></div>
+                        </div>
+                        <div class="tab-pane fade" id="navs-income-id" role="tabpanel">
+                          <div id="earningReportsTabsIncome"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Revenue Report -->
+                {% comment %} <div class="col-xxl-5">
+                  <div class="card h-100">
+                    <div class="card-body p-0">
+                      <div class="row row-bordered g-0">
+                        <div class="col-md-12 position-relative p-6">
+                          <div class="card-header d-inline-block p-0 text-wrap position-absolute">
+                            <h5 class="m-0 card-title">Occupied vs Empty</h5>
+                          </div>
+                          <div id="totalRevenueChart" class="mt-n1"></div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div> {% endcomment %}
+
+                <div class="col-lg-4 col-12">
+                  <div class="card h-100">
+                    <div class="card-header header-elements">
+                      <h5 class="card-title mb-0">Occupied vs Empty</h5>
+                      <div class="card-header-elements ms-auto py-0 dropdown">
+                        {% comment %} <button
+                          type="button"
+                          class="btn dropdown-toggle hide-arrow p-0"
+                          id="heat-chart-dd"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false">
+                          <i class="icon-base ti tabler-dots-vertical icon-lg"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="heat-chart-dd">
+                          <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
+                        </div> {% endcomment %}
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <canvas id="polarChart" class="chartjs" data-height="337"></canvas>
+                    </div>
+                  </div>
+                </div>
+
+                {% comment %} profit by property {% endcomment %}
+
+                 <div class="col-xxl-4 col-md-6 order-1 order-xl-0">
+                  <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between">
+                      <div class="card-title mb-0">
+                        <h5 class="mb-1">Profit by Properties</h5>
+                        <p class="card-subtitle">Monthly profit Overview</p>
+                      </div>
+                      <div class="dropdown">
+                        {% comment %} <button
+                          class="btn btn-text-secondary btn-icon rounded-pill text-body-secondary border-0 me-n1"
+                          type="button"
+                          id="salesByCountry"
+                          data-bs-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                          <i class="icon-base ti tabler-dots-vertical icon-22px text-body-secondary"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="salesByCountry">
+                          <a class="dropdown-item" href="javascript:void(0);">Download</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                        </div> {% endcomment %}
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <ul class="p-0 m-0" style="max-height: 400px; overflow-y: auto;">
+                        {% for i in profit_by_property %}
+                        <li class="d-flex align-items-center mb-4">
+                          <div class="avatar flex-shrink-0 me-4">
+                            <i class="fis fi fi-us rounded-circle fs-2"></i>
+                          </div>
+                          <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                            <div class="me-2">
+                              <div class="d-flex align-items-center">
+                                <h6 class="mb-0 me-1">{{symbol|safe}} {{i.this_month_profit}}</h6>
+                              </div>
+                              <small class="text-body">{{i.property_name}}</small>
+                            </div>
+                            {% if i.change_status == 'increase' %}
+                            <div class="user-progress">
+                              <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
+                                <i class="icon-base ti tabler-chevron-up"></i>
+                                {{i.percent_change}}%
+                              </p>
+                            </div>
+                            {% else %}
+                             <div class="user-progress">
+                              <p class="text-danger fw-medium mb-0 d-flex align-items-center gap-1">
+                                <i class="icon-base ti tabler-chevron-down"></i>
+                                {{i.percent_change}}%
+                              </p>
+                            </div>
+                            {% endif %}
+                          </div>
+                        </li>
+                     {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                {% comment %} profit by property {% endcomment %}
+
+                {% comment %} loss by property {% endcomment %}
+                 <div class="col-xxl-4 col-md-6 order-1 order-xl-0">
+                  <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between">
+                      <div class="card-title mb-0">
+                        <h5 class="mb-1">Loss by Properties</h5>
+                        <p class="card-subtitle">Monthly Loss Overview</p>
+                      </div>
+                      <div class="dropdown">
+                        {% comment %} <button
+                          class="btn btn-text-secondary btn-icon rounded-pill text-body-secondary border-0 me-n1"
+                          type="button"
+                          id="salesByCountry"
+                          data-bs-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                          <i class="icon-base ti tabler-dots-vertical icon-22px text-body-secondary"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="salesByCountry">
+                          <a class="dropdown-item" href="javascript:void(0);">Download</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                        </div> {% endcomment %}
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <ul class="p-0 m-0" style="max-height: 400px; overflow-y: auto;">
+                        {% for i in loss_by_property %}
+                        <li class="d-flex align-items-center mb-4">
+                          <div class="avatar flex-shrink-0 me-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="fs-2 rounded-circle" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                              <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                              <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                              <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+                            </svg>
+                          </div>
+
+                          <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                            <div class="me-2">
+                              <div class="d-flex align-items-center">
+                                <h6 class="mb-0 me-1">{{symbol|safe}} {{i.this_month_profit}}</h6>
+                              </div>
+                              <small class="text-body">{{i.property_name}}</small>
+                            </div>
+                            {% if i.change_status == 'loss-to-profit' %}
+                            <div class="user-progress">
+                              <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
+                                <i class="icon-base ti tabler-chevron-up"></i>
+                                {{i.percent_change}}%
+                              </p>
+                            </div>
+                            {% else %}
+                             <div class="user-progress">
+                              <p class="text-danger fw-medium mb-0 d-flex align-items-center gap-1">
+                                <i class="icon-base ti tabler-chevron-down"></i>
+                                {{i.percent_change}}%
+                              </p>
+                            </div>
+                            {% endif %}
+                          </div>
+                        </li>
+                     {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                {% comment %} loss by property {% endcomment %}
+
+
+                <!-- Last payment -->
+                <div class="col-md-6 col-12">
+                  <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                      <h5 class="card-title m-0 me-2">Payments</h5>
+                      <div class="dropdown">
+                        {% comment %} <button
+                          class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1"
+                          type="button"
+                          id="teamMemberList"
+                          data-bs-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                          <i class="icon-base ti tabler-dots-vertical icon-md text-body-secondary"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="teamMemberList">
+                          <a class="dropdown-item" href="javascript:void(0);">Download</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                        </div> {% endcomment %}
+                      </div>
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table table-borderless border-top">
+                        <thead class="border-bottom">
+                          <tr>
+                            <th>Date</th>
+                            <th>By</th>
+                            <th>For</th>
+                            <th>Mode</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% if payment %}
+                          {% for i in payment %}
+                          <tr>
+                            <td class="pt-5">
+                              <small class="text-body text-nowrap">{{i.paid_date|safe}}</small>
+                              
+                            </td>
+                            <td class="pt-5">
+                              <div class="d-flex flex-column">
+                                <p class="mb-0 text-heading">{{i.tenant_name}}</p>
+                                
+                              </div>
+                            </td>
+                            <td class="pt-5"><p class="mb-0 text-heading">{{i.m_for}}</p></td>
+                            <td class="pt-5"><p class="mb-0 text-heading">{{i.method}}</p></td>
+                            <td class="pt-5"><span class="badge bg-label-success">Verified</span></td>
+                            <td class="pt-5">
+                              <p class="mb-0 text-heading">{{symbol|safe}} {{i.amount}}</p>
+                            </td>
+                          </tr>
+                         {% endfor %}
+                         {% else %}
+                         <tr>
+                              <td colspan="6" class="text-center pt-5">
+                                  <p class="mb-0 text-muted">No payments available</p>
+                              </td>
+                          </tr>
+                            {% endif %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <!--/ Last payment -->
+                <!-- Last Expenses -->
+                <div class="col-md-6 col-12">
+                  <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                      <h5 class="card-title m-0 me-2">Expenses</h5>
+                      <div class="dropdown">
+                        {% comment %} <button
+                          class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1"
+                          type="button"
+                          id="teamMemberList"
+                          data-bs-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                          <i class="icon-base ti tabler-dots-vertical icon-md text-body-secondary"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="teamMemberList">
+                          <a class="dropdown-item" href="javascript:void(0);">Download</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                        </div> {% endcomment %}
+                      </div>
+                    </div>
+                   <div class="table-responsive">
+                      <table class="table table-borderless border-top">
+                        <thead class="border-bottom">
+                          <tr>
+                            <th>Date</th>
+                            <th>By</th>
+                            <th>For</th>
+                            <th>Mode</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% if expense %}
+                          {% for i in expense %}
+                          <tr>
+                            <td class="pt-5">
+                              <small class="text-body text-nowrap">{{i.paid_date|safe}}</small>
+                              
+                            </td>
+                            <td class="pt-5">
+                              <div class="d-flex flex-column">
+                                <p class="mb-0 text-heading">{{i.tenant_name}}</p>
+                                
+                              </div>
+                            </td>
+                            <td class="pt-5"><p class="mb-0 text-heading">{{i.m_for}}</p></td>
+                            <td class="pt-5"><p class="mb-0 text-heading">{{i.method}}</p></td>
+                            <td class="pt-5"><span class="badge bg-label-success">Verified</span></td>
+                            <td class="pt-5">
+                              <p class="mb-0 text-heading">{{symbol|safe}} {{i.amount}}</p>
+                            </td>
+                          </tr>
+                         {% endfor %}
+                          
+                         {% else %}
+                         <tr>
+                              <td colspan="6" class="text-center pt-5">
+                                  <p class="mb-0 text-muted">No expense available</p>
+                              </td>
+                          </tr>
+                            {% endif %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <!--/ Last Expenses -->
+                <!--/ Revenue Report -->
+            </div>
+                {% comment %} <div class='row'>
+                <div class="col-md-1 mb-1">
+                    <div class="form-group ">
+                        <select id="yearSelect" class="form-select">
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            
+                        </select>
+                    </div>
+                </div>
+
+            
+                <div class="col-md-1 mb-1">
+                    <div class="form-group">
+                        <select id="monthSelect" class="form-select">
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06" selected>June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary mb-1 mb-sm-0 mr-0 mr-sm-1 me-1" >Go</button>
+                </div>
+            </div> {% endcomment %}
+            {% comment %} <h2 class="mb-0 me-3 mb-2 mt-2">Financials</h2>
+
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bolder mb-75">200</h3>
+                                <span>Revene</span>
+                            </div>
+                            <div class="avatar bg-light-primary p-50">
+                                <span class="avatar-content">
+                                    <i data-feather="user" class="font-medium-4"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bolder mb-75">500</h3>
+                                <span>Total Collection</span>
+                            </div>
+                            <div class="avatar bg-light-success p-50">
+                                <span class="avatar-content">
+                                    <i data-feather="user-plus" class="font-medium-4"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bolder mb-75">400</h3>
+                                <span>Total piad</span>
+                            </div>
+                            <div class="avatar bg-light-danger p-50">
+                                <span class="avatar-content">
+                                    <i data-feather="user-check" class="font-medium-4"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+         
+        
+        
+       
+        <section class="app-user-list">
+            <h2 class="mb-2">Dues & Collection</h2>
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bolder mb-75">200</h3>
+                                <span>Revene</span>
+                            </div>
+                            <div class="avatar bg-light-primary p-50">
+                                <span class="avatar-content">
+                                    <i data-feather="user" class="font-medium-4"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+                
+            </div>
+         
+        
+        
+        <div class="content-body">
+        <section class="app-user-list">
+            <h2 class="mb-2">Property & Tenants</h2>
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bolder mb-75">20</h3>
+                                <span>Total Properties</span>
+                            </div>
+                            <div class="avatar bg-light-primary p-50">
+                                <span class="avatar-content">
+                                    <i data-feather="user" class="font-medium-4"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bolder mb-75">500</h3>
+                                <span>Total Rooms</span>
+                            </div>
+                            <div class="avatar bg-light-success p-50">
+                                <span class="avatar-content">
+                                    <i data-feather="user-plus" class="font-medium-4"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bolder mb-75">400</h3>
+                                <span>Rooms booked</span>
+                            </div>
+                            <div class="avatar bg-light-danger p-50">
+                                <span class="avatar-content">
+                                    <i data-feather="user-check" class="font-medium-4"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bolder mb-75">400</h3>
+                                <span>Empty Rooms</span>
+                            </div>
+                            <div class="avatar bg-light-danger p-50">
+                                <span class="avatar-content">
+                                    <i data-feather="user-check" class="font-medium-4"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="fw-bolder mb-75">400</h3>
+                                <span>Total Tenants</span>
+                            </div>
+                            <div class="avatar bg-light-danger p-50">
+                                <span class="avatar-content">
+                                    <i data-feather="user-check" class="font-medium-4"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+         
+        
+        
+        </section> {% endcomment %}
+        <!-- users list ends -->
+
+<!-- Earning Reports Tabs-->
+                
+    </div>
+</div>
+{% endblock content %}
+
+{% block scriptjs %}
+    <script>
+
+     
+  // Pass Django context variables into JS
+  const chartData = JSON.parse('{{ chart_data|safe|escapejs }}');
+  (function () {
+  let cardColor, labelColor, fontFamily, headingColor, shadeColor, legendColor, borderColor, barBgColor;
+  if (isDarkStyle) {
+    barBgColor = '#3d4157';
+    shadeColor = 'dark';
+  } else {
+    barBgColor = '#efeef0';
+    shadeColor = '';
+  }
+  cardColor = config.colors.cardColor;
+  labelColor = config.colors.textMuted;
+  legendColor = config.colors.bodyColor;
+  borderColor = config.colors.borderColor;
+  headingColor = config.colors.headingColor;
+  function EarningReportsBarChart(arrayData, highlightData) {
+    const basicColor = config.colors_label.primary,
+      highlightColor = config.colors.primary;
+    var colorArr = [];
+    let maxValue = Math.max(...arrayData);
+
+    for (let i = 0; i < arrayData.length; i++) {
+      if (i === highlightData) {
+        colorArr.push(highlightColor);
+      } else {
+        colorArr.push(basicColor);
+      }
+    }
+
+    const earningReportBarChartOpt = {
+      chart: {
+        height: 231,
+        parentHeightOffset: 0,
+        type: 'bar',
+        toolbar: {
+          show: false
+        }
+      },
+      plotOptions: {
+        bar: {
+          columnWidth: '32%',
+          startingShape: 'rounded',
+          borderRadius: 6,
+          distributed: true,
+          dataLabels: {
+            position: 'top'
+          }
+        }
+      },
+      grid: {
+        show: false,
+        padding: {
+          top: 0,
+          bottom: 0,
+          left: -10,
+          right: -10
+        }
+      },
+      colors: colorArr,
+      dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+          return val + 'k';
+        },
+        offsetY: -30,
+        style: {
+          fontSize: '15px',
+          colors: [headingColor],
+          fontWeight: '500',
+          fontFamily: fontFamily
+        }
+      },
+      series: [
+        {
+          data: arrayData
+        }
+      ],
+      legend: {
+        show: false
+      },
+      tooltip: {
+        enabled: false
+      },
+      xaxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep','OCT','NOV','Dec'],
+        axisBorder: {
+          show: true,
+          color: borderColor
+        },
+        axisTicks: {
+          show: false
+        },
+        labels: {
+          style: {
+            colors: labelColor,
+            fontSize: '13px',
+            fontFamily: fontFamily
+          }
+        }
+      },
+      yaxis: {
+        labels: {
+          offsetX: -15,
+          formatter: function (val) {
+            return parseInt(val / 1) + 'k';
+          },
+          style: {
+            fontSize: '13px',
+            colors: labelColor,
+            fontFamily: fontFamily
+          },
+          min: 0,
+          max: maxValue,
+          tickAmount: 6
+        }
+      },
+      responsive: [
+        {
+          breakpoint: 1441,
+          options: {
+            plotOptions: {
+              bar: {
+                columnWidth: '41%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 590,
+          options: {
+            plotOptions: {
+              bar: {
+                columnWidth: '61%',
+                borderRadius: 5
+              }
+            },
+            yaxis: {
+              labels: {
+                show: false
+              }
+            },
+            grid: {
+              padding: {
+                right: 0,
+                left: -20
+              }
+            },
+            dataLabels: {
+              style: {
+                fontSize: '12px',
+                fontWeight: '400'
+              }
+            }
+          }
+        }
+      ]
+    };
+    return earningReportBarChartOpt;
+  }
+  var chartJson = 'earning-reports-charts.json';
+  // Earning Chart JSON data
+  function loadChart(year) {
+  var earningReportsChart = $.ajax({
+    //url: assetsPath + 'json/' + chartJson, //? Use your own search api instead
+    url: "{% url 'landload:earning_report' year=0 %}".replace("0", year),
+    dataType: 'json',
+    async: false
+  }).responseJSON;
+  console.log('ear',earningReportsChart)
+  var vsmaxValue = Math.max(...earningReportsChart['earning'][0]['chart_data']);
+  var vsminValue = Math.min(...earningReportsChart['expenses'][0]['chart_data']);
+
+  // Earning Reports Tabs Orders
+  // --------------------------------------------------------------------
+  const earningReportsTabsOrdersEl = document.querySelector('#earningReportsTabsOrders'),
+    earningReportsTabsOrdersConfig = EarningReportsBarChart(
+      earningReportsChart['data'][0]['chart_data'],
+      earningReportsChart['data'][0]['active_option']
+    );
+ 
+    
+     if (earningReportsTabsOrdersEl) {
+    if (earningReportsTabsOrders instanceof ApexCharts) {
+      earningReportsTabsOrders.destroy(); // ✅ will work because it's a real chart instance
+    }
+    earningReportsTabsOrders = new ApexCharts(earningReportsTabsOrdersEl, earningReportsTabsOrdersConfig);
+    earningReportsTabsOrders.render();
+  }
+  
+  // Earning Reports Tabs Sales
+  // --------------------------------------------------------------------
+  {% comment %} const earningReportsTabsSalesEl = document.querySelector('#earningReportsTabsSales'),
+    earningReportsTabsSalesConfig = EarningReportsBarChart(
+      earningReportsChart['data'][1]['chart_data'],
+      earningReportsChart['data'][1]['active_option']
+    );
+  if (typeof earningReportsTabsSalesEl !== undefined && earningReportsTabsSalesEl !== null) {
+    const earningReportsTabsSales = new ApexCharts(earningReportsTabsSalesEl, earningReportsTabsSalesConfig);
+    earningReportsTabsSales.render();
+  } {% endcomment %}
+  // Earning Reports Tabs Profit
+  // --------------------------------------------------------------------
+  const earningReportsTabsProfitEl = document.querySelector('#earningReportsTabsProfit'),
+    totalRevenueChartOptions = {
+      series: [
+        {
+          name: 'Earning',
+          data: earningReportsChart['earning'][0]['chart_data'],
+        },
+        {
+          name: 'Expense',
+          data: earningReportsChart['expenses'][0]['chart_data'],
+        }
+      ],
+      chart: {
+        height: 231,
+        parentHeightOffset: 0,
+        stacked: true,
+        type: 'bar',
+        toolbar: { show: false }
+      },
+      tooltip: {
+        enabled: false
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '40%',
+          borderRadius: 7,
+          startingShape: 'rounded',
+          endingShape: 'rounded',
+          borderRadiusApplication: 'around',
+          borderRadiusWhenStacked: 'last'
+        }
+      },
+      colors: [config.colors.primary, config.colors.warning],
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 6,
+        lineCap: 'round',
+        colors: [cardColor]
+      },
+      legend: {
+        show: true,
+        horizontalAlign: 'right',
+        position: 'top',
+        fontSize: '13px',
+        fontFamily: fontFamily,
+        markers: {
+          size: 6,
+          offsetY: 0,
+          shape: 'circle',
+          strokeWidth: 0
+        },
+        labels: {
+          colors: headingColor
+        },
+        itemMargin: {
+          horizontal: 10,
+          vertical: 2
+        }
+      },
+      grid: {
+        show: false,
+        padding: {
+          bottom: -8,
+          right: 0,
+          top: 20
+        }
+      },
+      xaxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep','Oct','Nov','Dec'],
+        labels: {
+          style: {
+            fontSize: '13px',
+            colors: labelColor,
+            fontFamily: fontFamily
+          }
+        },
+        axisTicks: {
+          show: false
+        },
+        axisBorder: {
+          show: false
+        }
+      },
+      yaxis: {
+        labels: {
+          offsetX: -16,
+          style: {
+            fontSize: '13px',
+            colors: labelColor,
+            fontFamily: fontFamily
+          }
+        },
+        min: vsminValue,
+        max: vsmaxValue,
+        tickAmount: 5
+      },
+      responsive: [
+        {
+          breakpoint: 1700,
+          options: {
+            plotOptions: {
+              bar: {
+                columnWidth: '43%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 1441,
+          options: {
+            plotOptions: {
+              bar: {
+                columnWidth: '50%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 1300,
+          options: {
+            plotOptions: {
+              bar: {
+                columnWidth: '40%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 991,
+          options: {
+            plotOptions: {
+              bar: {
+                columnWidth: '38%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 850,
+          options: {
+            plotOptions: {
+              bar: {
+                columnWidth: '50%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 449,
+          options: {
+            plotOptions: {
+              bar: {
+                columnWidth: '73%'
+              }
+            },
+            xaxis: {
+              labels: {
+                offsetY: -5
+              }
+            },
+            legend: {
+              show: true,
+              horizontalAlign: 'right',
+              position: 'top',
+              itemMargin: {
+                horizontal: 10,
+                vertical: 0
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 394,
+          options: {
+            plotOptions: {
+              bar: {
+                columnWidth: '88%'
+              }
+            },
+            legend: {
+              show: true,
+              horizontalAlign: 'center',
+              position: 'bottom',
+              markers: {
+                offsetX: -3,
+                offsetY: 0
+              },
+              itemMargin: {
+                horizontal: 10,
+                vertical: 5
+              }
+            }
+          }
+        }
+      ],
+      states: {
+        hover: {
+          filter: {
+            type: 'none'
+          }
+        },
+        active: {
+          filter: {
+            type: 'none'
+          }
+        }
+      }
+    };
+  if (typeof earningReportsTabsProfitEl !== undefined && earningReportsTabsProfitEl !== null) {
+    if (earningReportsTabsProfit instanceof ApexCharts) {
+      earningReportsTabsProfit.destroy(); // ✅ will work because it's a real chart instance
+    }
+    earningReportsTabsProfit = new ApexCharts(earningReportsTabsProfitEl, totalRevenueChartOptions);
+    earningReportsTabsProfit.render();
+
+
+  }}
+   loadChart(new Date().getFullYear());
+
+  // On year change
+  $(document).on("change", "#year_id", function () {
+    let year = $(this).val();
+    if (year) {
+      loadChart(year);
+    }
+  });
+  })();
+  // Earning Reports Tabs Income
+  // --------------------------------------------------------------------
+
+</script>
+{% comment %} <script src="{% static 'v2/assets/js/dashboards-crm.js' %}"></script> {% endcomment %}
+<script src="{% static 'v2/assets/vendor/libs/chartjs/chartjs.js' %}"></script>
+    <script src="{% static 'v2/assets/js/app-ecommerce-dashboard.js' %}"></script>
+    <script src="{% static 'v2/assets//js/charts-chartjs-legend.js' %}"></script>
+    <script src="{% static 'v2/assets/js/charts-chartjs.js' %}"></script>
+
+
+{% endblock scriptjs %}

@@ -1,0 +1,1223 @@
+{% extends 'tenant/basic.html' %} 
+{% load static %}
+
+    {% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/wizard/bs-stepper.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css' %}">
+    <!-- END: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/pickers/form-flat-pickr.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/pages/app-user.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/core/menu/menu-types/vertical-menu.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-wizard.min.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+    {% endblock style %}
+
+{% block content %}
+
+
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper container-xxl p-0">
+            <div class="content-header row">
+              <div class="content-header-left col-md-9 col-12 mb-2">
+                  <div class="row breadcrumbs-top">
+                      <div class="col-12">
+                          <a href="{% url 'tenant:home' %}"><h2 class="content-header-title float-start mb-0">Home</h2></a>
+                          <div class="breadcrumb-wrapper">
+                              <ol class="breadcrumb">
+                                  <li class="breadcrumb-item">
+                                      Onboarding
+                                  </li>
+                                  
+                              </ol>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            <div class="content-body">
+                
+                <section class="horizontal-wizard">
+                  <div class="bs-stepper horizontal-wizard-example">
+                    <div class="bs-stepper-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center w-100 gap-3">
+                       <div class="d-flex flex-wrap flex-md-nowrap align-items-start align-items-md-center gap-2">
+                          <!-- Step 1 -->
+                          <div class="step" data-target="#account-details">
+                            <button type="button" class="step-trigger">
+                              <span class="bs-stepper-box">1</span>
+                              <span class="bs-stepper-label">
+                                <span class="bs-stepper-title">Step 1</span>
+                                <span class="bs-stepper-subtitle">Add Details</span>
+                              </span>
+                            </button>
+                          </div>
+                          <div class="line d-none d-md-block">
+                            <i data-feather="chevron-right" class="font-medium-2"></i>
+                          </div>
+
+                          <div class="step" data-target="#personal-info">
+                            <button type="button" class="step-trigger">
+                              <span class="bs-stepper-box">2</span>
+                              <span class="bs-stepper-label">
+                                <span class="bs-stepper-title">Step 2</span>
+                                <span class="bs-stepper-subtitle">Add Profession </span>
+                              </span>
+                            </button>
+                          </div>
+                          <div class="line d-none d-md-block">
+                            <i data-feather="chevron-right" class="font-medium-2"></i>
+                          </div>
+
+                           <div class="step" data-target="#bank-account">
+                            <button type="button" class="step-trigger">
+                              <span class="bs-stepper-box">3</span>
+                              <span class="bs-stepper-label">
+                                <span class="bs-stepper-title">step 3</span>
+                                <span class="bs-stepper-subtitle">Bank Account</span>
+                              </span>
+                            </button>
+                          </div>
+                          <div class="line d-none d-md-block">
+                            <i data-feather="chevron-right" class="font-medium-2"></i>
+                          </div>
+
+                           <div class="step" data-target="#upload-document">
+                            <button type="button" class="step-trigger">
+                              <span class="bs-stepper-box">4</span>
+                              <span class="bs-stepper-label">
+                                <span class="bs-stepper-title">Step 4</span>
+                                <span class="bs-stepper-subtitle">Upload your documents</span>
+                              </span>
+                            </button>
+                          </div>
+                          <div class="line d-none d-md-block">
+                            <i data-feather="chevron-right" class="font-medium-2"></i>
+                          </div>
+
+                          <!-- Step 3 -->
+                          <div class="step" data-target="#review-offer">
+                            <button type="button" class="step-trigger">
+                              <span class="bs-stepper-box">5</span>
+                              <span class="bs-stepper-label">
+                                <span class="bs-stepper-title">Step 5</span>
+                                <span class="bs-stepper-subtitle">Review offer</span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                        
+
+                        <!-- Save / Edit Buttons -->
+                        {% if more_fun %}
+                        <div class="d-flex flex-wrap gap-2">
+                          <a href="{% url 'landload:listing_update' id=property_id %}">
+                            <button class="btn btn-primary waves-effect waves-float waves-light">Edit</button>
+                          </a>
+                          {% comment %} {% if property_obj.number_of_flat %}
+                          <a href="{% url 'landload:room' id=property_id %}">
+                            <button class="btn btn-primary waves-effect waves-float waves-light">Room</button>
+                          </a>
+                          {% endif %} {% endcomment %}
+                        </div>
+                        {% endif %}
+                      </div>
+                    
+    <div class="bs-stepper-content">
+      <div id="account-details" class="content">
+        <div class="content-header">
+        </div>
+        <form method="POST" id="form-step-1"  class="invoice-repeater">
+            {% comment %} <div class="row mb-2">
+                <div class="col-12">
+                <label class="form-label" for="rental-type">Rental Type</label>
+                <div class="d-flex flex-wrap gap-2">
+                  {% for radio in form.rental_type %}
+                    <div class="form-check form-check-inline">
+                      {{ radio.tag }} {{ radio.choice_label }}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+              </div> {% endcomment %}
+              <div class="row mb-2">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" name="first_name" id="first_name" class="form-control"{% if tenant_obj.user.first_name %}readonly{% endif %} value="{{tenant_obj.user.first_name}}" {% if more_fun %} readonly disable {% endif %} required>  
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="middle_name">Middle Name</label>
+                        <input type="text" name="middle_name" id="middle_name" {% if tenant_obj.user.middle_name %} readonly value="{{tenant_obj.user.middle_name}}" {% endif %} {% if more_fun %} readonly disable {% endif %} class="form-control" >
+
+                        
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="last_name">Last name</label>
+                        <input type="text" name="last_name" id="last_name" {% if tenant_obj.user.last_name %}readonly value="{{tenant_obj.user.last_name}}"{% endif %} {% if more_fun %} readonly disable {% endif %} class="form-control" >
+                        
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="phone_number">Phone Number</label>
+                        <input type="text" name="phone_number" pattern="\d{10}" maxlength="10"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" id="last_name" class="form-control" {% if tenant_obj.user.phone_number %}readonly value="{{tenant_obj.user.phone_number}}" {% endif %} {% if more_fun %} readonly disable {% endif %} required>
+                        
+                    </div>
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" {% if tenant_obj.user.email %}readonly value="{{tenant_obj.user.email}}"{% endif %} {% if more_fun %} readonly disable {% endif %} required>
+                  </div>
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="residence_status">Residence Status</label>
+                    {{form.residence_status}}
+                </div>
+                
+                  <div class="form-group col-md-3 visa-details" style="display:none;">
+                    <label for="visa_type">Visa Type</label>
+                        {{ form.visa_type }}
+                  </div>
+                  <div class="form-group col-md-3 visa-details" style="display:none;">
+                    <label for="visa_from">Visa Duration - From</label>
+                       {{ form.visa_from }}
+                  </div>
+                 
+               
+              </div>
+              <div class="row mb-2 " >
+                <div class="form-group col-md-3 visa-details" style="display:none;">
+                    <label for="visa_to">To</label>
+                       {{ form.visa_to }}
+                </div>
+                <div class="form-group col-md-3 visa-details" style="display:none;">
+                  <label for="evisa_code">EVISA Share Code</label>
+                      {{ form.evisa_code }}
+                </div>
+                <div class="form-group col-md-3 visa-details" style="display:none;">
+                  <label for="right_to_rent_code">Right to Rent Share Code</label>
+                      {{ form.right_to_rent_code }}
+                </div>
+              </div>
+              <h6 class='mb-2'>Address History</h6>
+              <div data-repeater-list="invoice">
+                {% if addhistory %}
+                  {% for i in addhistory %}
+                    <div data-repeater-item>
+                        <div class="row d-flex align-items-end">
+                            <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="itemname">Landlord/Agent Name</label>
+                                    <input type="text" required class="form-control" id="landlord_name" name='landlord_name' value='{{i.landlord_name}}' aria-describedby="itemname"  />
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="itemcost">Landlord Contact Number</label>
+                                    <input type="number" required class="form-control" id="landlord_contact" name='landlord_contact' value='{{i.landlord_contact}}' aria-describedby="itemcost"  />
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="itemquantity">Landlord Email</label>
+                                    <input type="email" required class="form-control" id="landlord_email" name="history_email" value='{{i.landlord_email}}' aria-describedby="itemquantity"  />
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="staticprice">From </label>
+                                    <input type="date" required class="form-control" id="from_date" value='{{ i.from_date|date:'Y-m-d' }}' name="history_from_date"  />
+                                </div>
+                            </div>
+                        </div>
+                          <div class="row d-flex align-items-end">
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                <label for="staticprice">To </label>
+                                <input type="date" required class="form-control" id="to_date" value='{{ i.to_date|date:'Y-m-d' }}' name="history_to_date"  />
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                  <label for="staticprice">Address Line 1  </label>
+                                  <input type="text" required class="form-control" id="line1" value='{{i.line1}}' name="line1"  />
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                  <label for="staticprice">Address Line 2 </label>
+                                  <input type="text" class="form-control" id="line2" value='{{i.line2}}' name="line2"  />
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                  <label for="staticprice">City </label>
+                                  <input type="text" required class="form-control" id="city" value='{{i.city}}' name="city"  />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row d-flex align-items-end">
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                    <label for="staticprice">Country  </label>
+                                    <input type="text" required class="form-control" id="country" value='{{i.country}}' name="country"  />
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                    <label for="staticprice">Post Code </label>
+                                    <input type="text" required class="form-control" id="postcode" value='{{i.postcode}}' name="postcode"  />
+                              </div>
+                            </div>
+
+                            <div class="col-md-2 col-12 mb-50">
+                                <div class="form-group">
+                                    <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button">
+                                        <i data-feather="x" class="mr-25"></i>
+                                        <span>Delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                          </div>
+                        <hr />
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div data-repeater-item>
+                      <div class="row d-flex align-items-end">
+                          <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                  <label for="itemname">Landlord/Agent Name</label>
+                                  <input type="text" required class="form-control" id="landlord_name" name='landlord_name' aria-describedby="itemname"  />
+                              </div>
+                          </div>
+
+                          <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                  <label for="itemcost">Landlord Contact Number</label>
+                                  <input type="number" required class="form-control" id="landlord_contact" name='landlord_contact' aria-describedby="itemcost"  />
+                              </div>
+                          </div>
+
+                          <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                  <label for="itemquantity">Landlord Email</label>
+                                  <input type="email" required class="form-control" id="landlord_email" name="history_email" aria-describedby="itemquantity"  />
+                              </div>
+                          </div>
+
+                          <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                  <label for="staticprice">From </label>
+                                  <input type="date" required class="form-control" id="from_date" name="history_from_date"  />
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row d-flex align-items-end">
+                        <div class="col-md-3 col-12">
+                          <div class="form-group">
+                                <label for="staticprice">To </label>
+                                <input type="date" required class="form-control" id="to_date" name="history_to_date"  />
+                          </div>
+                        </div>
+                        <div class="col-md-3 col-12">
+                          <div class="form-group">
+                              <label for="staticprice">Address Line 1  </label>
+                              <input type="text" required class="form-control" id="line1" name="line1"  />
+                          </div>
+                        </div>
+                        <div class="col-md-3 col-12">
+                          <div class="form-group">
+                              <label for="staticprice">Address Line 2 </label>
+                              <input type="text" class="form-control" id="line2" name="line2"  />
+                          </div>
+                        </div>
+                        <div class="col-md-3 col-12">
+                          <div class="form-group">
+                              <label for="staticprice">City </label>
+                              <input type="text" required class="form-control" id="city" name="city"  />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row d-flex align-items-end">
+                          <div class="col-md-3 col-12">
+                            <div class="form-group">
+                                  <label for="staticprice">Country  </label>
+                                  <input type="text" required class="form-control" id="country" name="country"  />
+                            </div>
+                          </div>
+                          <div class="col-md-3 col-12">
+                            <div class="form-group">
+                                  <label for="staticprice">Post Code </label>
+                                  <input type="text" required class="form-control" id="postcode" name="postcode"  />
+                            </div>
+                          </div>
+                          <div class="col-md-2 col-12 mb-50">
+                              <div class="form-group">
+                                  <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button">
+                                      <i data-feather="x" class="mr-25"></i>
+                                      <span>Delete</span>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                      <hr />
+                  </div>
+                {% endif %}
+              </div>
+              <div class="row">
+                  <div class="col-12">
+                      <button class="btn btn-icon btn-primary" type="button" data-repeater-create>
+                          <i data-feather="plus" class="mr-25"></i>
+                          <span>Add New</span>
+                      </button>
+                  </div>
+              </div>
+
+              <script>
+                function toggleVisaFields() {
+                    const residenceSelect = document.getElementById('id_residence_status');
+                    const visaFields = document.querySelectorAll('.visa-details');
+
+                    if (residenceSelect.value === 'Visa') {
+                      visaFields.forEach(field => {
+                          field.style.display =  'block' 
+                        });
+                    } else {
+                        visaFields.forEach(field => {
+                          field.style.display =  'none' 
+                        });
+                    }
+                }
+
+                document.getElementById('id_residence_status').addEventListener('change', toggleVisaFields);
+                window.addEventListener('load', toggleVisaFields);
+              </script>
+           
+        </form>
+        <div class="d-flex justify-content-between mt-1">
+          <button class="btn btn-outline-secondary btn-prev" disabled>
+            <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
+            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+          </button>
+          <button class="btn btn-primary btn-next" onclick="submitForm(1)">
+            <span class="align-middle d-sm-inline-block d-none">Next</span>
+            <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
+          </button>
+        </div>
+      </div>
+      <div id="personal-info" class="content">
+        
+        <form method="POST" id="form-step-2" class='invoice-repeater'>
+          {% csrf_token %}
+          <input type="hidden" name="formid" {% if property_obj %}value="{{property_obj.id}}"{% endif %}value="">  
+          <div class="row mb-2">
+            <div class="form-group col-md-3">
+              <label class="form-label" for="first-name">Employer Name </label>
+              {{form2.employer_name}}
+            </div>
+            <div class="form-group col-md-3">
+              <label class="form-label" for="last-name">Employer Address </label>
+              {{form2.employer_address}}
+            </div>
+            <div class="form-group col-md-3">
+              <label class="form-label" for="last-name">Duration - From</label>
+              {{form2.employment_From}}
+            </div>
+            <div class="form-group col-md-3">
+              <label class="form-label" for="last-name">To</label>
+              {{form2.employment_to}}
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="form-group col-md-3">
+              <label class="form-label" for="country"> Salary Monthly</label>
+              {{form2.salary}}
+            </div>
+          </div>
+          <h6 class='mb-2'>Profession History</h6>
+              <div data-repeater-list="invoice">
+                {% if professhistory %}
+                  {% for i in professhistory %}
+                    <div data-repeater-item>
+                        <div class="row d-flex align-items-end">
+                            <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="itemname">Employer Name</label>
+                                    <input type="text" required class="form-control" id="history_employer_name" name='history_employer_name' value='{{i.history_employer_name}}' aria-describedby="itemname"  />
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="itemcost">Employer Address</label>
+                                    <input type="text" required class="form-control" id="history_employer_address" name='history_employer_address' value='{{i.history_employer_address}}' aria-describedby="itemcost"  />
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="staticprice">Duration - From </label>
+                                    <input type="date" required class="form-control" id="history_employment_From" value='{{ i.history_employment_From|date:'Y-m-d' }}' name="history_employment_From"  />
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                <label for="staticprice">To </label>
+                                <input type="date" required class="form-control" id="history_employment_to" value='{{ i.history_employment_to|date:'Y-m-d' }}' name="history_employment_to"  />
+                              </div>
+                            </div>
+                        </div>
+                          <div class="row d-flex align-items-end">
+                            
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                  <label for="staticprice">Salary Monthly  </label>
+                                  <input type="text" required class="form-control" id="history_salary" value='{{i.history_salary}}' name="history_salary"  />
+                              </div>
+                            </div>
+                          
+
+                            <div class="col-md-2 col-12 mb-50">
+                                <div class="form-group">
+                                    <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button">
+                                        <i data-feather="x" class="mr-25"></i>
+                                        <span>Delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                          </div>
+                        <hr />
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div data-repeater-item>
+                      <div class="row d-flex align-items-end">
+                          <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="itemname">Employer Name</label>
+                                    <input type="text" required class="form-control" id="history_employer_name" name='history_employer_name'  aria-describedby="itemname"  />
+                                </div>
+                          </div>
+
+                            <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="itemcost">Employer Address</label>
+                                    <input type="text" required class="form-control" id="history_employer_address" name='history_employer_address'  aria-describedby="itemcost"  />
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-12">
+                                <div class="form-group">
+                                    <label for="from">Duration - From </label>
+                                    <input type="date" required class="form-control" id="history_employment_From" name="history_employment_From"  />
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                <label for="to">To </label>
+                                <input type="date" required class="form-control" id="history_employment_to" name="history_employment_to"  />
+                              </div>
+                            </div>
+                        </div>
+                          <div class="row d-flex align-items-end">
+                            
+                            <div class="col-md-3 col-12">
+                              <div class="form-group">
+                                  <label for="Address">Salary Monthly  </label>
+                                  <input type="text" required class="form-control" id="history_salary"  name="history_salary"  />
+                              </div>
+                            </div>
+                         
+                          <div class="col-md-2 col-12 mb-50">
+                              <div class="form-group">
+                                  <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button">
+                                      <i data-feather="x" class="mr-25"></i>
+                                      <span>Delete</span>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                      <hr />
+                  </div>
+                {% endif %}
+              </div>
+              <div class="row mb-2">
+                  <div class="col-12">
+                      <button class="btn btn-icon btn-primary" type="button" data-repeater-create>
+                          <i data-feather="plus" class="mr-25"></i>
+                          <span>Add New</span>
+                      </button>
+                  </div>
+              </div>
+          {% comment %} <div id="repeater-section" style="display:{% if property_obj2.other %}block{% else %} none{% endif %};">
+            <div data-repeater-list="invoice">
+              {% if property_obj2.other %}
+              {% for i in property_obj2.financialsother.all %}
+              <div data-repeater-item>
+                <div class="row d-flex align-items-end">
+                  <div class="col-md-4 col-12">
+                    <div class="form-group">
+                      <label for="itemname">Label</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="label"
+                        id="itemname"
+                        aria-describedby="itemname"
+                        placeholder="Enter your field"
+                        value="{{i.lable}}"
+                        {% if more_fun %} readonly {% endif %}
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-md-2 col-12">
+                    <div class="form-group">
+                      <label for="itemcost">Amount</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        name='amount'
+                        id="itemcost"
+                        aria-describedby="itemcost"
+                        placeholder="32"
+                        value='{{i.amount}}'
+                        {% if more_fun %} readonly {% endif %}
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-md-2 col-12 mb-50">
+                    <div class="form-group">
+                      <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button"{% if more_fun %} disabled {% endif %}>
+                        <i data-feather="x" class="mr-25"></i>
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                {% endfor %}
+                {% else %}
+                <div data-repeater-item>
+                <div class="row d-flex align-items-end">
+                  <div class="col-md-4 col-12">
+                    <div class="form-group">
+                      <label for="itemname">Label</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="label"
+                        id="itemname"
+                        aria-describedby="itemname"
+                        placeholder="Enter your field"
+                        {% if more_fun %} readonly {% endif %}
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-md-2 col-12">
+                    <div class="form-group">
+                      <label for="itemcost">Amount</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        name='amount'
+                        id="itemcost"
+                        aria-describedby="itemcost"
+                        placeholder="32"
+                        {% if more_fun %} readonly {% endif %}
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-md-2 col-12 mb-50">
+                    <div class="form-group">
+                      <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button" {% if more_fun %} disabled {% endif %}>
+                        <i data-feather="x" class="mr-25"></i>
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <hr />
+              </div>
+              {% endif %}
+            </div>
+            <div class="row mb-2 mt-2">
+              <div class="col-12">
+                <button class="btn btn-icon btn-primary" type="button" data-repeater-create {% if more_fun %} disabled {% endif %}>
+                  <i data-feather="plus" class="mr-25"></i>
+                  <span>Add New</span>
+                </button>
+              </div>
+            </div>
+          </div> {% endcomment %}
+         
+        </form>
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-primary btn-prev">
+            <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
+            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+          </button>
+          <button class="btn btn-primary btn-next" onclick="submitForm(2)">
+            <span class="align-middle d-sm-inline-block d-none">Next</span>
+            <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
+          </button>
+        </div>
+      </div>
+      <div id="bank-account" class="content">
+   
+        <form method="post" id="form-step-3" enctype="multipart/form-data">
+          {% csrf_token %}
+    
+         <div class="row mb-2">
+                <div class="col-12">
+                <label class="form-label" for="rental-type">Account Type</label>
+                <div class="d-flex flex-wrap gap-2">
+                  {% for radio in form3.account_type %}
+                    <div class="form-check form-check-inline">
+                      {{ radio.tag }} {{ radio.choice_label }}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+              </div>
+          <div class="row mb-2">
+            <div class="form-group col-md-3">
+              <label class="form-label" for="first-name">Bank Name </label>
+              {{form3.bank_name}}
+            </div>
+            
+            <div class="form-group col-md-3">
+              <label class="form-label" for="first-name">Sort Code </label>
+              {{form3.sort_code}}
+            </div>
+            <div class="form-group col-md-3">
+              <label class="form-label" for="first-name">Account Number </label>
+              {{form3.account_number}}
+            </div>
+          </div>
+        </form >
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-primary btn-prev">
+            <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
+            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+          </button>
+          <button class="btn btn-primary btn-next" onclick="submitForm(3)">
+            <span class="align-middle d-sm-inline-block d-none">Next</span>
+            <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
+          </button>
+        </div>
+      </div>
+       <div id="upload-document" class="content">
+   
+        <form method="post" id="form-step-4" class="invoice-repeater" enctype="multipart/form-data">
+          {% csrf_token %}
+    
+         
+          <div class="row mb-2">
+            <div class="form-group col-md-3 mb-2">
+              <label class="form-label" for="first-name">Address Proof </label>
+              {{form4.address_proof}}
+            </div>
+            <div class="d-flex mb-2">
+                                            <a href="#" class="me-25">
+                                                <img src="{% if tenant.self_photo %}{{ tenant.self_photo.url }}{% else %}{% static 'image/logo/payment_proff.jpg' %}{% endif %}"
+                                                    id="self_photo-upload-img" class="uploadedAvatar rounded me-50" 
+                                                    alt="profile image" height="100" width="100" />
+                                            </a>
+                                            <div class="d-flex align-items-end mt-75 ms-1">
+                                                <div>
+                                                   
+                                                    <label for="self_photo-upload" class="btn btn-sm btn-primary mb-75 me-75">Photo</label>
+                                                    <input type="file" required name="self_photo" {% if more_fun %} disabled {% endif %} id="self_photo-upload" hidden accept="image/*" />
+                                                    <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            document.getElementById("self_photo-upload").addEventListener("change", function(event) {
+                                            const file = event.target.files[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = function(e) {
+                                                    document.getElementById("self_photo-upload-img").src = e.target.result;
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                            });
+                                        </script>
+            {% comment %} <div class="form-group col-md-3">
+              <label class="form-label" for="first-name">Photo </label>
+              {{form4.self_photo}}
+            </div> {% endcomment %}
+            <div class="d-flex mb-2">
+                                            <a href="#" class="me-25">
+                                                <img src="{% if tenant.visa_letter %}{{ tenant.visa_letter.url }}{% else %}{% static 'image/logo/payment_proff.jpg' %}{% endif %}"
+                                                    id="visa_letter-upload-img" class="uploadedAvatar rounded me-50" 
+                                                    alt="profile image" height="100" width="100" />
+                                            </a>
+                                            <div class="d-flex align-items-end mt-75 ms-1">
+                                                <div>
+                                                   
+                                                    <label for="visa_letter-upload" class="btn btn-sm btn-primary mb-75 me-75">Visa Letter</label>
+                                                    <input type="file" name="visa_letter" {% if more_fun %} disabled {% endif %} id="visa_letter-upload" hidden accept="image/*" />
+                                                    <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            document.getElementById("visa_letter-upload").addEventListener("change", function(event) {
+                                            const file = event.target.files[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = function(e) {
+                                                    document.getElementById("visa_letter-upload-img").src = e.target.result;
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                            });
+                                        </script>
+            {% comment %} <div class="form-group col-md-3">
+              <label class="form-label" for="first-name">Visa Letter </label>
+              {{form4.visa_letter}}
+            </div> {% endcomment %}
+
+            <div class="d-flex mb-2">
+                                            <a href="#" class="me-25">
+                                                <img src="{% if tenant.bank_statement %}{{ tenant.bank_statement.url }}{% else %}{% static 'image/logo/payment_proff.jpg' %}{% endif %}"
+                                                    id="bank_statement-upload-img" class="uploadedAvatar rounded me-50" 
+                                                    alt="profile image" height="100" width="100" />
+                                            </a>
+                                            <div class="d-flex align-items-end mt-75 ms-1">
+                                                <div>
+                                                   
+                                                    <label for="bank_statement-upload" class="btn btn-sm btn-primary mb-75 me-75">Bank Statement</label>
+                                                    <input type="file" name="bank_statement" {% if more_fun %} disabled {% endif %} id="bank_statement-upload" hidden accept="image/*" />
+                                                    <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            document.getElementById("bank_statement-upload").addEventListener("change", function(event) {
+                                            const file = event.target.files[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = function(e) {
+                                                    document.getElementById("bank_statement-upload-img").src = e.target.result;
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                            });
+                                        </script>
+            {% comment %} <div class="form-group col-md-3">
+              <label class="form-label" for="first-name">Bank Statement </label>
+              {{form4.bank_statement}}
+            </div> {% endcomment %}
+          </div>
+          <div class="row mb-2">
+             <div class="d-flex mb-2">
+                                            <a href="#" class="me-25">
+                                                <img src="{% if tenant.pay_slips %}{{ tenant.pay_slips.url }}{% else %}{% static 'image/logo/payment_proff.jpg' %}{% endif %}"
+                                                    id="pay_slips-upload-img" class="uploadedAvatar rounded me-50" 
+                                                    alt="profile image" height="100" width="100" />
+                                            </a>
+                                            <div class="d-flex align-items-end mt-75 ms-1">
+                                                <div>
+                                                   
+                                                    <label for="pay_slips-upload" class="btn btn-sm btn-primary mb-75 me-75">Pay Slips</label>
+                                                    <input type="file" name="pay_slips" {% if more_fun %} disabled {% endif %} id="pay_slips-upload" hidden accept="image/*" />
+                                                    <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            document.getElementById("pay_slips-upload").addEventListener("change", function(event) {
+                                            const file = event.target.files[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = function(e) {
+                                                    document.getElementById("pay_slips-upload-img").src = e.target.result;
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                            });
+                                        </script>
+            {% comment %} <div class="form-group col-md-3">
+              <label class="form-label" for="pay_slips">Pay Slips </label>
+              {{form4.pay_slips}}
+            </div> {% endcomment %}
+          </div>
+           <div class="row mb-2">
+            <div class="form-group col-md-3">
+              <label class="form-label" for="other">Other </label>
+              {% comment %} <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="checked" checked=""> {% endcomment %}
+              {{form4.other}}
+            </div>
+            
+          </div>
+           <div id="repeater-section" style="display:{% if tenant.other %}block{% else %} none{% endif %};">
+            <div data-repeater-list="invoice">
+              {% if tenant.other %}
+              {% for i in tenant.bankother.all %}
+              <div data-repeater-item>
+                <div class="row d-flex align-items-end">
+                  <div class="col-md-3 col-12 mb-2">
+                    <div class="form-group">
+                      <label for="itemname">Document type</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="document_type"
+                        id="itemname"
+                        aria-describedby="itemname"
+                        placeholder="Enter your field"
+                        value="{{i.document_type}}"
+                        {% if more_fun %} readonly {% endif %}
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-9 col-12">
+                                        <div class="d-flex mb-2">
+                                            <a href="#" class="me-25">
+                                                <img src="{% if i.upload_document %}{{ i.upload_document.url }}{% else %}{% static 'image/logo/payment_proff.jpg' %}{% endif %}"
+                                                    id="upload_document-upload-img" class="uploadedAvatar rounded  mt-2 me-50" 
+                                                    alt="profile image" height="100" width="100" />
+                                            </a>
+                                            <div class="d-flex align-items-end mt-75 ms-1">
+                                                <div>
+                                                   
+                                                    <label for="upload_document-upload" class="btn btn-sm btn-primary mb-75 me-75">Upload Document</label>
+                                                    <input type="file" name="upload_document" {% if more_fun %} disabled {% endif %} id="upload_document-upload" hidden accept="image/*" />
+                                                    <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            document.getElementById("upload_document-upload").addEventListener("change", function(event) {
+                                            const file = event.target.files[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = function(e) {
+                                                    document.getElementById("upload_document-upload-img").src = e.target.result;
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                            });
+                                        </script>
+                                      </div>
+                  {% comment %} <div class="col-md-2 col-12">
+                    <div class="form-group">
+                      <label for="itemcost">Amount</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        name='amount'
+                        id="itemcost"
+                        aria-describedby="itemcost"
+                        placeholder="32"
+                        value='{{i.amount}}'
+                        {% if more_fun %} readonly {% endif %}
+                      />
+                    </div>
+                  </div> {% endcomment %}
+
+                  <div class="col-md-2 col-12 mb-50">
+                    <div class="form-group">
+                      <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button"{% if more_fun %} disabled {% endif %}>
+                        <i data-feather="x" class="mr-25"></i>
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <hr />
+              </div>
+                {% endfor %}
+                {% else %}
+                <div data-repeater-item>
+                <div class="row d-flex align-items-end">
+                  <div class="col-md-3 col-12 mb-2">
+                    <div class="form-group">
+                      <label for="itemname">Document Type</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="document_type"
+                        id="itemname"
+                        aria-describedby="itemname"
+                        placeholder="Enter your field"
+                        {% if more_fun %} readonly {% endif %}
+                      />
+                    </div>
+                  </div>
+
+
+                  <div class="col-md-7 col-12">
+                    <div class="d-flex mb-2">
+                                            <a href="#" class="me-25">
+                                                <img src="{% static 'image/logo/payment_proff.jpg' %}"
+                                                    id="upload_document-upload-img" class="uploadedAvatar rounded me-50" 
+                                                    alt="profile image" height="100" width="100" />
+                                            </a>
+                                            <div class="d-flex align-items-end mt-75 ms-1">
+                                                <div>
+                                                   
+                                                    <label for="upload_document-upload" class="btn btn-sm btn-primary mb-75 me-75">Pay Slips</label>
+                                                    <input type="file" name="upload_document" {% if more_fun %} disabled {% endif %} id="upload_document-upload" hidden accept="image/*" />
+                                                    <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            document.getElementById("upload_document-upload").addEventListener("change", function(event) {
+                                            const file = event.target.files[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = function(e) {
+                                                    document.getElementById("upload_document-upload-img").src = e.target.result;
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                            });
+                                        </script>
+                                      </div>
+                  {% comment %} <div class="col-md-2 col-12">
+                    <div class="form-group">
+                      <label for="itemcost">Amount</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        name='amount'
+                        id="itemcost"
+                        aria-describedby="itemcost"
+                        placeholder="32"
+                        {% if more_fun %} readonly {% endif %}
+                      />
+                    </div>
+                  </div> {% endcomment %}
+
+                  <div class="col-md-2 col-12 mb-50">
+                    <div class="form-group">
+                      <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button" {% if more_fun %} disabled {% endif %}>
+                        <i data-feather="x" class="mr-25"></i>
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <hr />
+              </div>
+              {% endif %}
+            </div>
+            <div class="row mb-2 mt-2">
+              <div class="col-12">
+                <button class="btn btn-icon btn-primary" type="button" data-repeater-create {% if more_fun %} disabled {% endif %}>
+                  <i data-feather="plus" class="mr-25"></i>
+                  <span>Add New</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+        </form >
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-primary btn-prev">
+            <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
+            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+          </button>
+          <button class="btn btn-primary btn-next" onclick="submitForm(4)">
+            <span class="align-middle d-sm-inline-block d-none">Next</span>
+            <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
+          </button>
+        </div>
+      </div>
+       <div id="review-offer" class="content">
+   
+        <form method="post" id="form-step-5" enctype="multipart/form-data">
+          {% csrf_token %}
+    
+         
+          <div class="row mb-2">
+            <div class="col-md-3">
+              <div class="form-group">
+                  <label for="Property ">Property</label>
+                  <input type="text" name="Property" id="Property" class="form-control" readonly value="{{tenant.property.short_name}}"  disable >  
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                  <label for="Property ">Flat number </label>
+                  <input type="text" name="Property" id="Property" class="form-control" readonly value="{{tenant.room.room_code}}"  disable >  
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                  <label for="Property ">Rent</label>
+                  <input type="text" name="Property" id="Property" class="form-control" readonly value="{{tenant.room.rent}}"  disable >  
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                  <label for="Property ">Max Occupancy </label>
+                  <input type="text" name="Property" id="Property" class="form-control" readonly value="{{tenant.room.total_capacity}}"  disable >  
+              </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-md-3">
+              <div class="form-group">
+                  <label for="Property ">Additional Charges(1 time) </label>
+                  <input type="text" name="Property" id="Property" class="form-control" readonly value="{{tenant.property.financials.one_time_setup_cost}}"  disable >  
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                  <label for="Property ">Cleaning Fee</label>
+                  <input type="text" name="Property" id="Property" class="form-control" readonly value="{{tenant.property.financials.cleaning}}"  disable >  
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                  <label for="Property ">Food </label>
+                  <input type="text" name="Property" id="Property" class="form-control" readonly value=""  disable >  
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                  <label for="Property ">Any Additional Recurring Fee</label>
+                  <input type="text" name="Property" id="Property" class="form-control" readonly value=""  disable >  
+              </div>
+            </div>
+          </div>
+           <div class="row mb-2">
+            <div class="col-md-3">
+              <div class="form-group">
+                <input class="form-check-input valid" type="checkbox" name="agree" required id="inlineCheckbox1" {% if tenant.is_agree %}checked{% endif %}>  
+                <label for="Property ">I Agree </label>
+              </div>
+            </div>
+          </div>
+        </form >
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-primary btn-prev">
+            <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
+            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+          </button>
+          <button type="button" onclick='funsubmit()' id="sub001" class="btn btn-success" {% if not tenant.is_agree %}disabled{% endif %} >Submit</button>
+        </div>
+      </div>
+  
+    </div>
+  </div>
+</section>
+            </div>
+        </div>
+    <!-- END: Content-->
+{% endblock content %}
+
+ {% block scriptjs %}
+        
+       <!-- BEGIN: Page Vendor JS-->
+       <script href="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+       <script href="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+       <script href="{% static 'app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js' %}"></script>
+       <!-- END: Page Vendor JS-->
+        <script src="{% static 'app-assets/vendors/js/forms/wizard/bs-stepper.min.js' %}"></script>
+        <script src="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+        <script src="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+          <script src="{% static 'app-assets/vendors/js/forms/repeater/jquery.repeater.min.js' %}"></script>
+
+       <!-- BEGIN: Page JS-->
+       <script href="{% static 'app-assets/js/scripts/pages/app-user-edit.js' %}"></script>
+       <script href="{% static 'app-assets/js/scripts/components/components-navs.js' %}"></script>
+       <script src="{% static 'app-assets/js/scripts/forms/form-wizard.min.js' %}"></script>
+        <script src="{% static 'app-assets/js/scripts/forms/form-repeater.min.js' %}"></script>
+         <script src="{% static 'app-assets/js/scripts/customizer.min.js' %}"></script>
+         <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+         
+<script>
+   $(document).ready(function () {
+    $('#customCheck001').on('change', function () {
+    if ($(this).is(':checked')) {
+      $('#repeater-section').find('input[type="text"], input[type="number"]').attr('required', true);
+      $('#repeater-section').slideDown();
+    } else {
+      $('#repeater-section').find('input[type="text"], input[type="number"]').removeAttr('required');
+      $('#repeater-section').slideUp();
+    }
+  });
+});
+$(document).ready(function () {
+  const checkbox = $('#inlineCheckbox1');
+  const button = $('#sub001');
+
+  function toggleButton() {
+    if (checkbox.is(':checked')) {
+      button.removeAttr('disabled');
+    } else {
+      button.attr('disabled', true);
+    }
+  }
+
+  checkbox.on('change', toggleButton);
+  toggleButton(); // Run on page load
+});
+
+  function funsubmit(){
+    form=document.getElementById('form-step-5')
+    form.submit()
+  }
+
+function submitForm(step) {
+  console.log('he')
+    const form = document.getElementById(`form-step-${step}`);
+    const formData = new FormData(form);
+
+    fetch(`/tenant/submit-step/${step}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: formData
+    })
+    .then(res => res.json())  
+    .then(data => {
+        if (data.success) {
+            document.querySelector('#form-step-2 input[name="formid"]').value = data.formid;
+            document.querySelector('#form-step-3 input[name="formid2"]').value = data.formid;
+            // Hide current step
+            document.getElementById(`step-${step}`).style.display = 'none';
+            // Show next step
+            const nextStep = parseInt(step) + 1;
+            const nextDiv = document.getElementById(`step-${nextStep}`);
+            if (nextDiv) nextDiv.style.display = 'block';
+        } else {
+           
+        }
+    });
+}
+</script>
+{% endblock scriptjs %}

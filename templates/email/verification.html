@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body { font-family: Arial, sans-serif; color: #333; }
+      .container { max-width: 600px; margin: auto; padding: 20px; }
+      .otp { font-size: 24px; font-weight: bold; letter-spacing: 4px; color: #007bff; }
+      .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-top: 10px;
+      }
+      .footer { margin-top: 30px; font-size: 12px; color: #888; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Aquince Accommodation - Landlord Signup Verification</h2>
+      <p>Hi {{ landload.first_name }},</p>
+
+      <p>Thanks for signing up for Aquince Accommodation!</p>
+
+      <p>To verify your email address, you can either:</p>
+
+      <p>✅ Enter this 6-digit code in the app:</p>
+      <div class="otp">{{ otp }}</div>
+
+      <p>OR</p>
+
+      <p>🔗 Click the button below to verify instantly:</p>
+      <a href="{{ data }}" target="_blank" class="btn">Verify Email Address</a>
+
+      <p>This code and link are valid for a limited time and can only be used once.</p>
+
+      <p>If you didn’t sign up for Aquince Accommodation, feel free to ignore this message.</p>
+
+      <div class="footer">
+        Welcome aboard,<br>
+        The Aquince Accommodation Team
+      </div>
+    </div>
+  </body>
+</html>
