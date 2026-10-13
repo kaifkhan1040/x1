@@ -58,7 +58,7 @@
                             <button type="button" class="step-trigger">
                               <span class="bs-stepper-box">1</span>
                               <span class="bs-stepper-label">
-                                <span class="bs-stepper-title">Section 1</span>
+                                <span class="bs-stepper-title">Step 1</span>
                                 <span class="bs-stepper-subtitle">Setup Basic Details</span>
                               </span>
                             </button>
@@ -71,7 +71,7 @@
                             <button type="button" class="step-trigger">
                               <span class="bs-stepper-box">2</span>
                               <span class="bs-stepper-label">
-                                <span class="bs-stepper-title">Section 2</span>
+                                <span class="bs-stepper-title">Step 2</span>
                                 <span class="bs-stepper-subtitle">Financials</span>
                               </span>
                             </button>
@@ -85,7 +85,7 @@
                             <button type="button" class="step-trigger">
                               <span class="bs-stepper-box">3</span>
                               <span class="bs-stepper-label">
-                                <span class="bs-stepper-title">Section 3</span>
+                                <span class="bs-stepper-title">Step 3</span>
                                 <span class="bs-stepper-subtitle">Asset</span>
                               </span>
                             </button>
@@ -126,13 +126,13 @@
               </div>
               <div class="row mb-2">
                 <div class="form-group col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                    <label for="username">Name</label>
-                    {{form.short_name}}      
+                    <label for="username">Property name</label>
+                    {{form.property_name}}      
                     <input type="hidden" name="formid1" value="{{property_obj.id}}">                      
                 </div>
                 <div class="form-group col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                    <label for="username">Full Name</label>
-                    {{form.name}}                              
+                    <label for="username">Landload Name</label>
+                    {{form.landlord_name}}                              
                 </div>
                 <div class="form-group col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
                 <label for="username">Address 1</label>
@@ -163,12 +163,23 @@
                 </div>
             </div>
             <div class="row mb-2">
+              <div class="form-group col-md-3">
+                  <label for="username">End Date</label>
+                  {{form.end_date}}
+              </div>
+                 <div class="form-group col-md-3">
+                    <label class="form-label" for="first-name">Monthly Rental {{symbol}}</label>
+                    {{form2.monthly_rental}}
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label class="form-label" for="last-name">Tax {{symbol}}</label>
+                    {{form2.tax}}
+                  </div>
+                  <div class="form-group col-md-3">
+              <label class="form-label" for="country">One Time Setup Cost {{symbol}}</label>
+              {{form2.one_time_setup_cost}}
+            </div>
                 
-                
-                <div class="form-group col-md-3">
-                    <label for="username">End Date</label>
-                    {{form.end_date}}
-                </div>
                 <div class="form-group col-md-3" id="num-flat-group" style="display: none;">
                 <label for="username">Number of Flat</label>
                     {{form.number_of_flat}}
@@ -200,195 +211,8 @@
         <form method="POST" id="form-step-2" class='invoice-repeater1'>
           {% csrf_token %}
           <input type="hidden" name="formid" {% if property_obj %}value="{{property_obj.id}}"{% endif %}value="">  
-          <div class="row mb-2">
-            <div class="form-group col-md-3">
-              <label class="form-label" for="first-name">Monthly Rental {{symbol}}</label>
-              {{form2.monthly_rental}}
-            </div>
-            <div class="form-group col-md-3">
-              <label class="form-label" for="last-name">Tax {{symbol}}</label>
-              {{form2.tax}}
-            </div>
-            <div class="form-group col-md-3">
-              <label class="form-label" for="last-name">Cleaning {{symbol}}</label>
-              {{form2.cleaning}}
-            </div>
-            <div class="form-group col-md-3">
-              <label class="form-label" for="last-name">Electricity {{symbol}}</label>
-              {{form2.electricity}}
-            </div>
-          </div>
-          <div class="row mb-2">
-            <div class="form-group col-md-3">
-              <label class="form-label" for="country">Gas {{symbol}}</label>
-              {{form2.gas}}
-            </div>
-            <div class="form-group col-md-3">
-              <label class="form-label" for="country">Internet {{symbol}}</label>
-              {{form2.internet}}
-            </div>
-            <div class="form-group col-md-3">
-              <label class="form-label" for="country">Water {{symbol}}</label>
-              {{form2.water}}
-            </div>
-            <div class="form-group col-md-3">
-              <label class="form-label" for="country">License</label>
-              {{form2.license}}
-            </div>
-
-           
-          </div>
-          <div class="row mb-2">
-            <div class="form-group col-md-3">
-              <label class="form-label" for="country">One Time Setup Cost {{symbol}}</label>
-              {{form2.one_time_setup_cost}}
-            </div>
-            <div class="form-group col-md-9">
-              <label class="form-label d-block mb-1">Collect Rent</label>
-              {% for radio in form2.collect_rent %}
-                <div class="form-check form-check-inline">
-                  {{ radio.tag }}
-                  <label class="form-check-label" for="{{ radio.id_for_label }}">
-                    {{ radio.choice_label }}
-                  </label>
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="row mb-2">
-            <div class="form-group col-md-3">
-              <div class="custom-control custom-checkbox">
-                {{form2.other}}
-                {% comment %} <input type="checkbox" class="custom-control-input" id="customCheck1" /> {% endcomment %}
-                <label class="custom-control-label" for="customCheck1">Others</label>
-              </div>
-            </div>
-          </div>
-          <div id="repeater-section" style="display:{% if property_obj2.other %}block{% else %} none{% endif %};">
-            <div data-repeater-list="invoice">
-              {% if property_obj2.other %}
-              {% for i in property_obj2.financialsother.all %}
-              <div data-repeater-item>
-                <div class="row d-flex align-items-end">
-                  <div class="col-md-4 col-12">
-                    <div class="form-group">
-                      <label for="itemname">Label</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        name="label"
-                        id="itemname"
-                        aria-describedby="itemname"
-                        placeholder="Enter your field"
-                        value="{{i.lable}}"
-                        {% if more_fun %} readonly {% endif %}
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-md-2 col-12">
-                    <div class="form-group">
-                      <label for="itemcost">Amount {{symbol}}</label>
-                      <input
-                        type="number"
-                        class="form-control"
-                        name='amount'
-                        id="itemcost"
-                        aria-describedby="itemcost"
-                        placeholder="32"
-                        value='{{i.amount}}'
-                        {% if more_fun %} readonly {% endif %}
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-md-2 col-12 mb-50">
-                    <div class="form-group">
-                      <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button"{% if more_fun %} disabled {% endif %}>
-                        <i data-feather="x" class="mr-25"></i>
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-                {% endfor %}
-                {% else %}
-                <div data-repeater-item>
-                <div class="row d-flex align-items-end">
-                  <div class="col-md-4 col-12">
-                    <div class="form-group">
-                      <label for="itemname">Label</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        name="label"
-                        id="itemname"
-                        aria-describedby="itemname"
-                        placeholder="Enter your field"
-                        {% if more_fun %} readonly {% endif %}
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-md-2 col-12">
-                    <div class="form-group">
-                      <label for="itemcost">Amount</label>
-                      <input
-                        type="number"
-                        class="form-control"
-                        name='amount'
-                        id="itemcost"
-                        aria-describedby="itemcost"
-                        placeholder="32"
-                        {% if more_fun %} readonly {% endif %}
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-md-2 col-12 mb-50">
-                    <div class="form-group">
-                      <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button" {% if more_fun %} disabled {% endif %}>
-                        <i data-feather="x" class="mr-25"></i>
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <hr />
-              </div>
-              {% endif %}
-            </div>
-            <div class="row mb-2 mt-2">
-              <div class="col-12">
-                <button class="btn btn-icon btn-primary" type="button" data-repeater-create {% if more_fun %} disabled {% endif %}>
-                  <i data-feather="plus" class="mr-25"></i>
-                  <span>Add New</span>
-                </button>
-              </div>
-            </div>
-          </div>
-         
-        </form>
-        <div class="d-flex justify-content-between">
-          <button class="btn btn-primary btn-prev">
-            <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
-            <span class="align-middle d-sm-inline-block d-none">Previous</span>
-          </button>
-          <button class="btn btn-primary btn-next" onclick="submitForm(2)">
-            <span class="align-middle d-sm-inline-block d-none">Next</span>
-            <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
-          </button>
-        </div>
-      </div>
-      <div id="address-step" class="content">
-   
-        <form method="post" id="form-step-3" enctype="multipart/form-data">
-          {% csrf_token %}
-    
-          <input type="hidden" name="formid2" {% if property_obj %} value="{{property_obj.id}}"{% endif %}> 
-
-       {{ outside_images_json|json_script:"outside-images-json" }}
+          
+         {{ outside_images_json|json_script:"outside-images-json" }}
        {{ parking_images_json|json_script:"parking-images-json" }}
        {{ garage_images_json|json_script:"garage-images-json" }}
        {{ garden_images_json|json_script:"garden-images-json" }}
@@ -896,6 +720,26 @@
               </div>
             </div>
           </div>
+        </form>
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-primary btn-prev">
+            <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
+            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+          </button>
+          <button class="btn btn-primary btn-next" onclick="submitForm(2)">
+            <span class="align-middle d-sm-inline-block d-none">Next</span>
+            <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
+          </button>
+        </div>
+      </div>
+      <div id="address-step" class="content">
+   
+        <form method="post" id="form-step-3" enctype="multipart/form-data">
+          {% csrf_token %}
+    
+          <input type="hidden" name="formid2" {% if property_obj %} value="{{property_obj.id}}"{% endif %}> 
+
+       
 
           
     

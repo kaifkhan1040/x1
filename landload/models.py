@@ -10,14 +10,14 @@ class Property(models.Model):
 
 
     custom_id = models.CharField(max_length=10, unique=True, blank=True)
-    short_name = models.CharField(max_length=100)
-    name = models.CharField(max_length=200,blank=True,null=True)
+    property_name = models.CharField(max_length=250)
+    landlord_name = models.CharField(max_length=200,blank=True,null=True)
     address_1 = models.CharField(max_length=255)
     address_2 = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=100)
     postcode = models.CharField(max_length=8)
 
-    property_type = models.CharField(max_length=100,choices=(('Detached House','Detached House'),('Private Apartment','Private Apartment')),blank=True,null=True)
+    property_type = models.CharField(max_length=100,choices=(('House','House'),('Apartment','Apartment'),('Studio','Studio'),('Others','Others')),blank=True,null=True)
     number_of_flat = models.CharField(max_length=100,choices=ROOM_CHOICES,blank=True,null=True)
     cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     start_date = models.DateField()
@@ -31,7 +31,7 @@ class Property(models.Model):
   
 
     def __str__(self):
-        return f"{self.short_name} - {self.name}"
+        return f"{self.property_name} - {self.landlord_name}"
     
     def save(self, *args, **kwargs):
         if not self.custom_id:
@@ -70,7 +70,7 @@ class FinancialBreakdown(models.Model):
     license = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     one_time_setup_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     other = models.BooleanField(default=False)
-    collect_rent =models.CharField(max_length=20,choices=(('Weekly','Weekly'),('Monthly','Monthly')))
+    collect_rent =models.CharField(max_length=20,choices=(('Weekly','Weekly'),('Monthly','Monthly')),default='Monthly',blank=True)
     
     def total_cost(self):
         fields = [

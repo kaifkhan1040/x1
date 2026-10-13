@@ -15,7 +15,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>Demo: Dashboard - Analytics | Vuexy - Bootstrap Dashboard PRO</title>
+    <title>X1</title>
 
     <meta name="description" content="" />
 
@@ -107,7 +107,7 @@
                   </svg>
                 </span> {% endcomment %}
               </span>
-              <span class="app-brand-text demo menu-text fw-bold ms-3">Aquince Accommodation</span>
+              <span class="app-brand-text demo menu-text fw-bold ms-3">X1</span>
             </a>
 
             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -299,12 +299,12 @@
                 <div data-i18n="Tenants">Tenants</div>
               </a>
             </li>
-            <li class="menu-item {% if is_locked %}disabled readonly{% endif %}">
+            {% comment %} <li class="menu-item {% if is_locked %}disabled readonly{% endif %}">
               <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
                 <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}message{% endif %}"></i>
                 <div data-i18n="Messages">Messages</div>
               </a>
-            </li>
+            </li> {% endcomment %}
             <li class="menu-item {% if is_locked %}disabled readonly{% endif %}">
               <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link menu-toggle">
                 <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}message{% endif %}"></i>
@@ -486,7 +486,7 @@
               </ul>
             </li>
             <!-- e-commerce-app menu end -->
-            <li class="menu-item {% if is_maintenance %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
+            {% comment %} <li class="menu-item {% if is_maintenance %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
               <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
                 <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}settings{% endif %}"></i>
                 <div data-i18n="Maintenance">Maintenance</div>
@@ -497,7 +497,7 @@
                 <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}users{% endif %}"></i>
                 <div data-i18n="Agents">Agents</div>
               </a>
-            </li>
+            </li> {% endcomment %}
              <li class="menu-item {% if is_reports %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
               <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
                 <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}chart-bar{% endif %}"></i>
@@ -527,11 +527,11 @@
                     <div data-i18n="Email Setting">Email Setting</div>
                   </a>
                 </li>
-                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                {% comment %} <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
                   <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
                     <div data-i18n="WhatsApp">WhatsApp</div>
                   </a>
-                </li>
+                </li> {% endcomment %}
                 <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
                   <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
                     <div data-i18n="Billing">Billing</div>

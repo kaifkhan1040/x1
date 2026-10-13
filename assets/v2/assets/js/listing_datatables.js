@@ -42,14 +42,16 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 },
       columns: [
         { data: 'responsive_id', visible: false }, // 1
-          { data: null, defaultContent: '', orderable: false }, // 2 checkbox
+          // { data: null, defaultContent: '', orderable: false }, // 2 checkbox
           { data: 'sr' },        // ✅ sr should match the backend key
           { data: 'id' },
           { data: 'name' },
+          { data: 'earning' },
+          { data: 'expenses' },
           { data: 'profit' },
           { data: 'dues' },
           { data: 'loss' },
-          { data: null }
+          // { data: null }
       ],
       columnDefs: [
         {
@@ -59,28 +61,33 @@ document.addEventListener('DOMContentLoaded', function (e) {
           responsivePriority: 2,
           targets: 0
         },
-        {
-          // For Checkboxes
-          targets: 1,
-          orderable: false,
-          searchable: false,
-          responsivePriority: 3,
-          checkboxes: true,
-          render: function () {
-            return '<input type="checkbox" class="dt-checkboxes form-check-input">';
-          },
-          checkboxes: {
-            selectAllRender: '<input type="checkbox" class="form-check-input">'
-          }
-        },
         // {
-        //   targets: 2,
+        //   // For Checkboxes
+        //   targets: 1,
+        //   orderable: false,
         //   searchable: false,
-        //   visible: false
+        //   responsivePriority: 3,
+        //   checkboxes: true,
+        //   render: function () {
+        //     return '<input type="checkbox" class="dt-checkboxes form-check-input">';
+        //   },
+        //   checkboxes: {
+        //     selectAllRender: '<input type="checkbox" class="form-check-input">'
+        //   }
         // },
         {
+          targets: 1,
+          searchable: false,
+          visible: true
+        },
+        {
+          targets: 3,
+          searchable: false,
+          visible: true
+        },
+        {
           // Avatar image/badge, Name and post
-         targets: 3,  // ID column
+         targets: 2,  // ID column
     render: function (data, type, full, meta) {
       return `<a href="/landlord/listing-dashboard/${data}/" class="text-primary">${data}</a>`;
     }
@@ -113,27 +120,27 @@ document.addEventListener('DOMContentLoaded', function (e) {
             `;
           }
         },
-        {
-          // Actions
-          targets: -1,
-          title: 'Actions',
-          orderable: false,
-          searchable: false,
-          render: function (data, type, full, meta) {
-            return (
-              '<div class="d-inline-block">' +
-              '<a href="javascript:;" class="btn btn-icon btn-text-secondary rounded-pill waves-effect dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="icon-base ti tabler-dots-vertical"></i></a>' +
-              '<ul class="dropdown-menu dropdown-menu-end m-0">' +
-              '<li><a href="javascript:;" class="dropdown-item">Details</a></li>' +
-              '<li><a href="javascript:;" class="dropdown-item">Archive</a></li>' +
-              '<div class="dropdown-divider"></div>' +
-              '<li><a href="javascript:;" class="dropdown-item text-danger delete-record">Delete</a></li>' +
-              '</ul>' +
-              '</div>' +
-              '<a href="javascript:;" class="btn btn-icon btn-text-secondary rounded-pill waves-effect item-edit"><i class="icon-base ti tabler-pencil"></i></a>'
-            );
-          }
-        }
+        // {
+        //   // Actions
+        //   targets: -1,
+        //   title: 'Actions',
+        //   orderable: false,
+        //   searchable: false,
+        //   render: function (data, type, full, meta) {
+        //     return (
+        //       '<div class="d-inline-block">' +
+        //       '<a href="javascript:;" class="btn btn-icon btn-text-secondary rounded-pill waves-effect dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="icon-base ti tabler-dots-vertical"></i></a>' +
+        //       '<ul class="dropdown-menu dropdown-menu-end m-0">' +
+        //       '<li><a href="javascript:;" class="dropdown-item">Details</a></li>' +
+        //       '<li><a href="javascript:;" class="dropdown-item">Archive</a></li>' +
+        //       '<div class="dropdown-divider"></div>' +
+        //       '<li><a href="javascript:;" class="dropdown-item text-danger delete-record">Delete</a></li>' +
+        //       '</ul>' +
+        //       '</div>' +
+        //       '<a href="javascript:;" class="btn btn-icon btn-text-secondary rounded-pill waves-effect item-edit"><i class="icon-base ti tabler-pencil"></i></a>'
+        //     );
+        //   }
+        // }
       ],
       select: {
         style: 'multi',

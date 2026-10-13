@@ -168,7 +168,7 @@ def monthly_profit_comparison_by_property(request):
             else:
                 status = 'no-change'
             properties_data.append({
-            'property_name': prop_id.short_name,
+            'property_name': prop_id.property_name,
             'last_month_profit': last_month_profit,
             'this_month_profit': this_month_profit,
             'percent_change': change,
@@ -189,7 +189,7 @@ def monthly_profit_comparison_by_property(request):
                 status = 'loss-to-profit'
             
             properties_data_loss.append({
-            'property_name': prop_id.short_name,
+            'property_name': prop_id.property_name,
             # 'property_name':prop_name,
             'last_month_profit': last_month_profit,
             'this_month_profit': this_month_profit,
@@ -370,7 +370,7 @@ def listing(request):
    
     if query:
         property = property.filter(
-            Q(short_name__icontains=query) |
+            Q(property_name__icontains=query) |
             Q(custom_id__icontains=query) |
             Q(property_type__icontains=query) |
             Q(postcode__icontains=query)
@@ -381,9 +381,14 @@ def listing(request):
 def submit_step(request, step):
     if request.method == 'POST':
         post_data = request.POST.copy()
+        print(post_data)
         post_data['landload']=request.user
         post_data['is_active']=True
         post_data['status']=True
+        post_data_finance={}
+        post_data_finance['tax'] = request.POST.get('tax')
+        post_data_finance['monthly_rental'] =  request.POST.get('monthly_rental')
+        post_data_finance['one_time_setup_cost'] =  request.POST.get('one_time_setup_cost')
         if step == '1':
             formidtemp=request.POST.get('formid1')
             form = PropertyForm(post_data)
@@ -391,6 +396,9 @@ def submit_step(request, step):
                 prodata=Property.objects.filter(id=formidtemp).first()
                 if prodata:
                     form = PropertyForm(post_data,instance=prodata)
+                
+                
+                
         elif step == '2':
             post_data2 = request.POST.copy()
             formid = request.POST.get('formid')  
@@ -439,7 +447,19 @@ def submit_step(request, step):
             if temp.number_of_flat:
                 for i in range(int(temp.number_of_flat)):
                     Rooms.objects.create(property=temp,room_count=f"{i+1:02}")
-            print('temp id',temp.id)
+            print('temp id',temp.id,temp)
+            financial_instance = FinancialBreakdown.objects.filter(
+                                    property=temp
+                                ).first()
+
+            post_data_finance['property']=temp
+            formfinacal = FinancialBreakdownform(post_data_finance)
+            if financial_instance:
+                form = FinancialBreakdownform(post_data_finance,instance=financial_instance)
+            if formfinacal.is_valid():
+                financial_obj = formfinacal.save()
+            else:
+                print('error---------------',formfinacal.errors)
             return JsonResponse({'success': True,"formid":temp.id})
         else:
             return JsonResponse({'success': False, 'errors': form.errors})
@@ -742,7 +762,9 @@ def listing_list(request):
             'responsive_id':"",
             'sr':i,
             'id':obj.custom_id,
-            'name':obj.short_name,
+            'name':obj.property_name,
+            'earning':"---",
+            'expenses':"---",
             'profit': "---",
             'dues': "---",
             'loss': "---",
@@ -761,7 +783,7 @@ def payment_list(request):
             'sr':i,
             'id':obj.custom_id,
             'Full_name':obj.tenant_name,
-            'Property': str(obj.property.short_name),
+            'Property': str(obj.property.property_name),
             'Rent': "---",
             'Total Dues': "---",
             'Last Payment': "---",
@@ -780,7 +802,7 @@ def tenant_list(request):
             'id':obj.id,
             'custom_id': obj.custom_id,
             'full_name':obj.user.first_name+''+obj.user.last_name if obj.user.last_login else '',
-            'property': obj.property.short_name,
+            'property': obj.property.property_name,
             'rent': obj.rent,
             'total_dues': "----",
             'last_payment': "",  
@@ -969,8 +991,8 @@ def dues(request):
         dues = dues.filter(
             Q(tenant_name__icontains=query) |
             Q(custom_id__icontains=query) |
-            Q(property__name__icontains=query) |
-            Q(property__short_name__icontains=query)
+            Q(property__landlord_name__icontains=query) |
+            Q(property__property_name__icontains=query)
         )
     return render(request,'landload/dues.html',{'dues':dues,'search_field':True,'is_payment':True})    
 
@@ -1052,8 +1074,8 @@ def expense(request):
         dues = dues.filter(
             Q(tenant_name__icontains=query) |
             Q(custom_id__icontains=query) |
-            Q(property__name__icontains=query) |
-            Q(property__short_name__icontains=query)
+            Q(property__property_name__icontains=query) |
+            Q(property__landlord_name__icontains=query)
         )
     return render(request,'landload/expense.html',{'dues':dues,'search_field':True,'is_expence':True})    
 
@@ -1136,7 +1158,7 @@ def expenses_list(request):
             'sr':i,
             'id':obj.custom_id,
             'Full_name':obj.tenant_name,
-            'Property': str(obj.property.short_name),
+            'Property': str(obj.property.property_name),
             'Rent': "---",
             'Total Dues': "---",
             'Last Payment': "---",

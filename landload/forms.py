@@ -9,8 +9,8 @@ from django.forms.widgets import FileInput
 class PropertyForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['short_name'].widget.attrs.update({'class': 'form-control valid'})
-        self.fields['name'].widget.attrs.update({'class': 'form-control valid'})
+        self.fields['property_name'].widget.attrs.update({'class': 'form-control valid'})
+        self.fields['landlord_name'].widget.attrs.update({'class': 'form-control valid'})
         self.fields['address_1'].widget.attrs.update({'class': 'form-control valid'})
         self.fields['address_2'].widget.attrs.update({'class': 'form-control valid'})
         self.fields['city'].widget.attrs.update({'class': 'form-control valid'})
