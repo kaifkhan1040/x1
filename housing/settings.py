@@ -82,23 +82,30 @@ WSGI_APPLICATION = 'housing.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# DATABASES ={
-#         'default':{
-#                 'ENGINE': 'django.db.backends.mysql',
-#                 'NAME': 'housing',
-#                 'USER': 'root',
-#                 'PASSWORD': 'Root@123',
-#                 'HOST':'localhost',
-#                 'PORT':'3306',
-#         }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 # }
+
+DATABASES ={
+        'default':{
+                'ENGINE': 'django.db.backends.mysql',
+                "NAME": os.environ["DB_NAME"],
+                "USER": os.environ["DB_USER"],
+                "PASSWORD": os.environ["DB_PASSWORD"],
+                "HOST": os.environ["DB_HOST"],
+                "PORT": "3306",
+                "OPTIONS": {
+                    "charset": "utf8mb4",
+                    "ssl": {
+                        "ca": "/etc/ssl/certs/rds-global-bundle.pem",
+                    },
+                    "ssl_mode": "VERIFY_IDENTITY",
+                },
+        }
+}
 
 EMAIL_USE_TLS = config('EMAIL_USE_TLS')
 EMAIL_BACKEND = config('EMAIL_BACKEND')
