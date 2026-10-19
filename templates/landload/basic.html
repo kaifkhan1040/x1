@@ -287,56 +287,6 @@
             {% comment %} <li class="menu-header small">
               <span class="menu-header-text" data-i18n="Apps & Pages">Apps &amp; Pages</span>
             </li> {% endcomment %}
-            <li class="menu-item {% if is_listing %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
-              <a href="{% if is_locked %}#{% else %}{% url 'landload:listing' %}{% endif %}" class="menu-link">
-                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}home{% endif %}"></i>
-                <div data-i18n="Listings">Listings</div>
-              </a>
-            </li>
-            <li class="menu-item {% if is_tenant %}active{% endif %} {% if is_locked %}disabled readonly{% endif %}">
-              <a href="{% if is_locked %}#{% else %}{% url 'landload:tenant' %}{% endif %}" class="menu-link">
-                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}user{% endif %}"></i>
-                <div data-i18n="Tenants">Tenants</div>
-              </a>
-            </li>
-            {% comment %} <li class="menu-item {% if is_locked %}disabled readonly{% endif %}">
-              <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
-                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}message{% endif %}"></i>
-                <div data-i18n="Messages">Messages</div>
-              </a>
-            </li> {% endcomment %}
-            <li class="menu-item {% if is_locked %}disabled readonly{% endif %}">
-              <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link menu-toggle">
-                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}message{% endif %}"></i>
-                <div data-i18n="Finance">Finance</div>
-              </a>
-              <ul class="menu-sub">
-                
-                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-                  <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
-                    <div data-i18n="Dues">Dues</div>
-                  </a>
-                </li>
-                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-                  <a href="{% if is_locked %}#{% else %}{% url 'landload:dues' %}{% endif %}" class="menu-link">
-                    <div data-i18n="Payments">Payments</div>
-                  </a>
-                </li>
-                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-                  <a href="{% if is_locked %}#{% else %}{% url 'landload:expense' %}{% endif %}" class="menu-link">
-                    <div data-i18n="Expenses">Expenses</div>
-                  </a>
-                </li>
-                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-                  <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
-                    <div data-i18n="Deposits">Deposits</div>
-                  </a>
-                </li>
-              
-            </ul>
-            </li>
-           
-            <!-- e-commerce-app menu start -->
             <li class="menu-item" {% if is_locked %}disabled readonly{% endif %}  {% if is_locked %}style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
               <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}message{% endif %}"></i>
@@ -485,6 +435,57 @@
                 </li> {% endcomment %}
               </ul>
             </li>
+            <li class="menu-item {% if is_listing %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
+              <a href="{% if is_locked %}#{% else %}{% url 'landload:listing' %}{% endif %}" class="menu-link">
+                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}home{% endif %}"></i>
+                <div data-i18n="Listings">Listings</div>
+              </a>
+            </li>
+            <li class="menu-item {% if is_tenant %}active{% endif %} {% if is_locked %}disabled readonly{% endif %}">
+              <a href="{% if is_locked %}#{% else %}{% url 'landload:tenant' %}{% endif %}" class="menu-link">
+                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}user{% endif %}"></i>
+                <div data-i18n="Tenants">Tenants</div>
+              </a>
+            </li>
+            {% comment %} <li class="menu-item {% if is_locked %}disabled readonly{% endif %}">
+              <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
+                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}message{% endif %}"></i>
+                <div data-i18n="Messages">Messages</div>
+              </a>
+            </li> {% endcomment %}
+            <li class="menu-item {% if is_locked %}disabled readonly{% endif %}">
+              <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link menu-toggle">
+                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}message{% endif %}"></i>
+                <div data-i18n="Finance">Finance</div>
+              </a>
+              <ul class="menu-sub">
+                
+                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                  <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
+                    <div data-i18n="Dues">Dues</div>
+                  </a>
+                </li>
+                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                  <a href="{% if is_locked %}#{% else %}{% url 'landload:dues' %}{% endif %}" class="menu-link">
+                    <div data-i18n="Payments">Payments</div>
+                  </a>
+                </li>
+                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                  <a href="{% if is_locked %}#{% else %}{% url 'landload:expense' %}{% endif %}" class="menu-link">
+                    <div data-i18n="Expenses">Expenses</div>
+                  </a>
+                </li>
+                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                  <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
+                    <div data-i18n="Deposits">Deposits</div>
+                  </a>
+                </li>
+              
+            </ul>
+            </li>
+           
+            <!-- e-commerce-app menu start -->
+            
             <!-- e-commerce-app menu end -->
             {% comment %} <li class="menu-item {% if is_maintenance %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
               <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
@@ -504,41 +505,14 @@
                 <div data-i18n="Reports">Reports</div>
               </a>
             </li>
-
-            <!-- Academy menu start -->
-            <li class="menu-item" {% if is_locked %}disabled readonly{% endif %} {% if is_locked %}style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}user{% endif %}"></i>
-                <div data-i18n="Account">Account</div>
+            <li class="menu-item {% if is_locked %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
+              <a href="{% if is_locked %}#{% else %}{% endif %}" class="menu-link">
+                <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}users{% endif %}"></i>
+                <div data-i18n="User">User</div>
               </a>
-              <ul class="menu-sub">
-                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-                  <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
-                    <div data-i18n="Profile">Profile</div>
-                  </a>
-                </li>
-                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-                  <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
-                    <div data-i18n="Users">Users</div>
-                  </a>
-                </li>
-                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-                  <a href="{% if is_locked %}#{% else %}{% url 'landload:email_setting' %}{% endif %}" class="menu-link">
-                    <div data-i18n="Email Setting">Email Setting</div>
-                  </a>
-                </li>
-                {% comment %} <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-                  <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
-                    <div data-i18n="WhatsApp">WhatsApp</div>
-                  </a>
-                </li> {% endcomment %}
-                <li class="menu-item " {% if is_locked %}disabled readonly{% endif %} {% if is_locked %} style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
-                  <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
-                    <div data-i18n="Billing">Billing</div>
-                  </a>
-                </li>
-              </ul>
             </li>
+            <!-- Academy menu start -->
+           
          
 
       

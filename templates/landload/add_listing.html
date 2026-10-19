@@ -210,9 +210,28 @@
         </div> {% endcomment %}
         <form method="POST" id="form-step-2" class='invoice-repeater1'>
           {% csrf_token %}
-          <input type="hidden" name="formid" {% if property_obj %}value="{{property_obj.id}}"{% endif %}value="">  
+          <input type="hidden" name="formid" {% if property_obj %} value="{{property_obj.id}}" {% endif %} value="">  
           
-         {{ outside_images_json|json_script:"outside-images-json" }}
+         <div id="rooms-container"></div>
+        </form>
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-primary btn-prev">
+            <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
+            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+          </button>
+          <button class="btn btn-primary btn-next" onclick="submitForm(2)">
+            <span class="align-middle d-sm-inline-block d-none">Next</span>
+            <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
+          </button>
+        </div>
+      </div>
+      <div id="address-step" class="content">
+   
+        <form method="post" id="form-step-3" enctype="multipart/form-data">
+          {% csrf_token %}
+    
+          <input type="hidden" name="formid2" {% if property_obj %} value="{{property_obj.id}}"{% endif %}> 
+          {{ outside_images_json|json_script:"outside-images-json" }}
        {{ parking_images_json|json_script:"parking-images-json" }}
        {{ garage_images_json|json_script:"garage-images-json" }}
        {{ garden_images_json|json_script:"garden-images-json" }}
@@ -720,25 +739,6 @@
               </div>
             </div>
           </div>
-        </form>
-        <div class="d-flex justify-content-between">
-          <button class="btn btn-primary btn-prev">
-            <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
-            <span class="align-middle d-sm-inline-block d-none">Previous</span>
-          </button>
-          <button class="btn btn-primary btn-next" onclick="submitForm(2)">
-            <span class="align-middle d-sm-inline-block d-none">Next</span>
-            <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
-          </button>
-        </div>
-      </div>
-      <div id="address-step" class="content">
-   
-        <form method="post" id="form-step-3" enctype="multipart/form-data">
-          {% csrf_token %}
-    
-          <input type="hidden" name="formid2" {% if property_obj %} value="{{property_obj.id}}"{% endif %}> 
-
        
 
           
@@ -1104,6 +1104,156 @@ numberOfFlatInput.setAttribute("disabled", "disabled");
         });
     });
 </script>
+
+
+
+<div id="rooms-container"></div>
+
+<script>
+function generateRoomFields(rooms, symbol = '') {
+    const container = document.getElementById('rooms-container');
+    container.innerHTML = '';
+
+    // Create column headings only once
+    const header = document.createElement('div');
+    header.className = 'row mb-2 fw-bold align-items-center';
+
+    const headings = [
+        { text: 'Room', width: 2 },
+        { text: 'Room Type', width: 2 },
+        { text: 'Ensuite', width: 2 },
+        { text: 'Max Capacity', width: 2 },
+        { text: 'Rent', width: 2 },
+        { text: `Rent Amount ${symbol}`, width: 2 }
+    ];
+
+    headings.forEach(item => {
+        const col = document.createElement('div');
+        col.className = `col-md-${item.width}`;
+        col.textContent = item.text;
+        header.appendChild(col);
+    });
+
+    container.appendChild(header);
+
+    // Create a row for each room
+    rooms.forEach((room, index) => {
+        const row = document.createElement('div');
+        row.className = 'row mb-3 align-items-center';
+
+        // Hidden fields for saving the room
+        const roomId = document.createElement('input');
+        roomId.type = 'hidden';
+        roomId.name = 'room_id';
+        roomId.value = room.id || '';
+
+        const roomCount = document.createElement('input');
+        roomCount.type = 'hidden';
+        roomCount.name = 'room_count';
+        roomCount.value = room.room_count || '';
+
+        row.appendChild(roomId);
+        row.appendChild(roomCount);
+
+        // Helper function to create each field
+        function addColumn(width, fieldName, type, value, options = []) {
+            const col = document.createElement('div');
+            col.className = `col-md-${width}`;
+
+            let input;
+
+            if (type === 'select') {
+                input = document.createElement('select');
+                input.className = 'form-select';
+
+                options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    opt.selected = String(value) === option;
+                    input.appendChild(opt);
+                });
+            } else {
+                input = document.createElement('input');
+                input.type = type;
+                input.className = 'form-control';
+                input.value = value ?? '';
+
+                if (type === 'number') {
+                    input.min = '0';
+                    input.step = 'any';
+                    input.required = true;
+                }
+            }
+
+            input.name = fieldName;
+            col.appendChild(input);
+            row.appendChild(col);
+        }
+
+        // Room number
+        const numberCol = document.createElement('div');
+        numberCol.className = 'col-md-2';
+
+        const numberInput = document.createElement('input');
+        numberInput.type = 'text';
+        numberInput.className = 'form-control';
+        numberInput.value = room.room_count || `Room ${index + 1}`;
+        numberInput.readOnly = true;
+
+        numberCol.appendChild(numberInput);
+        row.appendChild(numberCol);
+
+        // Room Type
+        addColumn(
+            2,
+            'type_of_room',
+            'select',
+            room.type_of_room || 'Single',
+            ['Single', 'Double', 'Triple', 'Studio']
+        );
+
+        // Ensuite
+        addColumn(
+            2,
+            'ensuite',
+            'select',
+            room.ensuite || 'Yes',
+            ['Yes', 'No']
+        );
+
+        // Maximum Capacity
+        addColumn(
+            2,
+            'total_capacity',
+            'select',
+            room.total_capacity || '1',
+            ['1', '2', '3', '4', '5']
+        );
+
+        // Rent frequency
+        addColumn(
+            2,
+            'rent',
+            'select',
+            room.rent || 'Monthly',
+            ['Per night', 'Weekly', 'Monthly']
+        );
+
+        // Rent amount
+        addColumn(
+            2,
+            'rent_ammount',
+            'number',
+            room.rent_ammount ?? ''
+        );
+
+        container.appendChild(row);
+    });
+}
+</script>
+
+
 <script>
 function submitForm(step) {
   console.log('he')
@@ -1123,6 +1273,7 @@ function submitForm(step) {
             document.querySelector('#form-step-2 input[name="formid"]').value = data.formid;
             document.querySelector('#form-step-3 input[name="formid2"]').value = data.formid;
             // Hide current step
+            generateRoomFields(data.rooms, '₹');
             document.getElementById(`step-${step}`).style.display = 'none';
             // Show next step
             const nextStep = parseInt(step) + 1;

@@ -381,7 +381,7 @@ def listing(request):
 def submit_step(request, step):
     if request.method == 'POST':
         post_data = request.POST.copy()
-        print(post_data)
+        # print(post_data)
         post_data['landload']=request.user
         post_data['is_active']=True
         post_data['status']=True
@@ -400,45 +400,29 @@ def submit_step(request, step):
                 
                 
         elif step == '2':
-            post_data2 = request.POST.copy()
             formid = request.POST.get('formid')  
-            # other = request.POST.get('other')  
-            # if other:
-            #     post_data2['other']=other
-            property_instance = get_object_or_404(Property, id=formid)
-            post_data2['property']=property_instance
-            invoice_data = request.POST
-
-            other_labels = []
-            other_amounts = []
-
-            for key in invoice_data:
-                if 'label' in key:
-                    other_labels.append(invoice_data[key])
-                if 'amount' in key:
-                    other_amounts.append(invoice_data[key])
-            tempdatafi=FinancialBreakdown.objects.filter(property=property_instance).first()
-            form = FinancialBreakdownform(post_data2)
-            if tempdatafi:
-                form = FinancialBreakdownform(post_data2,instance=tempdatafi)
-            if form.is_valid():
-                financial_obj = form.save()
-                print('label:',other_labels,other_amounts)
-
-                for label, amount in zip(other_labels, other_amounts):
-                    if label.strip() or amount.strip():
-                        FinancialOtherModel.objects.create(
-                            financial=financial_obj,
-                            lable=label,
-                            amount=amount
-                        )
+            room_ids = request.POST.getlist('room_id')  
+            types = request.POST.getlist('type_of_room')
+            ensuites = request.POST.getlist('ensuite')
+            capacities = request.POST.getlist('total_capacity')
+            rents = request.POST.getlist('rent')
+            amounts = request.POST.getlist('rent_ammount')
+            print("------------->",rents)
+            for  room_ids,type_, ensuite, capacity,amount in zip(room_ids, types, ensuites, capacities,amounts):
+                if room_ids:  
+                    room = Rooms.objects.filter(id=room_ids).first()
+                    print('rooom==========>',room)
+                    if room:
+                        room.type_of_room = type_
+                        room.ensuite = ensuite
+                        room.total_capacity = capacity
+                        room.rent_ammount = amount
+                        room.save()
                 
-                return JsonResponse({'success': True,"formid":formid})
-            else:
-                print('*'*100)
-                print(form.errors)
+            return JsonResponse({'success': True,"formid":formid})
+           
 
-            return JsonResponse({'success': False, 'errors': form.errors})
+            return JsonResponse({'success': False})
 
        
 
@@ -447,7 +431,10 @@ def submit_step(request, step):
             if temp.number_of_flat:
                 for i in range(int(temp.number_of_flat)):
                     Rooms.objects.create(property=temp,room_count=f"{i+1:02}")
-            print('temp id',temp.id,temp)
+            else:
+                Rooms.objects.create(property=temp,room_count=f"01")
+            existing_rooms = Rooms.objects.filter(property=temp).order_by('id')
+            # print('temp id',temp.id,temp)
             financial_instance = FinancialBreakdown.objects.filter(
                                     property=temp
                                 ).first()
@@ -458,9 +445,19 @@ def submit_step(request, step):
                 form = FinancialBreakdownform(post_data_finance,instance=financial_instance)
             if formfinacal.is_valid():
                 financial_obj = formfinacal.save()
-            else:
-                print('error---------------',formfinacal.errors)
-            return JsonResponse({'success': True,"formid":temp.id})
+            return JsonResponse({'success': True,"formid":temp.id,'rooms': [
+                    {
+                        'id': room.id,
+                        'room_count': room.room_count,
+                        'type_of_room': room.type_of_room,
+                        'ensuite': room.ensuite,
+                        'total_capacity': room.total_capacity,
+                        'rent': room.rent,
+                        'room_code': room.room_code,
+                        'rent_ammount': room.rent_ammount,
+                    }
+                    for room in existing_rooms
+                ]})
         else:
             return JsonResponse({'success': False, 'errors': form.errors})
         

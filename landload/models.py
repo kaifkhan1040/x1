@@ -107,7 +107,7 @@ class PropertyImage(models.Model):
 
 class Rooms(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='room_set')    
-    type_of_room = models.CharField(max_length=20,choices=[('Single','Single'),('Double','Double')])
+    type_of_room = models.CharField(max_length=20,choices=[('Single','Single'),('Double','Double'),('Triple','Triple'),('Studio','Studio')])
     ensuite = models.CharField(max_length=20,choices=[('Yes','Yes'),('No','No')])
     total_capacity = models.CharField(max_length=20,choices=[('1','1'),('2','2'),('3','3'),('4','4'),('5','5')])
     rent =models.CharField(max_length=20,choices=(('Per night','Per night'),('Weekly','Weekly'),('Monthly','Monthly')))
