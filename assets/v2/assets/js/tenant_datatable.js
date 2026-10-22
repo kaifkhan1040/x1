@@ -399,20 +399,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
         },
         topStart: {
           rowClass: 'row mx-0 px-3 my-0 justify-content-between border-bottom',
-          features: [
-            {
-              pageLength: {
-                menu: [10, 25, 50, 100],
-                text: 'Show_MENU_entries'
-              }
-            }
-          ]
+          features: []
         },
-        topEnd: {
-          search: {
-            placeholder: ''
-          }
-        },
+        topEnd: { features: [] },
         bottomStart: {
           rowClass: 'row mx-3 justify-content-between',
           features: ['info']
@@ -465,6 +454,49 @@ document.addEventListener('DOMContentLoaded', function (e) {
         }
       }
     });
+
+    const propertyInputs = Array.from(document.querySelectorAll('.property-filter-checkbox'));
+    const propertyLabel = document.getElementById('propertyFilterLabel');
+    const rentDueFilter = document.getElementById('rentDueFilter');
+    const tenantNameSearch = document.getElementById('tenantNameSearch');
+    const selectedProperties = () => propertyInputs.filter(input => input.checked).map(input => String(input.value));
+
+    function refreshPropertyLabel() {
+      const selected = propertyInputs.filter(input => input.checked);
+      rentDueFilter.disabled = selected.length === 0;
+      if (!selected.length) {
+        propertyLabel.textContent = 'All properties';
+        rentDueFilter.value = 'all';
+      } else if (selected.length === 1) {
+        propertyLabel.textContent = selected[0].nextElementSibling.textContent.trim();
+      } else {
+        propertyLabel.textContent = `${selected.length} properties selected`;
+      }
+    }
+
+    DataTable.ext.search.push(function (settings, data, dataIndex, rowData) {
+      if (settings.nTable !== dt_basic_table) return true;
+      const selected = selectedProperties();
+      const propertyMatches = selected.length === 0 || selected.includes(String(rowData.property_id));
+      const dueMatches = rentDueFilter.value !== 'due' || rowData.rent_due === true;
+      const query = tenantNameSearch.value.trim().toLocaleLowerCase();
+      const nameMatches = !query || String(rowData.full_name || '').toLocaleLowerCase().includes(query);
+      return propertyMatches && dueMatches && nameMatches;
+    });
+
+    propertyInputs.forEach(input => input.addEventListener('change', () => {
+      refreshPropertyLabel();
+      dt_basic.draw();
+    }));
+    document.querySelector('.tenant-property-menu')?.addEventListener('click', event => event.stopPropagation());
+    document.getElementById('clearPropertyFilter')?.addEventListener('click', () => {
+      propertyInputs.forEach(input => { input.checked = false; });
+      refreshPropertyLabel();
+      dt_basic.draw();
+    });
+    rentDueFilter.addEventListener('change', () => dt_basic.draw());
+    tenantNameSearch.addEventListener('input', () => dt_basic.draw());
+    refreshPropertyLabel();
 
     // Add New record
     // ? Remove/Update this code as per your requirements

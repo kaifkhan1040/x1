@@ -1,15 +1,20 @@
+import calendar
 from django.shortcuts import render,get_object_or_404,redirect
+from django.urls import reverse
 from .models import Property,Rooms,Tenant,TenentProfileVerify,Payment,FinancialBreakdown,\
     FinancialOtherModel,PropertyImage,Expenses,EmailSettings,Country,LandlordProfile,LandloadDoucment
 from .forms import PropertyForm,PropertyReadOnlyForm,RoomsForm,TenantForm,TenantReadOnlyForm,TenantInviteForm,PaymentForm,\
     PaymentReadOnlyForm,FinancialBreakdownform,MultiImageForm,FinancialBreakdownReadOnlyform,MultiImageReadOnlyForm,ExpensesForm,\
     ExpensesReadOnlyForm,TenantStep1Form,EmailSettingsForm,LandlordProfileForm,IdProffForm
+from .forms import ManagerTenantForm, ManagerTenantDocumentsForm
 from django.db.models import Q
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from babel.numbers import get_currency_symbol
 
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, Http404
+from django.db import transaction
+import mimetypes
 from django.contrib.auth.decorators import login_required
 from users.models import CustomUser
 from users.email import tenant_invitation_email
@@ -21,7 +26,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 import pytz
 from django.db.models.functions import Cast
-from django.utils.timezone import now
+from django.utils.timezone import now, localdate
 import datetime
 from django.db.models.functions import ExtractMonth
 from django.db.models import Sum
@@ -748,7 +753,13 @@ def tenant(request):
             Q(custom_id__icontains=query) |
             Q(property__short_name__icontains=query) 
         )
-    return render(request,'landload/tenant_list.html',{'tenant':tenant,'search_field':True,'is_tenant':True})
+    properties = Property.objects.filter(landload=request.user, is_active=True).order_by('property_name')
+    return render(request,'landload/tenant_list.html',{
+        'tenant': tenant,
+        'properties': properties,
+        'search_field': True,
+        'is_tenant': True,
+    })
 
 @login_required(login_url='/')
 def listing_list(request):
@@ -792,18 +803,56 @@ def payment_list(request):
 @login_required(login_url='/')
 def tenant_list(request):
     data = []
-    print('*'*1000)
-    tenant = Tenant.objects.filter(landload=request.user,is_active=True)
+    today = localdate()
+    tenant = Tenant.objects.filter(landload=request.user, is_active=True).select_related('user', 'property')
+    rent_payments = Payment.objects.filter(
+        landload=request.user,
+        is_active=True,
+        m_for='Rent WS',
+        paid_date__lte=today,
+    ).values('property_id', 'tenant_name', 'paid_date', 'amount')
+    payments_by_tenant = {}
+    for payment in rent_payments:
+        key = (payment['property_id'], (payment['tenant_name'] or '').strip().casefold())
+        payments_by_tenant.setdefault(key, []).append((payment['paid_date'], payment['amount']))
+
     for obj in tenant:
+        full_name = f'{obj.user.first_name} {obj.user.last_name}'.strip() if obj.user else ''
+        payment_name = full_name.casefold()
+        paid_amount = 0
+        rent_due = False
+        if obj.rent > 0 and obj.property and (not obj.move_in_date or obj.move_in_date <= today):
+            try:
+                collection_frequency = obj.property.financials.collect_rent
+            except FinancialBreakdown.DoesNotExist:
+                collection_frequency = 'Monthly'
+
+            if collection_frequency == 'Weekly':
+                days_since_move_in = (today - obj.move_in_date).days if obj.move_in_date else today.weekday()
+                period_start = today - datetime.timedelta(days=days_since_move_in % 7)
+            else:
+                due_day = obj.move_in_date.day if obj.move_in_date else 1
+                last_day = calendar.monthrange(today.year, today.month)[1]
+                period_start = today.replace(day=min(due_day, last_day))
+
+            if today >= period_start:
+                paid_amount = sum(
+                    amount for paid_date, amount in payments_by_tenant.get((obj.property_id, payment_name), [])
+                    if paid_date >= period_start
+                )
+                rent_due = paid_amount + 0.009 < obj.rent
+
         data.append({
             'id':obj.id,
             'custom_id': obj.custom_id,
-            'full_name':obj.user.first_name+''+obj.user.last_name if obj.user.last_login else '',
-            'property': obj.property.property_name,
+            'full_name': full_name,
+            'property': obj.property.property_name if obj.property else '',
+            'property_id': obj.property_id,
             'rent': obj.rent,
-            'total_dues': "----",
+            'total_dues': round(max(obj.rent - paid_amount, 0), 2) if rent_due else 0,
             'last_payment': "",  
-            'move_in_date': "",  
+            'move_in_date': obj.move_in_date.strftime('%d %b %Y') if obj.move_in_date else '',
+            'rent_due': rent_due,
             
         })
 
@@ -811,58 +860,93 @@ def tenant_list(request):
 
 @login_required(login_url='/')
 def tenant_add(request):
-    property = Property.objects.filter(landload=request.user,is_active=True)
-    form = TenantForm()
-    print('run')
-    if request.method == "POST":
-        post_data = request.POST.copy()
-        # print('post')
-        # print(request.POST)
-        post_data['landload']=request.user
-        post_data['is_active']=True
-        first_name=request.POST.get('first_name')
-        middle_name=request.POST.get('middle_name')
-        last_name=request.POST.get('last_name')
-        phone_number=request.POST.get('phone_number')
-        email=request.POST.get('email')
-        form = TenantForm(post_data,request.FILES)
-        if form.is_valid():
-            print('pass 1')
-            
-            # if CustomUser.objects.filter(email=email).exists():
-            #    messages.error(request, f'Email already exixts')
-            #    return redirect('landload:tenant')
-            user_data, created = CustomUser.objects.get_or_create(first_name=first_name,last_name=last_name,
-                                      middle_name=middle_name,email=email,is_verify=True,
-                                      phone_number=phone_number,defaults={
-                                                                'password': 'Tenant@123',
-                                                                'role': 'tenant'
-                                                            })
-            if created:
-                # set hashed password securely
-                user_data.set_password('Tenant@123')
-                user_data.save()
-            # form['landload']=request.user
-            print('pass 2')
-       
-            property_obj = form.save(commit=False)
-            property_obj.user = user_data  
-            property_obj.save()
-            token = get_random_string(16)
-            TenentProfileVerify(tenant=property_obj, link=token).save()
-            temp_url=redirect('tenant:tenantverify', id=token)
-            token = 'http://'+str(get_current_site(request).domain)+str(temp_url.url)
-            tenant_invitation_email(property_obj.user.first_name if property_obj.user.first_name else ''+' '+property_obj.user.last_name if property_obj.user.last_name else "",
-            property_obj.user.email,request.user.first_name+' '+request.user.last_name if request.user.last_name else '',token,landload_id=request.user.id)
-            messages.success(request, f'Tenant has been Created successfully!')
-            return redirect('landload:tenant')
+    form = ManagerTenantForm(request.POST or None, landlord=request.user)
+    if request.method == 'POST' and form.is_valid():
+        data = form.cleaned_data
+        user = CustomUser.objects.filter(email__iexact=data['email']).first()
+        if user and user.role not in (None, '', 'tenant'):
+            form.add_error('email', 'This email address belongs to an account with a different role.')
+        elif user and Tenant.objects.filter(user=user, landload=request.user, is_active=True).exists():
+            form.add_error('email', 'This tenant is already listed under your account.')
         else:
-            # print('errr',form.errors)
-            error_messages = '<br>'.join(
-                [f"{error}" for field_errors in form.errors.values() for error in field_errors]
+            with transaction.atomic():
+                if user is None:
+                    user = CustomUser(email=data['email'], token=get_random_string(16), description='', role='tenant', is_verify=True)
+                    user.set_unusable_password()
+                    user.save()
+                user.first_name = data['first_name']
+                user.last_name = data['last_name']
+                user.phone_number = data['phone_number']
+                user.role = 'tenant'
+                user.is_verify = True
+                user.save()
+                tenant_obj = Tenant.objects.create(
+                    user=user, landload=request.user, property=data['property'], room=data['room'],
+                    move_in_date=data['move_in_date'], term_agreed=data['term_agreed'],
+                    rent=data['rent'], deposit=data['deposit'], residence_status='Citizen',
+                    address_proof='Passport',
+                )
+            return redirect('landload:tenant_documents', tenant_id=tenant_obj.id)
+
+    return render(request, 'landload/tenant_wizard.html', {'form': form, 'step': 1, 'is_tenant': True})
+
+
+@login_required(login_url='/')
+def tenant_documents(request, tenant_id):
+    tenant_obj = get_object_or_404(Tenant, pk=tenant_id, landload=request.user, is_active=True)
+    form = ManagerTenantDocumentsForm(request.POST or None, request.FILES or None, instance=tenant_obj)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        if request.POST.get('action') == 'finish':
+            messages.success(request, 'Tenant added successfully.')
+            return redirect('landload:tenant')
+        messages.success(request, 'Documents saved. You can view or download them below.')
+        return redirect('landload:tenant_documents', tenant_id=tenant_obj.id)
+
+    document_fields = [('id_proof', 'ID proof'), ('photo', 'Photo'), ('bank_statement', 'Bank statement')]
+    saved_documents = []
+    for field_name, label in document_fields:
+        document = getattr(tenant_obj, field_name)
+        if document:
+            content_type = mimetypes.guess_type(document.name)[0] or ''
+            document_url = reverse(
+                'landload:tenant_document_file',
+                kwargs={'tenant_id': tenant_obj.id, 'field_name': field_name},
             )
-            messages.error(request, mark_safe(error_messages))
-    return render(request,'landload/add_tenant.html',{'form':form,'property':property,'is_tenant':True})
+            saved_documents.append({
+                'label': label,
+                'url': document_url,
+                'download_url': f'{document_url}?download=1',
+                'is_image': content_type.startswith('image/'),
+            })
+
+    return render(request, 'landload/tenant_wizard.html', {
+        'form': form, 'tenant_obj': tenant_obj, 'step': 2, 'is_tenant': True,
+        'saved_documents': saved_documents,
+    })
+
+
+@login_required(login_url='/')
+def tenant_document_file(request, tenant_id, field_name):
+    tenant_obj = get_object_or_404(Tenant, pk=tenant_id, landload=request.user, is_active=True)
+    if field_name not in {'id_proof', 'photo', 'bank_statement'}:
+        raise Http404
+    document = getattr(tenant_obj, field_name)
+    if not document:
+        raise Http404
+    try:
+        document.open('rb')
+    except (FileNotFoundError, OSError):
+        raise Http404
+    content_type = mimetypes.guess_type(document.name)[0] or 'application/octet-stream'
+    return FileResponse(document, as_attachment=request.GET.get('download') == '1', content_type=content_type)
+
+
+@login_required(login_url='/')
+def tenant_available_rooms(request):
+    property_obj = get_object_or_404(Property, pk=request.GET.get('property_id'), landload=request.user, is_active=True)
+    rooms = Rooms.objects.filter(property=property_obj).exclude(tenant__is_active=True).order_by('room_code')
+    return JsonResponse({'rooms': [{'id': room.id, 'label': room.room_code} for room in rooms]})
 
 
 @login_required(login_url='/')

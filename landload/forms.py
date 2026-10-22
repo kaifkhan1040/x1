@@ -5,6 +5,7 @@ from django.forms import ModelForm, TextInput, EmailInput, CharField, PasswordIn
     NumberInput, DateInput
 from .models import Property,Rooms,Tenant,Payment,FinancialBreakdown,Expenses,AddressHistory,EmailSettings,LandlordProfile
 from django.forms.widgets import FileInput
+from django.core.validators import FileExtensionValidator
 
 class PropertyForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -164,6 +165,52 @@ class TenantForm(ModelForm):
     class Meta:
             model = Tenant
             fields = "__all__"
+
+
+class ManagerTenantForm(forms.Form):
+    first_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'given-name'}))
+    last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'family-name'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'autocomplete': 'email'}))
+    phone_number = forms.CharField(max_length=10, widget=forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'tel', 'autocomplete': 'tel'}))
+    property = forms.ModelChoiceField(queryset=Property.objects.none(), widget=forms.Select(attrs={'class': 'form-select'}))
+    room = forms.ModelChoiceField(queryset=Rooms.objects.none(), required=False, widget=forms.Select(attrs={'class': 'form-select'}))
+    move_in_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    term_agreed = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 12 months'}))
+    rent = forms.DecimalField(min_value=0, max_digits=10, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '0.01'}))
+    deposit = forms.DecimalField(min_value=0, max_digits=10, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '0.01'}))
+
+    def __init__(self, *args, landlord, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.landlord = landlord
+        self.fields['property'].queryset = Property.objects.filter(landload=landlord, is_active=True).order_by('property_name')
+        property_id = self.data.get('property') or self.initial.get('property')
+        available_rooms = Rooms.objects.filter(property__landload=landlord, property__is_active=True).exclude(tenant__is_active=True)
+        if property_id:
+            available_rooms = available_rooms.filter(property_id=property_id)
+        else:
+            available_rooms = available_rooms.none()
+        self.fields['room'].queryset = available_rooms.order_by('room_code')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        property_obj = cleaned_data.get('property')
+        room = cleaned_data.get('room')
+        if room and property_obj and room.property_id != property_obj.id:
+            self.add_error('room', 'Choose a room in the selected property.')
+        return cleaned_data
+
+
+class ManagerTenantDocumentsForm(forms.ModelForm):
+    right_to_rent_code = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'}))
+    id_proof = forms.FileField(required=False, validators=[FileExtensionValidator(['pdf', 'png', 'jpg', 'jpeg', 'webp'])], widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,image/*'}))
+    bank_statement = forms.FileField(required=False, validators=[FileExtensionValidator(['pdf', 'png', 'jpg', 'jpeg', 'webp'])], widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,image/*'}))
+
+    class Meta:
+        model = Tenant
+        fields = ['id_proof', 'right_to_rent_code', 'photo', 'bank_statement']
+        widgets = {
+            'photo': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+        }
 
 class TenantReadOnlyForm(TenantForm):
     def __init__(self, *args, **kwargs):

@@ -65,17 +65,19 @@ def loginPage(request):
                 print('for checking',user.role,login_as)
                 if user.is_superuser:
                     return HttpResponseRedirect(reverse_lazy('customadmin:home'))
-                if user.role==login_as:
-                    print('login sus')
-                    if login_as=='admin':
-                        return HttpResponseRedirect(reverse_lazy('customadmin:home'))
-                    elif login_as=='landload':
-                        return HttpResponseRedirect(reverse_lazy('landload:home'))
-
-                    else:
-                        return HttpResponseRedirect(reverse_lazy('tenant:home'))
                 else:
-                    msg=f'You are not registered as {login_as}'
+                    return HttpResponseRedirect(reverse_lazy('landload:home'))
+                # if user.role==login_as:
+                #     print('login sus')
+                #     if login_as=='admin':
+                #         return HttpResponseRedirect(reverse_lazy('customadmin:home'))
+                #     elif login_as=='landload':
+                #         return HttpResponseRedirect(reverse_lazy('landload:home'))
+
+                #     else:
+                #         return HttpResponseRedirect(reverse_lazy('tenant:home'))
+                # else:
+                #     msg=f'You are not registered as {login_as}'
             else:
                 msg='Invalid Password'
                 messages.error(request, msg)
