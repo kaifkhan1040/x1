@@ -100,6 +100,7 @@ class PropertyImage(models.Model):
         ('residence', 'Residence'),
     ]
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='images')
+    room = models.ForeignKey('Rooms', on_delete=models.CASCADE, related_name='images', null=True, blank=True)
     field_type = models.CharField(max_length=20, choices=FIELD_CHOICES)
     image = models.ImageField(upload_to=upload_to)
     caption = models.CharField(max_length=255, blank=True)

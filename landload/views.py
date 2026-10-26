@@ -413,14 +413,16 @@ def submit_step(request, step):
             rents = request.POST.getlist('rent')
             amounts = request.POST.getlist('rent_ammount')
             print("------------->",rents)
-            for  room_ids,type_, ensuite, capacity,amount in zip(room_ids, types, ensuites, capacities,amounts):
-                if room_ids:  
-                    room = Rooms.objects.filter(id=room_ids).first()
-                    print('rooom==========>',room)
+            for room_id, type_, ensuite, capacity, rent, amount in zip(
+                room_ids, types, ensuites, capacities, rents, amounts
+            ):
+                if room_id:
+                    room = Rooms.objects.filter(id=room_id, property_id=formid).first()
                     if room:
                         room.type_of_room = type_
                         room.ensuite = ensuite
                         room.total_capacity = capacity
+                        room.rent = rent
                         room.rent_ammount = amount
                         room.save()
                 
@@ -433,11 +435,14 @@ def submit_step(request, step):
 
         if form.is_valid():
             temp=form.save()
-            if temp.number_of_flat:
-                for i in range(int(temp.number_of_flat)):
-                    Rooms.objects.create(property=temp,room_count=f"{i+1:02}")
-            else:
-                Rooms.objects.create(property=temp,room_count=f"01")
+            # A step-1 save may happen again while editing. Do not create a
+            # second set of rooms when the property already has rooms.
+            if not Rooms.objects.filter(property=temp).exists():
+                if temp.number_of_flat:
+                    for i in range(int(temp.number_of_flat)):
+                        Rooms.objects.create(property=temp,room_count=f"{i+1:02}")
+                else:
+                    Rooms.objects.create(property=temp,room_count=f"01")
             existing_rooms = Rooms.objects.filter(property=temp).order_by('id')
             # print('temp id',temp.id,temp)
             financial_instance = FinancialBreakdown.objects.filter(
@@ -445,9 +450,9 @@ def submit_step(request, step):
                                 ).first()
 
             post_data_finance['property']=temp
-            formfinacal = FinancialBreakdownform(post_data_finance)
+            formfinacal = FinancialBreakdownform(post_data_finance, instance=financial_instance)
             if financial_instance:
-                form = FinancialBreakdownform(post_data_finance,instance=financial_instance)
+                formfinacal = FinancialBreakdownform(post_data_finance,instance=financial_instance)
             if formfinacal.is_valid():
                 financial_obj = formfinacal.save()
             return JsonResponse({'success': True,"formid":temp.id,'rooms': [
@@ -485,14 +490,7 @@ def listing_add(request):
         
             # property_instance = Property.objects.create(name="Sample Property")
 
-        for field in ['outside', 'parking', 'garage', 'garden', 'common_area', 'residence']:
-            files = request.FILES.getlist(field)
-            for file in files:
-                PropertyImage.objects.create(
-                    property=property_obj,
-                    field_type=field,
-                    image=file
-                )
+        save_listing_photos(request, property_obj)
    
 
         return redirect('landload:listing') 
@@ -519,7 +517,44 @@ def listing_add(request):
         #         [f"{error}" for field_errors in form.errors.values() for error in field_errors]
         #     )
         #     messages.error(request, mark_safe(error_messages))
-    return render(request,'landload/add_listing.html',{'form':form,'form2':form2,'video_form': video_form,'is_listing':True,'form3':form3,'symbol':symbol})
+    return render(request,'landload/add_listing.html',{'form':form,'form2':form2,'video_form': video_form,'is_listing':True,'form3':form3,'symbol':symbol,'photo_rooms_json': [],'photo_rows_json': {}})
+
+
+def save_listing_photos(request, property_obj):
+    for uploaded_file in request.FILES.getlist('photos_common'):
+        PropertyImage.objects.create(
+            property=property_obj,
+            field_type='common_area',
+            image=uploaded_file,
+        )
+
+    for key in request.FILES:
+        if not key.startswith('photos_room_'):
+            continue
+        room_id = key.removeprefix('photos_room_')
+        room = Rooms.objects.filter(id=room_id, property=property_obj).first()
+        if room:
+            for uploaded_file in request.FILES.getlist(key):
+                PropertyImage.objects.create(
+                    property=property_obj,
+                    room=room,
+                    field_type='common_area',
+                    image=uploaded_file,
+                )
+
+
+def photo_upload_context(property_obj):
+    rooms = Rooms.objects.filter(property=property_obj).order_by('id')
+    rows = {'common': []}
+    for room in rooms:
+        rows[f'room_{room.id}'] = []
+    for image in PropertyImage.objects.filter(property=property_obj, field_type='common_area').select_related('room'):
+        row_key = f'room_{image.room_id}' if image.room_id else 'common'
+        rows.setdefault(row_key, []).append(image.image.url)
+    return {
+        'photo_rooms_json': list(rooms.values('id', 'room_count')),
+        'photo_rows_json': rows,
+    }
 
 @login_required(login_url='/')
 def listing_view(request,id):
@@ -537,7 +572,20 @@ def listing_view(request,id):
     form = PropertyReadOnlyForm(instance=property_obj)
     return render(request,'landload/add_listing.html',{'form':form,'form2':form2,'is_listing':True,
                                                        'property_id':property_obj.id,'property_obj':property_obj,'more_fun':True,
-                                                       'property_obj2':property_obj2,'form3':form3,'symbol':symbol})
+                                                       'property_obj2':property_obj2,'form3':form3,'symbol':symbol,
+                                                       'rooms_json': [
+                                                           {
+                                                               'id': room.id,
+                                                               'room_count': room.room_count,
+                                                               'type_of_room': room.type_of_room,
+                                                               'ensuite': room.ensuite,
+                                                               'total_capacity': room.total_capacity,
+                                                               'rent': room.rent,
+                                                               'rent_ammount': room.rent_ammount,
+                                                           }
+                                                           for room in Rooms.objects.filter(property=property_obj).order_by('id')
+                                                       ],
+                                                       **photo_upload_context(property_obj)})
 
 @login_required(login_url='/')
 def listing_dashboard(request,id):
@@ -618,15 +666,7 @@ def listing_update(request,id):
         
             # property_instance = Property.objects.create(name="Sample Property")
 
-        for field in ['outside', 'parking', 'garage', 'garden', 'common_area', 'residence']:
-            files = request.FILES.getlist(field)
-            print('files',files)
-            for file in files:
-                PropertyImage.objects.create(
-                    property=property_obj,
-                    field_type=field,
-                    image=file
-                )
+        save_listing_photos(request, property_obj)
    
             
 
@@ -654,7 +694,19 @@ def listing_update(request,id):
                                                         'common_area_images_json': common_area_image_urls,
                                                         'residence_images_json': residence_image_urls,
                                                         'symbol':symbol,
-                                                        })
+                                                        'rooms_json': [
+                                                            {
+                                                                'id': room.id,
+                                                                'room_count': room.room_count,
+                                                                'type_of_room': room.type_of_room,
+                                                                'ensuite': room.ensuite,
+                                                                'total_capacity': room.total_capacity,
+                                                                'rent': room.rent,
+                                                                'rent_ammount': room.rent_ammount,
+                                                            }
+                                                            for room in Rooms.objects.filter(property=property_obj).order_by('id')
+                                                        ],
+                                                        **photo_upload_context(property_obj)})
 
 
 @csrf_exempt  # but ideally use csrf_protect with valid CSRF!

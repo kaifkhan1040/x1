@@ -197,7 +197,7 @@
             <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
             <span class="align-middle d-sm-inline-block d-none">Previous</span>
           </button>
-          <button class="btn btn-primary btn-next" onclick="submitForm(1)">
+          <button class="btn btn-primary btn-next" {% if not more_fun %}onclick="submitForm(1)"{% endif %}>
             <span class="align-middle d-sm-inline-block d-none">Next</span>
             <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
           </button>
@@ -219,7 +219,7 @@
             <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
             <span class="align-middle d-sm-inline-block d-none">Previous</span>
           </button>
-          <button class="btn btn-primary btn-next" onclick="submitForm(2)">
+          <button class="btn btn-primary btn-next" {% if not more_fun %}onclick="submitForm(2)"{% endif %}>
             <span class="align-middle d-sm-inline-block d-none">Next</span>
             <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
           </button>
@@ -231,520 +231,98 @@
           {% csrf_token %}
     
           <input type="hidden" name="formid2" {% if property_obj %} value="{{property_obj.id}}"{% endif %}> 
-          {{ outside_images_json|json_script:"outside-images-json" }}
-       {{ parking_images_json|json_script:"parking-images-json" }}
-       {{ garage_images_json|json_script:"garage-images-json" }}
-       {{ garden_images_json|json_script:"garden-images-json" }}
-       {{ common_area_images_json|json_script:"common-area-images-json" }}
-       {{ residence_images_json|json_script:"residence-images-json" }}
-
-<!-- ✅ 2) Define outsideImages JS variable immediately after JSON -->
-<script>
-  const outsideImages = JSON.parse(document.getElementById('outside-images-json').textContent);
-  const parkingImages = JSON.parse(document.getElementById('parking-images-json').textContent);
-  const garageImages = JSON.parse(document.getElementById('garage-images-json').textContent);
-  const gardenImages = JSON.parse(document.getElementById('garden-images-json').textContent);
-  const commonareaImages = JSON.parse(document.getElementById('common-area-images-json').textContent);
-  const residenceImages = JSON.parse(document.getElementById('residence-images-json').textContent);
-</script>
-
-          <div class="row mb-2 align-items-center">
-            <div class="col-12 col-sm-4 col-md-1 mb-sm-0">
-              <h4 class="m-0">Outside</h4>
-              
-                                            
-                                            
-                                        
-              {% comment %} <label class="form-label" for="first-name">Outside</label> {% endcomment %}
-              {% comment %} {{form3.outside}} {% endcomment %}
-            </div>
-            {% if outside_images %}
-              <div class="col-md-2 col-sm-12">
-                <div class="card">
-                  <div class="card-body">
-                    <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
-                      <!-- Indicators -->
-                      <div class="carousel-indicators">
-                        {% for image in outside_images %}
-                         {% if image.image %}
-                          <button type="button"
-                            data-bs-target="#propertyCarousel"
-                            data-bs-slide-to="{{ forloop.counter0 }}"
-                            id="item{{image.id}}"
-                            class="{% if forloop.first %}active{% endif %}"
-                            aria-current="{% if forloop.first %}true{% endif %}"
-                            aria-label="Slide {{ forloop.counter }}"></button>
-                        {% endif %} 
-                        {% endfor %}
-                        {% comment %} <button type="button" data-bs-target="#propertyCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button> {% endcomment %}
-                        {% comment %} <button type="button" data-bs-target="#propertyCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button> {% endcomment %}
-                      </div>
-
-                      <!-- Slides -->
-                      <div class="carousel-inner">
-                        {% for image in outside_images %}
-                        {% if image.image %}
-                        <div class="carousel-item {% if forloop.first %}active{% endif %}" id='carousel-item{{ image.id }}' data-image-id="{{ image.id }}">
-                         <img src="{{ image.image.url }}" class="d-block w-100 img-fluid rounded"
-                            style="cursor: pointer;"
-                              onclick="showCarouselModal(outsideImages, {{ forloop.counter0 }},'propertyCarousel')">
-                          <div class="carousel-caption d-none d-md-block">
-                            {% if image.caption %}
-                              <p>{{ image.caption }}</p>
-                            {% endif %}
-                          </div>
-                          <!-- JSON script with just image URLs -->
-                        </div>
-                        {% endif %}
-                        {% endfor %}
-                        {% comment %} <div class="carousel-item">
-                          <img src="{% static 'app-assets/images/slider/03.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Second slide">
-                          <div class="carousel-caption d-none d-md-block">
-                            <p>Caption for second slide</p>
-                          </div>
-                        </div>
-                        <div class="carousel-item">
-                          <img src="{% static 'app-assets/images/slider/01.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Third slide">
-                          <div class="carousel-caption d-none d-md-block">
-                            <p>Caption for third slide</p>
-                          </div>
-                        </div> {% endcomment %}
-                      </div>
-
-                      <!-- Controls -->
-                      <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                      </button>
-                      <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {% endif %}
-            <div class="col-12 col-sm-4 col-md-2 text-center text-sm-start">
-              <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-sm-start gap-2">
-                <label for="{{ form3.outside.id_for_label }}" class="btn btn-primary btn-sm mb-0">+</label>
-                {{form3.outside}}
-                {% comment %} <input type="file" multiple name="outside" {% if more_fun %} disabled {% endif %} id="account-upload" hidden accept="image/*" /> {% endcomment %}
-                <p class="mb-0 small text-muted">Allowed file types: png, jpg, jpeg.</p>
-              </div>
-            </div>
+          {{ photo_rows_json|json_script:"photo-rows-json" }}
+          {{ photo_rooms_json|json_script:"photo-rooms-json" }}
+          <h5 class="mb-1">Add Photos</h5>
+          <div class="small text-muted mb-2"><strong>Note:</strong> You can upload multiple photos for each section. Supported file types: PNG, JPG, JPEG.</div>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <tbody id="photo-rows"></tbody>
+            </table>
           </div>
+          <style>
+            #photo-rows th { width: 8.5rem; min-width: 7rem; font-size: .875rem; }
+            #photo-rows td { min-height: 3.25rem; }
+            .photo-row-previews { display: flex; flex-wrap: wrap; gap: .5rem; }
+            .photo-row-previews img { width: 3.5rem; height: 3.5rem; object-fit: cover; border-radius: .375rem; }
+            .photo-add-button { min-width: 2rem; }
+            .photo-file-input { display: none; }
+          </style>
+          <script>
+            const photoRowsData = JSON.parse(document.getElementById('photo-rows-json').textContent);
+            const photoRoomsData = JSON.parse(document.getElementById('photo-rooms-json').textContent);
+            const photoFilesByRow = new Map();
 
+            function renderPhotoRows(rooms) {
+              const tbody = document.getElementById('photo-rows');
+              if (!tbody) return;
+              const rows = [{ key: 'common', label: 'Common' }].concat(
+                (rooms || []).map((room, index) => ({
+                  key: `room_${room.id}`,
+                  label: room.room_count ? `Room ${parseInt(room.room_count, 10) || index + 1}` : `Room ${index + 1}`,
+                  id: room.id
+                }))
+              );
+              tbody.innerHTML = '';
+              rows.forEach(row => {
+                const tr = document.createElement('tr');
+                const heading = document.createElement('th');
+                heading.scope = 'row';
+                heading.className = '';
+                heading.textContent = row.label;
+                const cell = document.createElement('td');
+                const controls = document.createElement('div');
+                controls.className = 'd-flex flex-wrap align-items-center gap-2';
+                const add = document.createElement('button');
+                add.type = 'button';
+                add.className = 'btn btn-sm btn-outline-primary photo-add-button';
+                add.textContent = '+';
+                add.setAttribute('aria-label', `Add photos for ${row.label}`);
+                {% if more_fun %}add.disabled = true;{% endif %}
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/png,image/jpeg';
+                input.multiple = true;
+                input.className = 'photo-file-input';
+                {% if more_fun %}input.disabled = true;{% endif %}
+                input.name = `photos_${row.key}`;
+                const previews = document.createElement('div');
+                previews.className = 'photo-row-previews';
+                controls.append(add, input, previews);
+                cell.appendChild(controls);
+                tr.append(heading, cell);
+                tbody.appendChild(tr);
+                add.addEventListener('click', () => input.click());
+                input.addEventListener('change', () => {
+                  const files = photoFilesByRow.get(row.key) || [];
+                  files.push(...Array.from(input.files || []));
+                  photoFilesByRow.set(row.key, files);
+                  input.value = '';
+                  const accumulatedFiles = new DataTransfer();
+                  files.forEach(file => accumulatedFiles.items.add(file));
+                  input.files = accumulatedFiles.files;
+                  previews.querySelectorAll('[data-new-preview]').forEach(node => node.remove());
+                  files.forEach(file => {
+                    if (!file.type.startsWith('image/')) return;
+                    const image = document.createElement('img');
+                    image.dataset.newPreview = 'true';
+                    image.alt = file.name;
+                    image.title = file.name;
+                    image.src = URL.createObjectURL(file);
+                    previews.appendChild(image);
+                  });
+                });
+                (photoRowsData[row.key] || []).forEach(url => {
+                  const image = document.createElement('img');
+                  image.src = url;
+                  image.alt = `${row.label} photo`;
+                  previews.appendChild(image);
+                });
+              });
+            }
 
-          <div class="row  mb-2 align-items-center">
-            <div class="col-12 col-sm-4 col-md-1 mb-sm-0">
-              <h4 class="m-0">Parking</h4>
-              
-                                            
-                                            
-                                        
-              {% comment %} <label class="form-label" for="first-name">Outside</label> {% endcomment %}
-              {% comment %} {{form3.outside}} {% endcomment %}
-            </div>
-            {% if parking_images %}
-            <div class="col-md-2 col-sm-12">
-              <div class="card">
-                <div class="card-body">
-                  <div id="{{ form3.parking.id_for_label }}Carousel" class="carousel slide" data-bs-ride="carousel">
-                    <!-- Indicators -->
-                    <div class="carousel-indicators">
-                      {% for image in parking_images %}
-                       <button type="button"
-                            data-bs-target="{{ form3.parking.id_for_label }}"
-                            data-bs-slide-to="{{ forloop.counter0 }}"
-                            id="item{{image.id}}"
-                            class="{% if forloop.first %}active{% endif %}"
-                            aria-current="{% if forloop.first %}true{% endif %}"
-                            aria-label="Slide {{ forloop.counter }}"></button>
-                       {% endfor %}
-                      {% comment %} <button type="button" data-bs-target="#{{ form3.parking.id_for_label }}Carousel" data-bs-slide-to="1" aria-label="Slide 2"></button> {% endcomment %}
-                      {% comment %} <button type="button" data-bs-target="#{{ form3.parking.id_for_label }}Carousel" data-bs-slide-to="2" aria-label="Slide 3"></button> {% endcomment %}
-                    </div>
-
-                    <!-- Slides -->
-                    <div class="carousel-inner">
-                      {% for image in parking_images %}
-                      <div class="carousel-item {% if forloop.first %}active{% endif %}" id='carousel-item{{ image.id }}' data-image-id="{{ image.id }}">
-                        <img src="{{ image.image.url }}" class="d-block w-100 img-fluid rounded"
-                          style="cursor: pointer;"
-                            onclick="showCarouselModal(parkingImages, {{ forloop.counter0 }},'{{ form3.parking.id_for_label }}Carousel')">
-                        <div class="carousel-caption d-none d-md-block">
-                          {% comment %} <p>Caption for first slide</p> {% endcomment %}
-                        </div>
-                      </div>
-                      {% endfor %}
-                      {% comment %} <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/03.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Second slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for second slide</p>
-                        </div>
-                      </div>
-                      <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/01.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Third slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for third slide</p>
-                        </div>
-                      </div> {% endcomment %}
-                    </div>
-
-                    <!-- Controls -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#{{ form3.parking.id_for_label }}Carousel" data-bs-slide="prev">
-                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#{{ form3.parking.id_for_label }}Carousel" data-bs-slide="next">
-                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Next</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {% endif %}
-            <div class="col-12 col-sm-4 col-md-2 text-center text-sm-start">
-              <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-sm-start gap-2">
-                <label for="{{ form3.parking.id_for_label }}" class="btn btn-primary btn-sm mb-0">+</label>
-                {{form3.parking}}
-                {% comment %} <input type="file" multiple name="parking" {% if more_fun %} disabled {% endif %} id="account-upload" hidden accept="image/*" /> {% endcomment %}
-                <p class="mb-0 small text-muted">Allowed file types: png, jpg, jpeg.</p>
-              </div>
-            </div>
-          </div>
-
-
-          <div class="row mb-2 align-items-center">
-            <div class="col-12 col-sm-4 col-md-1 mb-sm-0">
-              <h4 class="m-0">Garage</h4>
-              
-                                            
-                                            
-                                        
-              {% comment %} <label class="form-label" for="first-name">Outside</label> {% endcomment %}
-              {% comment %} {{form3.outside}} {% endcomment %}
-            </div>
-            {% if garage_images %}
-             <div class="col-md-2 col-sm-12">
-              <div class="card">
-                <div class="card-body">
-                  <div id="{{ form3.garage.id_for_label }}Carousel" class="carousel slide" data-bs-ride="carousel">
-                    <!-- Indicators -->
-                    <div class="carousel-indicators">
-                      {% for image in garage_images %}
-                      <button type="button"
-                            data-bs-target="{{ form3.garage.id_for_label }}"
-                            data-bs-slide-to="{{ forloop.counter0 }}"
-                            id="item{{image.id}}"
-                            class="{% if forloop.first %}active{% endif %}"
-                            aria-current="{% if forloop.first %}true{% endif %}"
-                            aria-label="Slide {{ forloop.counter }}"></button>
-                      {% endfor %}
-                      {% comment %} <button type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                      <button type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide-to="2" aria-label="Slide 3"></button> {% endcomment %}
-                    </div>
-
-                    <!-- Slides -->
-                    <div class="carousel-inner">
-                      {% for image in garage_images %}
-                      <div class="carousel-item {% if forloop.first %}active{% endif %}" id='carousel-item{{ image.id }}' data-image-id="{{ image.id }}">
-                        
-                          <img src="{{ image.image.url }}" class="d-block w-100 img-fluid rounded"
-                          style="cursor: pointer;"
-                            onclick="showCarouselModal(garageImages, {{ forloop.counter0 }},'{{ form3.garage.id_for_label }}Carousel')">
-                        <div class="carousel-caption d-none d-md-block">
-                          {% comment %} <p>Caption for first slide</p> {% endcomment %}
-                        </div>
-                      </div>
-                       {% endfor %}
-                      {% comment %} <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/03.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Second slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for second slide</p>
-                        </div>
-                      </div>
-                      <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/01.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Third slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for third slide</p>
-                        </div>
-                      </div> {% endcomment %}
-                    </div>
-
-                    <!-- Controls -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide="prev">
-                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide="next">
-                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Next</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {% endif %}
-            <div class="col-12 col-sm-4 col-md-2 text-center text-sm-start">
-              <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-sm-start gap-2">
-                <label for="{{ form3.garage.id_for_label }}" class="btn btn-primary btn-sm mb-0">+</label>
-                {{form3.garage}}
-                {% comment %} <input type="file" name="garage" {% if more_fun %} disabled {% endif %} id="account-upload" hidden accept="image/*" /> {% endcomment %}
-                <p class="mb-0 small text-muted">Allowed file types: png, jpg, jpeg.</p>
-              </div>
-            </div>
-          </div>
-
-
-          <div class="row mb-2 align-items-center">
-            <div class="col-12 col-sm-4 col-md-1 mb-sm-0">
-              <h4 class="m-0">Garden</h4>
-              
-                                            
-                                            
-                                        
-              {% comment %} <label class="form-label" for="first-name">Outside</label> {% endcomment %}
-              {% comment %} {{form3.outside}} {% endcomment %}
-            </div>
-            {% if garden_images %}
-             <div class="col-md-2 col-sm-12">
-              <div class="card">
-                <div class="card-body">
-                  <div id="{{ form3.garden.id_for_label }}Carousel" class="carousel slide" data-bs-ride="carousel">
-                    <!-- Indicators -->
-                    <div class="carousel-indicators">
-                      {% for image in garden_images %}
-                      <button type="button"
-                            data-bs-target="{{ form3.garden.id_for_label }}"
-                            data-bs-slide-to="{{ forloop.counter0 }}"
-                            id="item{{image.id}}"
-                            class="{% if forloop.first %}active{% endif %}"
-                            aria-current="{% if forloop.first %}true{% endif %}"
-                            aria-label="Slide {{ forloop.counter }}"></button>
-                      {% endfor %}
-                      {% comment %} <button type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                      <button type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide-to="2" aria-label="Slide 3"></button> {% endcomment %}
-                    </div>
-
-                    <!-- Slides -->
-                    <div class="carousel-inner">
-                      {% for image in garden_images %}
-                      <div class="carousel-item {% if forloop.first %}active{% endif %}" id='carousel-item{{ image.id }}' data-image-id="{{ image.id }}">
-                        <img src="{{ image.image.url }}" class="d-block w-100 img-fluid rounded"
-                          style="cursor: pointer;"
-                            onclick="showCarouselModal(gardenImages, {{ forloop.counter0 }},'{{ form3.garden.id_for_label }}Carousel')">
-                        <div class="carousel-caption d-none d-md-block">
-                          {% comment %} <p>Caption for first slide</p> {% endcomment %}
-                        </div>
-                      </div>
-                       {% endfor %}
-                      {% comment %} <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/03.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Second slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for second slide</p>
-                        </div>
-                      </div>
-                      <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/01.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Third slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for third slide</p>
-                        </div>
-                      </div> {% endcomment %}
-                    </div>
-
-                    <!-- Controls -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#{{ form3.garden.id_for_label }}Carousel" data-bs-slide="prev">
-                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#{{ form3.garden.id_for_label }}Carousel" data-bs-slide="next">
-                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Next</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {% endif %}
-            <div class="col-12 col-sm-4 col-md-2 text-center text-sm-start">
-              <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-sm-start gap-2">
-                <label for="{{ form3.garden.id_for_label }}" class="btn btn-primary btn-sm mb-0">+</label>
-                {{form3.garden}}
-                {% comment %} <input type="file" name="Garden" {% if more_fun %} disabled {% endif %} id="account-upload" hidden accept="image/*" /> {% endcomment %}
-                <p class="mb-0 small text-muted">Allowed file types: png, jpg, jpeg.</p>
-              </div>
-            </div>
-          </div>
-
-
-           <div class="row mb-2 align-items-center">
-            <div class="col-12 col-sm-4 col-md-1 mb-sm-0">
-              <h4 class="m-0">Common Area</h4>
-              
-                                            
-                                            
-                                        
-              {% comment %} <label class="form-label" for="first-name">Outside</label> {% endcomment %}
-              {% comment %} {{form3.outside}} {% endcomment %}
-            </div>
-             {% if common_area_images %}
-             <div class="col-md-2 col-sm-12">
-              <div class="card">
-                <div class="card-body">
-                  <div id="{{ form3.common_area.id_for_label }}Carousel" class="carousel slide" data-bs-ride="carousel">
-                    <!-- Indicators -->
-                    <div class="carousel-indicators">
-                      {% for image in common_area_images %}
-                      <button type="button"
-                            data-bs-target="{{ form3.common_area.id_for_label }}"
-                            data-bs-slide-to="{{ forloop.counter0 }}"
-                            id="item{{image.id}}"
-                            class="{% if forloop.first %}active{% endif %}"
-                            aria-current="{% if forloop.first %}true{% endif %}"
-                            aria-label="Slide {{ forloop.counter }}"></button>
-                      {% endfor %}
-                      {% comment %} <button type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                      <button type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide-to="2" aria-label="Slide 3"></button> {% endcomment %}
-                    </div>
-
-                    <!-- Slides -->
-                    <div class="carousel-inner">
-                      {% for image in common_area_images %}
-                      <div class="carousel-item {% if forloop.first %}active{% endif %}" id='carousel-item{{ image.id }}' data-image-id="{{ image.id }}">
-                        <img src="{{ image.image.url }}" class="d-block w-100 img-fluid rounded"
-                          style="cursor: pointer;"
-                            onclick="showCarouselModal(commonareaImages, {{ forloop.counter0 }},'{{ form3.common_area.id_for_label }}Carousel')">
-                        <div class="carousel-caption d-none d-md-block">
-                          {% comment %} <p>Caption for first slide</p> {% endcomment %}
-                        </div>
-                      </div>
-                       {% endfor %}
-                      {% comment %} <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/03.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Second slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for second slide</p>
-                        </div>
-                      </div>
-                      <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/01.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Third slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for third slide</p>
-                        </div>
-                      </div> {% endcomment %}
-                    </div>
-
-                    <!-- Controls -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#{{ form3.common_area.id_for_label }}Carousel" data-bs-slide="prev">
-                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#{{ form3.common_area.id_for_label }}Carousel" data-bs-slide="next">
-                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Next</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {% endif %}
-            <div class="col-12 col-sm-4 col-md-2 text-center text-sm-start">
-              <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-sm-start gap-2">
-                <label for="{{ form3.common_area.id_for_label }}" class="btn btn-primary btn-sm mb-0">+</label>
-                {{form3.common_area}}
-                {% comment %} <input type="file" name="common_area" {% if more_fun %} disabled {% endif %} id="account-upload" hidden accept="image/*" /> {% endcomment %}
-                <p class="mb-0 small text-muted">Allowed file types: png, jpg, jpeg.</p>
-              </div>
-            </div>
-          </div>
-
-
-          <div class="row mb-2 align-items-center">
-            <!-- Label -->
-            <div class="col-12 col-sm-4 col-md-1 mb-sm-0">
-              <h5 class="m-0">Residence</h5>
-            </div>
-
-            <!-- Image preview -->
-            {% if residence_images %}
-             <div class="col-md-2 col-sm-12">
-              <div class="card">
-                <div class="card-body">
-                  <div id="{{ form3.residence.id_for_label }}Carousel" class="carousel slide" data-bs-ride="carousel">
-                    <!-- Indicators -->
-                    <div class="carousel-indicators">
-                      {% for image in residence_images %}
-                      <button type="button"
-                            data-bs-target="{{ form3.residence.id_for_label }}Carousel"
-                            data-bs-slide-to="{{ forloop.counter0 }}"
-                            id="item{{image.id}}"
-                            class="{% if forloop.first %}active{% endif %}"
-                            aria-current="{% if forloop.first %}true{% endif %}"
-                            aria-label="Slide {{ forloop.counter }}"></button>
-                      {% endfor %}
-                      {% comment %} <button type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                      <button type="button" data-bs-target="#{{ form3.garage.id_for_label }}Carousel" data-bs-slide-to="2" aria-label="Slide 3"></button> {% endcomment %}
-                    </div>
-
-                    <!-- Slides -->
-                    <div class="carousel-inner">
-                      {% for image in residence_images %}
-                      <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        <img src="{{ image.image.url }}" class="d-block w-100 img-fluid rounded"
-                          style="cursor: pointer;"
-                            onclick="showCarouselModal(residenceImages, {{ forloop.counter0 }},'{{ form3.residence.id_for_label }}Carousel')">
-                        <div class="carousel-caption d-none d-md-block">
-                          {% comment %} <p>Caption for first slide</p> {% endcomment %}
-                        </div>
-                      </div>
-                       {% endfor %}
-                      {% comment %} <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/03.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Second slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for second slide</p>
-                        </div>
-                      </div>
-                      <div class="carousel-item">
-                        <img src="{% static 'app-assets/images/slider/01.jpg' %}" class="d-block w-100 img-fluid rounded" alt="Third slide">
-                        <div class="carousel-caption d-none d-md-block">
-                          <p>Caption for third slide</p>
-                        </div>
-                      </div> {% endcomment %}
-                    </div>
-
-                    <!-- Controls -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#{{ form3.residence.id_for_label }}Carousel" data-bs-slide="prev">
-                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#{{ form3.residence.id_for_label }}Carousel" data-bs-slide="next">
-                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                      <span class="visually-hidden">Next</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {% endif %}
-
-            <!-- Upload button & file input -->
-            <div class="col-12 col-sm-4 col-md-2 text-center text-sm-start">
-              <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-sm-start gap-2">
-                <label for="{{ form3.residence.id_for_label }}" class="btn btn-primary btn-sm mb-0">+</label>
-                {{form3.residence}}
-                {% comment %} <input type="file" multiple name="residence" {% if more_fun %} disabled {% endif %} id="account-upload" hidden accept="image/*" /> {% endcomment %}
-                <p class="mb-0 small text-muted">Allowed: png, jpg, jpeg.</p>
-              </div>
-            </div>
-          </div>
-       
-
-          
-    
-    
-
+            renderPhotoRows(photoRoomsData);
+          </script>
           <!-- Video URL -->
           {% comment %} <h4>Video Links</h4>
           {{ video_form.video_url.label_tag }} {{ video_form.video_url }} {% endcomment %}
@@ -781,7 +359,7 @@
             <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
             <span class="align-middle d-sm-inline-block d-none">Previous</span>
           </button>
-          <button type="button" onclick='funsubmit()' class="btn btn-success">Submit</button>
+          <button type="button" onclick='funsubmit()' class="btn btn-success" {% if more_fun %}disabled{% endif %}>Submit</button>
         </div>
       </div>
   
@@ -848,7 +426,6 @@
                                                    
                                                     <label for="account-upload" class="btn btn-sm btn-primary mb-75 me-75">Upload</label>
                                                     <input type="file" name="prop_thumbnail" {% if more_fun %} disabled {% endif %} id="account-upload" hidden accept="image/*" />
-                                                    <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
                                                    
                                                 </div>
                                             </div>
@@ -1107,12 +684,14 @@ numberOfFlatInput.setAttribute("disabled", "disabled");
 
 
 
-<div id="rooms-container"></div>
+{{ rooms_json|default:"[]"|json_script:"rooms-json" }}
 
 <script>
 function generateRoomFields(rooms, symbol = '') {
     const container = document.getElementById('rooms-container');
+    const listingReadOnly = {{ more_fun|yesno:"true,false" }};
     container.innerHTML = '';
+    renderPhotoRows(rooms);
 
     // Create column headings only once
     const header = document.createElement('div');
@@ -1187,6 +766,7 @@ function generateRoomFields(rooms, symbol = '') {
             }
 
             input.name = fieldName;
+            input.disabled = listingReadOnly;
             col.appendChild(input);
             row.appendChild(col);
         }
@@ -1251,6 +831,13 @@ function generateRoomFields(rooms, symbol = '') {
         container.appendChild(row);
     });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const roomsNode = document.getElementById('rooms-json');
+    if (!roomsNode) return;
+    const rooms = JSON.parse(roomsNode.textContent || '[]');
+    if (rooms.length) generateRoomFields(rooms, '{{ symbol|escapejs }}');
+});
 </script>
 
 
@@ -1272,13 +859,11 @@ function submitForm(step) {
         if (data.success) {
             document.querySelector('#form-step-2 input[name="formid"]').value = data.formid;
             document.querySelector('#form-step-3 input[name="formid2"]').value = data.formid;
-            // Hide current step
-            generateRoomFields(data.rooms, '₹');
-            document.getElementById(`step-${step}`).style.display = 'none';
-            // Show next step
-            const nextStep = parseInt(step) + 1;
-            const nextDiv = document.getElementById(`step-${nextStep}`);
-            if (nextDiv) nextDiv.style.display = 'block';
+            // Step 1 creates the room rows. Keep them intact after saving step 2
+            // so returning from step 3 shows the user's entries.
+            if (String(step) === '1' && Array.isArray(data.rooms)) {
+              generateRoomFields(data.rooms, '₹');
+            }
         } else {
            
         }

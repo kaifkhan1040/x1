@@ -455,6 +455,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
       }
     });
 
+    // Move the existing filter section below the Tenants title and action buttons.
+    const tenantFilters = document.querySelector('.tenant-filters');
+    const tenantHeader = dt_basic_table.closest('.card-datatable')?.querySelector('.card-header');
+    if (tenantFilters && tenantHeader) {
+      tenantHeader.after(tenantFilters);
+    }
+
     const propertyInputs = Array.from(document.querySelectorAll('.property-filter-checkbox'));
     const propertyLabel = document.getElementById('propertyFilterLabel');
     const rentDueFilter = document.getElementById('rentDueFilter');
