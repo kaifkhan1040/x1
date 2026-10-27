@@ -67,18 +67,26 @@ def loginPage(request):
                     return HttpResponseRedirect(reverse_lazy('customadmin:home'))
                 # else:
                 #     return HttpResponseRedirect(reverse_lazy('landload:home'))
-                if user.role==login_as:
-                    print('login sus')
-                    if login_as=='admin':
-                        return HttpResponseRedirect(reverse_lazy('customadmin:home'))
-                    elif login_as=='landload':
-                        return HttpResponseRedirect(reverse_lazy('landload:home'))
+                if user.role=='admin':
+                    return HttpResponseRedirect(reverse_lazy('customadmin:home'))
+                elif user.role=='landload':
+                    return HttpResponseRedirect(reverse_lazy('landload:home'))
 
-                    else:
-                        # return HttpResponseRedirect(reverse_lazy('tenant:home'))
-                        msg=f'You are not Authorized to login as {login_as}'
                 else:
-                    msg=f'You are not registered as {login_as}'
+                    # return HttpResponseRedirect(reverse_lazy('tenant:home'))
+                    msg=f'You are not Authorized to login'
+                # if user.role==login_as:
+                #     print('login sus')
+                #     if user.role=='admin':
+                #         return HttpResponseRedirect(reverse_lazy('customadmin:home'))
+                #     elif user.role=='landload':
+                #         return HttpResponseRedirect(reverse_lazy('landload:home'))
+
+                #     else:
+                #         # return HttpResponseRedirect(reverse_lazy('tenant:home'))
+                #         msg=f'You are not Authorized to login as {login_as}'
+                # else:
+                #     msg=f'You are not registered as {login_as}'
             else:
                 msg='Invalid Password'
                 messages.error(request, msg)
