@@ -39,7 +39,7 @@ def get_symbol(currency_code):
         return '' 
     
 def property_earning_report(request,year,pro_id):
-    print('%'*1000)
+    # print('%'*1000)
     monthly_totals = [0] * 12  
     monthly_exp = [0] * 12
 # query payments grouped by month
@@ -66,7 +66,7 @@ def property_earning_report(request,year,pro_id):
     payment_by_year={'data':[{'id':1,"chart_data":monthly_totals}],
                      'earning':[{'id':1,"chart_data":monthly_totals}],
                      'expenses':[{'id':1,"chart_data":monthly_exp}]}
-    print('monthly_totals',monthly_totals,'monthly_exp',monthly_exp)
+    # print('monthly_totals',monthly_totals,'monthly_exp',monthly_exp)
     
 
     # for i in payments:
@@ -74,7 +74,7 @@ def property_earning_report(request,year,pro_id):
     return JsonResponse(payment_by_year,safe=False)
 
 def earning_report(request,year):
-    print('%'*1000)
+    # print('%'*1000)
     monthly_totals = [0] * 12  
     monthly_exp = [0] * 12
 # query payments grouped by month
@@ -101,7 +101,7 @@ def earning_report(request,year):
     payment_by_year={'data':[{'id':1,"chart_data":monthly_totals}],
                      'earning':[{'id':1,"chart_data":monthly_totals}],
                      'expenses':[{'id':1,"chart_data":monthly_exp}]}
-    print('monthly_totals',monthly_totals,'monthly_exp',monthly_exp)
+    # print('monthly_totals',monthly_totals,'monthly_exp',monthly_exp)
     
 
     # for i in payments:
@@ -128,7 +128,7 @@ def monthly_profit_comparison_by_property(request):
         id__in=Payment.objects.filter(landload=request.user).values_list('property', flat=True).distinct(),
         landload=request.user  # in case Property also has landload field
     )
-    print('properties',properties)
+    # print('properties',properties)
     for prop_id in properties:
         # This month totals
         this_month_payments = Payment.objects.filter(
@@ -159,7 +159,7 @@ def monthly_profit_comparison_by_property(request):
         ).aggregate(total=Sum('amount'))['total'] or 0
 
         last_month_profit = last_month_payments - last_month_expenses
-        print('last_month_profit',last_month_profit)
+        # print('last_month_profit',last_month_profit)
         # Calculate percentage change
         change = None
         status = 'no-data'
@@ -184,12 +184,12 @@ def monthly_profit_comparison_by_property(request):
             if this_month_profit < 0:
                 # Both months losses → compare as % improvement in loss
                 raw = (this_month_profit - last_month_profit) / abs(last_month_profit) * 100
-                print('loss ma ',raw)
+                # print('loss ma ',raw)
                 change = round(raw, 2)
                 status = 'loss-change'
             elif this_month_profit >= 0:
                 raw = (this_month_profit - last_month_profit) / abs(last_month_profit) * 100
-                print('loss ma ',raw)
+                # print('loss ma ',raw)
                 change = round(raw, 2)
                 status = 'loss-to-profit'
             
@@ -221,7 +221,7 @@ def index(request):
     expense=Expenses.objects.filter(landload=request.user)
     # print(request.user.country)
     profit_by_property,loss_by_property=monthly_profit_comparison_by_property(request)
-    print(profit_by_property,'loss',loss_by_property)
+    # print(profit_by_property,'loss',loss_by_property)
    
     try:
         symbol = get_symbol(data.currency)
@@ -371,8 +371,8 @@ def setup_location(request):
 @login_required(login_url='/')
 def listing(request):
     query = request.GET.get('q', '')
-    property = Property.objects.filter(landload=request.user,is_active=True)
-   
+    property = Property.objects.filter(landload=request.user,is_active=True).order_by('-id')
+    # print('pro------------------------------------>',property)
     if query:
         property = property.filter(
             Q(property_name__icontains=query) |
@@ -380,7 +380,16 @@ def listing(request):
             Q(property_type__icontains=query) |
             Q(postcode__icontains=query)
         )
-    return render(request,'landload/listing.html',{'property':property,'search_field':True,'is_listing':True})
+    today = localdate()
+    start_year = max(2026, today.year)
+    return render(request,'landload/listing.html',{
+        'property':property,
+        'search_field':True,
+        'is_listing':True,
+        'current_month':today.month,
+        'current_year':today.year,
+        'filter_years':range(start_year, start_year + 11),
+    })
 
 @login_required(login_url='/')
 def submit_step(request, step):
@@ -412,7 +421,7 @@ def submit_step(request, step):
             capacities = request.POST.getlist('total_capacity')
             rents = request.POST.getlist('rent')
             amounts = request.POST.getlist('rent_ammount')
-            print("------------->",rents)
+            # print("------------->",rents)
             for room_id, type_, ensuite, capacity, rent, amount in zip(
                 room_ids, types, ensuites, capacities, rents, amounts
             ):
@@ -475,15 +484,15 @@ def submit_step(request, step):
 def listing_add(request):
     data=LandlordProfile.objects.filter(landlord=request.user).first()
     video_form=''
-    print('*'*1000,request.method)
+    # print('*'*1000,request.method)
     form = PropertyForm()
     form2 =FinancialBreakdownform()
     form3 = MultiImageForm()
     symbol = get_symbol(data.currency)
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++',symbol)
+    # print('+++++++++++++++++++++++++++++++++++++++++++++++++++',symbol)
     if request.method == "POST":
         formid = request.POST.get('formid2') 
-        print('form id',formid)
+        # print('form id',formid)
         property_obj=get_object_or_404(Property, id=formid)
         form = MultiImageForm(request.POST, request.FILES)
 
@@ -566,7 +575,7 @@ def listing_view(request,id):
     form3 = MultiImageReadOnlyForm()
     data=LandlordProfile.objects.filter(landlord=request.user).first()
     symbol = get_symbol(data.currency)
-    print('data',property_obj2,property_obj)
+    # print('data',property_obj2,property_obj)
     if property_obj2:
         form2=FinancialBreakdownReadOnlyform(instance=property_obj2)
     form = PropertyReadOnlyForm(instance=property_obj)
@@ -592,7 +601,7 @@ def listing_dashboard(request,id):
     form2=FinancialBreakdownReadOnlyform()
     property_obj = get_object_or_404(Property, custom_id=id)
     all_rooms = property_obj.room_set.all().count()
-    print('*'*100,all_rooms)
+    # print('*'*100,all_rooms)
 # Occupied rooms (rooms that have at least one tenant)
     occupied_rooms = Rooms.objects.filter(
         property=property_obj,
@@ -605,13 +614,13 @@ def listing_dashboard(request,id):
     ).exclude(
         id__in=occupied_rooms
     )
-    print('occ:',occupied_rooms.count(),'emp:',empty_rooms.count())
+    # print('occ:',occupied_rooms.count(),'emp:',empty_rooms.count())
     # property_obj2 = get_object_or_404(FinancialBreakdown, property=property_obj.id)
     property_obj2 = FinancialBreakdown.objects.filter(property__custom_id=id).first()
     property_obj3 = PropertyImage.objects.filter(property__custom_id=id).first()
     form3 = MultiImageReadOnlyForm()
 
-    print('data',property_obj2,property_obj)
+    # print('data',property_obj2,property_obj)
     if property_obj2:
         form2=FinancialBreakdownReadOnlyform(instance=property_obj2)
     form = PropertyReadOnlyForm(instance=property_obj)
@@ -644,7 +653,7 @@ def listing_update(request,id):
     residence_image_urls = list(residence_images.values('id','image'))
     data=LandlordProfile.objects.filter(landlord=request.user).first()
     symbol = get_symbol(data.currency)
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++',symbol)
+    # print('+++++++++++++++++++++++++++++++++++++++++++++++++++',symbol)
     property_obj2 = FinancialBreakdown.objects.filter(property=id).first()
     form = PropertyForm(instance=property_obj)
     form2=FinancialBreakdownform()
@@ -659,10 +668,10 @@ def listing_update(request,id):
         form = PropertyForm(post_data, request.FILES, instance=property_obj)
         
         formid = request.POST.get('formid2') 
-        print('form id',formid)
+        # print('form id',formid)
         # property_obj=get_object_or_404(Property, id=formid)
         form3 = MultiImageForm(request.POST, request.FILES)
-        print('update form =========?')
+        # print('update form =========?')
         
             # property_instance = Property.objects.create(name="Sample Property")
 
@@ -758,11 +767,11 @@ def room(request,id):
         capacities = request.POST.getlist('total_capacity')
         rents = request.POST.getlist('rent')
         amounts = request.POST.getlist('rent_ammount')
-        print(rents)
+        # print(rents)
         for  room_ids,type_, ensuite, capacity,amount in zip(room_ids, types, ensuites, capacities,amounts):
             if room_ids:  
                 room = Rooms.objects.filter(id=room_ids).first()
-                print('rooom',room)
+                # print('rooom',room)
                 if room:
                     room.type_of_room = type_
                     room.ensuite = ensuite
@@ -815,17 +824,40 @@ def tenant(request):
 
 @login_required(login_url='/')
 def listing_list(request):
+    today = localdate()
+    try:
+        year = int(request.GET.get('year', today.year))
+        month = int(request.GET.get('month', today.month))
+    except (TypeError, ValueError):
+        year, month = today.year, today.month
+    if year < 2026 or not 1 <= month <= 12 or (year == 2026 and month < 4):
+        year, month = today.year, today.month
+
     data = []
-    tenant_qs  = Property.objects.filter(landload=request.user,is_active=True)
+    tenant_qs  = Property.objects.filter(landload=request.user,is_active=True).order_by('-id')
+    payment_totals = dict(
+        Payment.objects.filter(
+            landload=request.user, is_active=True,
+            paid_date__year=year, paid_date__month=month,
+        ).values('property_id').annotate(total=Sum('amount')).values_list('property_id', 'total')
+    )
+    expense_totals = dict(
+        Expenses.objects.filter(
+            landload=request.user, is_active=True,
+            paid_date__year=year, paid_date__month=month,
+        ).values('property_id').annotate(total=Sum('amount')).values_list('property_id', 'total')
+    )
     for i, obj in enumerate(tenant_qs, start=1):
+        earning = float(payment_totals.get(obj.id) or 0)
+        expenses = float(expense_totals.get(obj.id) or 0)
         data.append({
             'responsive_id':"",
             'sr':i,
             'id':obj.custom_id,
             'name':obj.property_name,
-            'earning':"---",
-            'expenses':"---",
-            'profit': "---",
+            'earning':round(earning, 2),
+            'expenses':round(expenses, 2),
+            'profit':round(earning - expenses, 2),
             'dues': "---",
             'loss': "---",
         })
@@ -835,7 +867,7 @@ def listing_list(request):
 @login_required(login_url='/')
 def payment_list(request):
     data = []
-    print('*'*1000)
+    # print('*'*1000)
     tenant_qs  = Payment.objects.filter(landload=request.user,is_active=True)
     for i, obj in enumerate(tenant_qs, start=1):
         data.append({
@@ -1106,7 +1138,6 @@ def tenant_invite_add(request):
             messages.success(request, f'Tenant has been Created successfully!')
             return redirect('landload:tenant')
         else:
-            # print('errr',form.errors)
             error_messages = '<br>'.join(
                 [f"{error}" for field_errors in form.errors.values() for error in field_errors]
             )
@@ -1117,8 +1148,6 @@ def tenant_invite_add(request):
 @login_required(login_url='/')
 def dues(request):
     query = request.GET.get('q', '')
-    # print('*'*1000)
-    # print(query)
     dues = Payment.objects.filter(landload=request.user,is_active=True)
     if query:
         dues = dues.filter(
@@ -1283,7 +1312,7 @@ def deactivate_expense(request,id):
 @login_required(login_url='/')
 def expenses_list(request):
     data = []
-    print('*'*1000)
+    # print('*'*1000)
     tenant_qs  = Expenses.objects.filter(landload=request.user,is_active=True)
     for i, obj in enumerate(tenant_qs, start=1):
         data.append({

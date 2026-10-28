@@ -38,7 +38,7 @@ class Property(models.Model):
             with transaction.atomic():
                 # Lock the table during ID generation
                 last_obj = Property.objects.select_for_update().order_by('-id').first()
-                if last_obj and last_obj.custom_id.startswith('PP'):
+                if last_obj and last_obj.custom_id.startswith('PT'):
                     try:
                         last_number = int(last_obj.custom_id[2:])
                     except ValueError:
@@ -49,7 +49,7 @@ class Property(models.Model):
 
                 # Loop to ensure uniqueness
                 while True:
-                    candidate_id = f'PP{next_number}'
+                    candidate_id = f'PT{next_number}'
                     if not Property.objects.filter(custom_id=candidate_id).exists():
                         self.custom_id = candidate_id
                         break

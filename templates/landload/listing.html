@@ -2,6 +2,27 @@
 {% load static %}
 {% block style %}
 
+<style>
+  .dt-length,
+  .dataTables_length {
+    display: none !important;
+  }
+  .listing-period-filter select {
+    width: auto;
+    min-width: 7rem;
+  }
+  .listing-period-filter {
+    margin-top: .25rem;
+    margin-bottom: .25rem;
+  }
+  .dt-layout-row:has(.listing-period-filter) .dt-layout-start {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+  }
+</style>
+
 
     <!-- BEGIN: Vendor CSS-->
      {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/jquery.dataTables.min.css' %}"> {% endcomment %}
@@ -37,7 +58,7 @@
     </div>
              <div class="card">
                 <div class="card-datatable table-responsive pt-0">
-                  <table class="datatables-basic table">
+                  <table class="datatables-basic table" data-current-month="{{ current_month }}" data-current-year="{{ current_year }}" data-filter-years="{% for year in filter_years %}{{ year }}{% if not forloop.last %},{% endif %}{% endfor %}">
                     <thead>
                       <tr>
                         {% comment %} <th></th> {% endcomment %}

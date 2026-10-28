@@ -32,13 +32,20 @@ document.addEventListener('DOMContentLoaded', function (e) {
   let dt_basic;
 
   if (dt_basic_table) {
-    let tableTitle = document.createElement('h5');
-    tableTitle.classList.add('card-title', 'mb-0', 'text-md-start', 'text-center', 'pb-md-0', 'pb-6');
-    tableTitle.innerHTML = 'Listings';
+    let selectedMonth = Number(dt_basic_table.dataset.currentMonth);
+    let selectedYear = Number(dt_basic_table.dataset.currentYear);
+    const filterHost = document.createElement('div');
+    filterHost.className = 'listing-filter-host';
     dt_basic = new DataTable(dt_basic_table, {
+      pageLength: 20,
+      lengthChange: false,
       ajax: {
                     url: '/landlord/listing_list',
-                    dataSrc: 'data'
+                    dataSrc: 'data',
+                    data: function (request) {
+                      request.month = selectedMonth;
+                      request.year = selectedYear;
+                    }
                 },
       columns: [
         { data: 'responsive_id', visible: false }, // 1
@@ -54,6 +61,22 @@ document.addEventListener('DOMContentLoaded', function (e) {
           // { data: null }
       ],
       columnDefs: [
+        {
+          targets: [1, 2, 4, 5, 6, 7, 8],
+          className: 'text-center'
+        },
+        {
+          targets: 3,
+          className: 'text-start'
+        },
+        {
+          targets: 1,
+          width: '3.5rem'
+        },
+        {
+          targets: 2,
+          width: '5rem'
+        },
         {
           // For Responsive
            className: 'control',
@@ -82,8 +105,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
         },
         {
           targets: 3,
-          searchable: false,
+          searchable: true,
           visible: true
+        },
+        {
+          targets: 2,
+          searchable: true
         },
         {
           // Avatar image/badge, Name and post
@@ -150,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
       layout: {
         top2Start: {
           rowClass: 'row card-header flex-column flex-md-row border-bottom mx-0 px-3',
-          features: [tableTitle]
+          features: [filterHost]
         },
         top2End: {
           features: [
@@ -374,17 +401,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
             }
           ]
         },
-        topStart: {
-          rowClass: 'row mx-0 px-3 my-0 justify-content-between border-bottom',
-          features: [
-            {
-              pageLength: {
-                menu: [10, 25, 50, 100],
-                text: 'Show_MENU_entries'
-              }
-            }
-          ]
-        },
         topEnd: {
           search: {
             placeholder: ''
@@ -442,6 +458,68 @@ document.addEventListener('DOMContentLoaded', function (e) {
         }
       }
     });
+
+    // Add the period controls on the left side of the table header.
+    const tableContainer = dt_basic.table().container();
+    const filterCell = tableContainer.querySelector('.listing-filter-host');
+    if (filterCell) {
+      const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      const years = (dt_basic_table.dataset.filterYears || String(selectedYear))
+        .split(',').map(Number).filter(Number.isFinite);
+      const filter = document.createElement('div');
+      filter.className = 'listing-period-filter d-flex flex-wrap align-items-center gap-2';
+
+      const monthSelect = document.createElement('select');
+      monthSelect.className = 'form-select';
+      monthSelect.setAttribute('aria-label', 'Filter listings by month');
+      const yearSelect = document.createElement('select');
+      yearSelect.className = 'form-select';
+      yearSelect.setAttribute('aria-label', 'Filter listings by year');
+
+      years.forEach(year => {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        option.selected = year === selectedYear;
+        yearSelect.appendChild(option);
+      });
+
+      function populateMonths(year, preferredMonth) {
+        monthSelect.innerHTML = '';
+        const firstMonth = year === 2026 ? 4 : 1;
+        for (let month = firstMonth; month <= 12; month += 1) {
+          const option = document.createElement('option');
+          option.value = month;
+          option.textContent = monthNames[month - 1];
+          option.selected = month === preferredMonth;
+          monthSelect.appendChild(option);
+        }
+        if (!monthSelect.value) monthSelect.value = String(firstMonth);
+      }
+
+      populateMonths(selectedYear, selectedMonth);
+      yearSelect.addEventListener('change', function () {
+        const year = Number(yearSelect.value);
+        const month = Number(monthSelect.value);
+        populateMonths(year, month);
+      });
+
+      const showButton = document.createElement('button');
+      showButton.type = 'button';
+      showButton.className = 'btn btn-primary';
+      showButton.textContent = 'Show';
+      showButton.addEventListener('click', function () {
+        selectedMonth = Number(monthSelect.value);
+        selectedYear = Number(yearSelect.value);
+        dt_basic.ajax.reload();
+      });
+
+      filter.append(monthSelect, yearSelect, showButton);
+      filterCell.appendChild(filter);
+    }
 
     // Add New record
     // ? Remove/Update this code as per your requirements
