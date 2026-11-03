@@ -381,14 +381,14 @@ def listing(request):
             Q(postcode__icontains=query)
         )
     today = localdate()
-    start_year = max(2026, today.year)
+    start_year = today.year + 1
     return render(request,'landload/listing.html',{
         'property':property,
         'search_field':True,
         'is_listing':True,
         'current_month':today.month,
         'current_year':today.year,
-        'filter_years':range(start_year, start_year + 11),
+        'filter_years':range(2022, start_year + 1),
     })
 
 @login_required(login_url='/')
@@ -828,13 +828,14 @@ def listing_list(request):
     try:
         year = int(request.GET.get('year', today.year))
         month = int(request.GET.get('month', today.month))
+        # print('month--------------->',month)
     except (TypeError, ValueError):
         year, month = today.year, today.month
-    if year < 2026 or not 1 <= month <= 12 or (year == 2026 and month < 4):
+    if year < 2022 or year > today.year + 1 or not 1 <= month <= 12:
         year, month = today.year, today.month
 
     data = []
-    tenant_qs  = Property.objects.filter(landload=request.user,is_active=True).order_by('-id')
+    tenant_qs  = Property.objects.filter(landload=request.user,is_active=True, created_at__date__gte=f'{year:04d}-{month:02d}-01').order_by('-id')
     payment_totals = dict(
         Payment.objects.filter(
             landload=request.user, is_active=True,

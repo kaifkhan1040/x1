@@ -5,6 +5,10 @@ from .models import Rooms,Property,Tenant,TenentProfileVerify,Payment,Country,\
 # Register your models here.
 admin.site.register(Rooms)
 admin.site.register(Property)
+class PropertyAdmin(admin.ModelAdmin):
+    # 1. Shows created_at as a column in the list view
+    list_display = ("__str__", "created_at")
+    fields = ("created_at",)
 admin.site.register(Tenant)
 admin.site.register(TenentProfileVerify)
 admin.site.register(Payment)

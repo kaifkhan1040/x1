@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         },
         topEnd: {
           search: {
-            placeholder: ''
+            placeholder: 'Search'
           }
         },
         bottomStart: {
@@ -413,6 +413,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         bottomEnd: 'paging'
       },
       language: {
+        search: '',
         paginate: {
           next: '<i class="icon-base ti tabler-chevron-right scaleX-n1-rtl icon-18px"></i>',
           previous: '<i class="icon-base ti tabler-chevron-left scaleX-n1-rtl icon-18px"></i>',
@@ -462,6 +463,17 @@ document.addEventListener('DOMContentLoaded', function (e) {
     // Add the period controls on the left side of the table header.
     const tableContainer = dt_basic.table().container();
     const filterCell = tableContainer.querySelector('.listing-filter-host');
+    const filterRow = filterCell?.closest('.dt-layout-row');
+    const searchElement = tableContainer.querySelector('.dt-search');
+    let searchSlot = null;
+    if (filterCell && searchElement) {
+      const searchRow = searchElement.closest('.dt-layout-row');
+      searchSlot = document.createElement('div');
+      searchSlot.className = 'listing-search-center';
+      searchSlot.appendChild(searchElement);
+      if (searchRow && searchRow !== filterRow) searchRow.remove();
+    }
+
     if (filterCell) {
       const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
@@ -489,15 +501,14 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
       function populateMonths(year, preferredMonth) {
         monthSelect.innerHTML = '';
-        const firstMonth = year === 2026 ? 4 : 1;
-        for (let month = firstMonth; month <= 12; month += 1) {
+        for (let month = 1; month <= 12; month += 1) {
           const option = document.createElement('option');
           option.value = month;
           option.textContent = monthNames[month - 1];
           option.selected = month === preferredMonth;
           monthSelect.appendChild(option);
         }
-        if (!monthSelect.value) monthSelect.value = String(firstMonth);
+        if (!monthSelect.value) monthSelect.value = '1';
       }
 
       populateMonths(selectedYear, selectedMonth);
@@ -519,6 +530,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
       filter.append(monthSelect, yearSelect, showButton);
       filterCell.appendChild(filter);
+      if (searchSlot) filterCell.appendChild(searchSlot);
     }
 
     // Add New record
@@ -545,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
   setTimeout(() => {
     const elementsToModify = [
       { selector: '.dt-buttons .btn', classToRemove: 'btn-secondary' },
-      { selector: '.dt-search .form-control', classToRemove: 'form-control-sm', classToAdd: 'ms-4' },
+      { selector: '.dt-search .form-control', classToRemove: 'form-control-sm' },
       { selector: '.dt-length .form-select', classToRemove: 'form-select-sm' },
       { selector: '.dt-layout-table', classToRemove: 'row mt-2' },
       { selector: '.dt-layout-end', classToAdd: 'mt-0' },

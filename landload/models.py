@@ -28,6 +28,7 @@ class Property(models.Model):
     rental_type= models.CharField(max_length=25,choices=(('Single Ownership','Single Ownership'),('Multi Ownership','Multi Ownership' )),blank=False)
     is_active =models.BooleanField(default=True)
     property_description = models.TextField(blank=True,null=True)
+    created_at = models.DateTimeField(default=timezone.now)
   
 
     def __str__(self):
