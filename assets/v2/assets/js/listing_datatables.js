@@ -32,6 +32,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
   let dt_basic;
 
   if (dt_basic_table) {
+    // Register the bundled virtual file system before PDF export is used.
+    if (window.pdfMake && window.pdfFonts && !window.pdfMake.vfs) {
+      window.pdfMake.vfs = window.pdfFonts.pdfMake?.vfs || window.pdfFonts.vfs || window.pdfFonts;
+    }
+
     let selectedMonth = Number(dt_basic_table.dataset.currentMonth);
     let selectedYear = Number(dt_basic_table.dataset.currentYear);
     const filterHost = document.createElement('div');
@@ -196,12 +201,16 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         columns: [3, 4, 5, 6, 7],
                         format: {
                           body: function (inner, coldex, rowdex) {
-                            if (inner.length <= 0) return inner;
+                            // DataTables may pass a DOM node instead of an HTML string.
+                            const value = inner && typeof inner === 'object'
+                              ? (inner.outerHTML || inner.textContent || '')
+                              : String(inner ?? '');
+                            if (value.length <= 0) return value;
 
                             // Check if inner is HTML content
-                            if (inner.indexOf('<') > -1) {
+                            if (value.indexOf('<') > -1) {
                               const parser = new DOMParser();
-                              const doc = parser.parseFromString(inner, 'text/html');
+                              const doc = parser.parseFromString(value, 'text/html');
 
                               // Get all text content
                               let text = '';
@@ -225,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                               return text.trim();
                             }
 
-                            return inner;
+                            return value;
                           }
                         }
                       },
@@ -277,43 +286,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         }
                       }
                     },
-                    {
-                      extend: 'excel',
-                      text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file-spreadsheet me-1"></i>Excel</span>`,
-                      className: 'dropdown-item',
-                      exportOptions: {
-                        columns: [3, 4, 5, 6, 7],
-                        format: {
-                          body: function (inner, coldex, rowdex) {
-                            if (inner.length <= 0) return inner;
-
-                            // Parse HTML content
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(inner, 'text/html');
-
-                            let text = '';
-
-                            // Handle user-name elements specifically
-                            const userNameElements = doc.querySelectorAll('.user-name');
-                            if (userNameElements.length > 0) {
-                              userNameElements.forEach(el => {
-                                // Get text from nested structure - try different selectors
-                                const nameText =
-                                  el.querySelector('.fw-medium')?.textContent ||
-                                  el.querySelector('.d-block')?.textContent ||
-                                  el.textContent;
-                                text += nameText.trim() + ' ';
-                              });
-                            } else {
-                              // Handle other elements (status, role, etc)
-                              text = doc.body.textContent || doc.body.innerText;
-                            }
-
-                            return text.trim();
-                          }
-                        }
-                      }
-                    },
+                    
                     {
                       extend: 'pdf',
                       text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file-description me-1"></i>Pdf</span>`,
