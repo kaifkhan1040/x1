@@ -18,6 +18,7 @@ class PropertyForm(ModelForm):
         self.fields['postcode'].widget.attrs.update({'class': 'form-control valid'})
         self.fields['property_type'].widget.attrs.update({'class': 'form-select valid'})
         self.fields['number_of_flat'].widget.attrs.update({'class': 'form-select valid','required':True})
+        self.fields['created_at'].widget.attrs.update({'class': 'form-select valid','required':False})
         self.fields['cost'].widget.attrs.update({'class': 'form-control valid'})
         self.fields['start_date'].widget.attrs.update({'class': 'form-control valid'})
         self.fields['property_description'].widget.attrs.update({'class': 'form-control valid','rows': 5})

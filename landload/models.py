@@ -21,14 +21,14 @@ class Property(models.Model):
     number_of_flat = models.CharField(max_length=100,choices=ROOM_CHOICES,blank=True,null=True)
     cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     start_date = models.DateField()
-    end_date = models.DateField()
+    end_date = models.DateField(null=True,blank=True)
     status =models.BooleanField(default=True)
     prop_thumbnail = models.ImageField(upload_to='property_thumbnails/', blank=True, null=True)
     landload = models.ForeignKey(CustomUser,on_delete=models.CASCADE,blank=True,null=True)
     rental_type= models.CharField(max_length=25,choices=(('Single Ownership','Single Ownership'),('Multi Ownership','Multi Ownership' )),blank=False)
     is_active =models.BooleanField(default=True)
     property_description = models.TextField(blank=True,null=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now,blank=True)
   
 
     def __str__(self):

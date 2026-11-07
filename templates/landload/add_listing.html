@@ -43,7 +43,12 @@
         <ol class="breadcrumb mb-0">
           <li class="breadcrumb-item"><a href="{% url 'landload:home' %}">Home</a></li>
           <li class="breadcrumb-item " aria-current="page"><a href="{% url 'landload:listing' %}">Listings</a></li>
-          <li class="breadcrumb-item active">Details</li>
+          {% if property_obj %}
+          <li class="breadcrumb-item"><a href="{% url 'landload:listing_dashboard' id=property_obj.custom_id %}">{{ property_obj.property_name }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Details</li>
+          {% else %}
+          <li class="breadcrumb-item active" aria-current="page">Add Listing</li>
+          {% endif %}
         </ol>
       </nav>
     </div>
@@ -86,10 +91,26 @@
                               <span class="bs-stepper-box">3</span>
                               <span class="bs-stepper-label">
                                 <span class="bs-stepper-title">Step 3</span>
-                                <span class="bs-stepper-subtitle">Asset</span>
+                                <span class="bs-stepper-subtitle">Photos</span>
                               </span>
                             </button>
                           </div>
+
+                           {% comment %} <div class="line d-none d-md-block">
+                            <i data-feather="chevron-right" class="font-medium-2"></i>
+                          </div>
+
+                          <!-- Step 4 -->
+                          <div class="step" data-target="#address-step">
+                            <button type="button" class="step-trigger">
+                              <span class="bs-stepper-box">4</span>
+                              <span class="bs-stepper-label">
+                                <span class="bs-stepper-title">Step 4</span>
+                                <span class="bs-stepper-subtitle">Documents</span>
+                              </span>
+                            </button>
+                          </div> {% endcomment %}
+                          
                         </div>
 
                         <!-- Save / Edit Buttons -->
@@ -126,25 +147,33 @@
               </div>
               <div class="row mb-2">
                 <div class="form-group col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                    <label for="username">Property name</label>
+                    <label for="username">Property Name</label>
                     {{form.property_name}}      
                     <input type="hidden" name="formid1" value="{{property_obj.id}}">                      
                 </div>
                 <div class="form-group col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                    <label for="username">Landload Name</label>
+                    <label for="username">Landlord Name</label>
                     {{form.landlord_name}}                              
                 </div>
                 <div class="form-group col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                <label for="username">Address 1</label>
-                    {{form.address_1}}                               
+                    <label for="username">Start Date</label>
+                    {{form.start_date}}
                 </div>
                 <div class="form-group col-12 col-md-6 col-lg-3 mb-2 mb-lg-0">
-                <label for="username">Address 2</label>
-                    {{form.address_2}}
-                </div>
+                  <label for="username">End Date</label>
+                  {{form.end_date}}
+              </div>
             </div>
             <div class="row mb-2">
-                
+              
+              <div class="form-group col-md-3">
+              <label for="username">Property Type</label>
+                  {{form.property_type}}
+              </div>
+              <div class="form-group col-md-3">
+                <label for="username">Address 1</label>
+                    {{form.address_1}}                               
+              </div>
                 <div class="form-group col-md-3">
                 <label for="username">City</label>
                     {{form.city}}
@@ -153,26 +182,15 @@
                     <label for="username">Postcode</label>
                     {{form.postcode}}
                 </div>
-                <div class="form-group col-md-3">
-                <label for="username">Property Type</label>
-                    {{form.property_type}}
-                </div>
-                <div class="form-group col-md-3">
-                    <label for="username">Start Date</label>
-                    {{form.start_date}}
-                </div>
             </div>
             <div class="row mb-2">
-              <div class="form-group col-md-3">
-                  <label for="username">End Date</label>
-                  {{form.end_date}}
-              </div>
+              
                  <div class="form-group col-md-3">
                     <label class="form-label" for="first-name">Monthly Rental {{symbol}}</label>
                     {{form2.monthly_rental}}
                   </div>
                   <div class="form-group col-md-3">
-                    <label class="form-label" for="last-name">Tax {{symbol}}</label>
+                    <label class="form-label" for="last-name">Monthly Tax {{symbol}}</label>
                     {{form2.tax}}
                   </div>
                   <div class="form-group col-md-3">
@@ -197,7 +215,7 @@
             <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
             <span class="align-middle d-sm-inline-block d-none">Previous</span>
           </button>
-          <button class="btn btn-primary btn-next" {% if not more_fun %}onclick="submitForm(1)"{% endif %}>
+          <button class="btn btn-primary {% if more_fun %}btn-next{% endif %}" {% if not more_fun %}type="button" onclick="submitForm(1)"{% endif %}>
             <span class="align-middle d-sm-inline-block d-none">Next</span>
             <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
           </button>
@@ -256,8 +274,9 @@
             function renderPhotoRows(rooms) {
               const tbody = document.getElementById('photo-rows');
               if (!tbody) return;
+              const roomList = Array.isArray(rooms) ? rooms : [];
               const rows = [{ key: 'common', label: 'Common' }].concat(
-                (rooms || []).map((room, index) => ({
+                roomList.map((room, index) => ({
                   key: `room_${room.id}`,
                   label: room.room_count ? `Room ${parseInt(room.room_count, 10) || index + 1}` : `Room ${index + 1}`,
                   id: room.id
@@ -690,8 +709,9 @@ numberOfFlatInput.setAttribute("disabled", "disabled");
 function generateRoomFields(rooms, symbol = '') {
     const container = document.getElementById('rooms-container');
     const listingReadOnly = {{ more_fun|yesno:"true,false" }};
+    const roomList = Array.isArray(rooms) ? rooms : [];
     container.innerHTML = '';
-    renderPhotoRows(rooms);
+    renderPhotoRows(roomList);
 
     // Create column headings only once
     const header = document.createElement('div');
@@ -716,7 +736,7 @@ function generateRoomFields(rooms, symbol = '') {
     container.appendChild(header);
 
     // Create a row for each room
-    rooms.forEach((room, index) => {
+    roomList.forEach((room, index) => {
         const row = document.createElement('div');
         row.className = 'row mb-3 align-items-center';
 
@@ -843,31 +863,41 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
 function submitForm(step) {
-  console.log('he')
     const form = document.getElementById(`form-step-${step}`);
+    if (!form.reportValidity()) return;
     const formData = new FormData(form);
 
-    fetch(`/landlord/submit-step/${step}/`, {
+    const submitUrl = "{% url 'landload:submit_step' step='1' %}".replace('/1/', `/${step}/`);
+    fetch(submitUrl, {
         method: 'POST',
         headers: {
             'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
         },
         body: formData
     })
-    .then(res => res.json())  
+    .then(res => {
+        if (!res.ok) throw new Error(`Step ${step} save failed (${res.status})`);
+        return res.json();
+    })
     .then(data => {
         if (data.success) {
-            document.querySelector('#form-step-2 input[name="formid"]').value = data.formid;
-            document.querySelector('#form-step-3 input[name="formid2"]').value = data.formid;
+            const formIdInput = document.querySelector('#form-step-2 input[name="formid"]');
+            const photoFormIdInput = document.querySelector('#form-step-3 input[name="formid2"]');
+            if (formIdInput) formIdInput.value = data.formid;
+            if (photoFormIdInput) photoFormIdInput.value = data.formid;
             // Step 1 creates the room rows. Keep them intact after saving step 2
             // so returning from step 3 shows the user's entries.
             if (String(step) === '1' && Array.isArray(data.rooms)) {
               generateRoomFields(data.rooms, '₹');
+              new Stepper(document.querySelector('.horizontal-wizard-example')).next();
+            } else if (String(step) === '1') {
+              console.error('Step 1 was saved without a room list:', data);
             }
         } else {
-           
+            console.error(`Step ${step} was not saved:`, data.errors || data);
         }
-    });
+    })
+    .catch(error => console.error(`Unable to save step ${step}:`, error));
 }
 </script>
 {% comment %} <script>
