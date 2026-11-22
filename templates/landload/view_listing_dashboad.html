@@ -32,56 +32,45 @@
               <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="{% url 'landload:home' %}">Home</a></li>
                 <li class="breadcrumb-item " aria-current="page"><a href="{% url 'landload:listing' %}">Listings</a></li>
-                <li class="breadcrumb-item active">Dashboard</li>
+                <li class="breadcrumb-item active" aria-current="page">{{ property_obj.property_name|truncatechars:25 }}</li>
+                <li class="breadcrumb-item active" aria-current="page">Overview</li>
+
               </ol>
             </nav>
+            <div class="btn-group">
+              <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                More
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{% url 'landload:listing_view' id=property_obj.custom_id %}">Details</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0);">Tenants</a></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Tickets</span></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Tasks</span></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Logs</span></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Notes</span></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Dues</span></li>
+              </ul>
+            </div>
           </div>
              
                 <!-- users list start -->
                
                 <div class="row g-6">
                     <!-- list and filter start -->
-                    <div class="card">
+                    {% comment %} <div class="card">
                         
                         <div class="card-body border-bottom">
                             <div class="row">
-                                <div class="col-md-4 ">
+                                <div class="col-12">
                                     Listing id - {{property_obj.custom_id}}
                                     {% comment %} <a href="{% url 'landload:listing_add' %}"><button class="btn btn-primary w-80 waves-effect waves-float waves-light" >Add Listing</button></a> {% endcomment %}
-                                </div>
-                                <div class="col-md-6">
-
-                                </div>
-                                <div class="col-md-2 ">
-                                   {% comment %} <div class="demo-inline-spacing"> {% endcomment %}
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                            More
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                            
-                                            <li><a class="dropdown-item" href="{% url 'landload:listing_view' id=property_obj.custom_id %}">Details</a></li>
-                                            <li><a class="dropdown-item" href="javascript:void(0);">Tenants</a></li>
-                                            {% if property_obj.number_of_flat %}
-                                            <li><a class="dropdown-item" href="{% url 'landload:room' id=property_id %}">Rooms</a></li>
-                                            {% endif %}
-                                            <li><a class="dropdown-item" href="javascript:void(0);">Tickets</a></li>
-                                            <li><a class="dropdown-item" href="javascript:void(0);">Tasks</a></li>
-                                            <li><a class="dropdown-item" href="javascript:void(0);">Logs</a></li>
-                                            <li><a class="dropdown-item" href="javascript:void(0);">Notes</a></li>
-                                            <li><a class="dropdown-item" href="javascript:void(0);">Dues</a></li>
-                                            
-                                            
-                                            </ul>
-                                        </div>
-                                    {% comment %} </div> {% endcomment %}
-                                </div>
+                               {% comment %} </div>
                             </div>
                         </div>
                         
                         
                         
-                    </div>
+                    </div> {% endcomment %}
                     <!-- list and filter end -->
                
                 

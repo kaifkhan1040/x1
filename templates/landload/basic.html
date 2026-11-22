@@ -287,9 +287,16 @@
             {% comment %} <li class="menu-header small">
               <span class="menu-header-text" data-i18n="Apps & Pages">Apps &amp; Pages</span>
             </li> {% endcomment %}
-            <li class="menu-item" {% if is_locked %}disabled readonly{% endif %}  {% if is_locked %}style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
+            {% comment %} <li class="menu-item" {% if is_locked %}disabled readonly{% endif %}  {% if is_locked %}style="pointer-events: none; opacity: 0.6; cursor: not-allowed;"{% endif %}>
               <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}message{% endif %}"></i>
+
+                <div data-i18n="Tasks">Tasks</div>
+              </a> {% endcomment %}
+              <li class="menu-item" disabled readonly style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon icon-base ti tabler-lock"></i>
+
                 <div data-i18n="Tasks">Tasks</div>
               </a>
               <ul class="menu-sub">
@@ -499,15 +506,27 @@
                 <div data-i18n="Agents">Agents</div>
               </a>
             </li> {% endcomment %}
-             <li class="menu-item {% if is_reports %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
+            {% comment %} <li class="menu-item {% if is_reports %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
               <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
                 <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}chart-bar{% endif %}"></i>
                 <div data-i18n="Reports">Reports</div>
               </a>
+            </li> {% endcomment %}
+            <li class="menu-item {% if is_reports %}active{% endif %} disabled readonly"  >
+              <a href="#" class="menu-link">
+                <i class="menu-icon icon-base ti tabler-lock"></i>
+                <div data-i18n="Reports">Reports</div>
+              </a>
             </li>
-            <li class="menu-item {% if is_locked %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
+            {% comment %} <li class="menu-item {% if is_locked %}active{% endif %} {% if is_locked %}disabled readonly{% endif %} "  >
               <a href="{% if is_locked %}#{% else %}{% endif %}" class="menu-link">
                 <i class="menu-icon icon-base ti tabler-{% if is_locked %}lock{% else %}users{% endif %}"></i>
+                <div data-i18n="User">User</div>
+              </a>
+            </li> {% endcomment %}
+            <li class="menu-item {% if is_locked %}active{% endif %} disabled readonly "  >
+              <a href="{% if is_locked %}#{% else %}#{% endif %}" class="menu-link">
+                <i class="menu-icon icon-base ti tabler-lock"></i>
                 <div data-i18n="User">User</div>
               </a>
             </li>

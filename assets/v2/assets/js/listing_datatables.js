@@ -32,6 +32,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
   let dt_basic;
 
   if (dt_basic_table) {
+    const currencySymbol = dt_basic_table.dataset.currencySymbol || '';
+    const renderCurrency = function (data, type) {
+      if (type !== 'display' || data === null || data === undefined || data === '') return data;
+      const amount = Number(data);
+      return Number.isFinite(amount) ? `${currencySymbol}${amount.toFixed(2)}` : data;
+    };
+
     // Register the bundled virtual file system before PDF export is used.
     if (window.pdfMake && window.pdfFonts && !window.pdfMake.vfs) {
       window.pdfMake.vfs = window.pdfFonts.pdfMake?.vfs || window.pdfFonts.vfs || window.pdfFonts;
@@ -58,11 +65,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
           { data: 'sr' },        // ✅ sr should match the backend key
           { data: 'id' },
           { data: 'name' },
-          { data: 'earning' },
-          { data: 'expenses' },
-          { data: 'profit' },
+          { data: 'earning', render: renderCurrency },
+          { data: 'expenses', render: renderCurrency },
+          { data: 'profit', render: renderCurrency },
           { data: 'dues' },
-          { data: 'loss' },
+          { data: 'loss', render: renderCurrency },
           // { data: null }
       ],
       columnDefs: [
@@ -76,11 +83,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
         },
         {
           targets: 1,
-          width: '3.5rem'
+          width: '1.5rem',
+          className: 'text-center text-nowrap'
         },
         {
           targets: 2,
-          width: '5rem'
+          width: '2.75rem',
+          className: 'text-center text-nowrap'
         },
         {
           // For Responsive
@@ -132,6 +141,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
           // Label
           targets: -2,
           render: function (data, type, full, meta) {
+            if (type === 'display' && data !== null && data !== undefined && data !== '') {
+              const amount = Number(data);
+              if (Number.isFinite(amount)) return `${currencySymbol}${amount.toFixed(2)}`;
+            }
+
             const statusNumber = full.status;
             const statuses = {
               1: { title: 'Current', class: 'bg-label-primary' },
@@ -141,9 +155,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
               5: { title: 'Applied', class: 'bg-label-info' }
             };
 
-            if (typeof statuses[statusNumber] === 'undefined') {
-              return data;
-            }
+            if (typeof statuses[statusNumber] === 'undefined') return data;
 
             return `
               <span class="badge ${statuses[statusNumber].class}">
@@ -449,8 +461,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     if (filterCell) {
       const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'Jan', 'Feb', 'March', 'April', 'May', 'June',
+        'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
       ];
       const years = (dt_basic_table.dataset.filterYears || String(selectedYear))
         .split(',').map(Number).filter(Number.isFinite);
@@ -494,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
       const showButton = document.createElement('button');
       showButton.type = 'button';
       showButton.className = 'btn btn-primary';
-      showButton.textContent = 'Show';
+      showButton.textContent = 'Go';
       showButton.addEventListener('click', function () {
         selectedMonth = Number(monthSelect.value);
         selectedYear = Number(yearSelect.value);

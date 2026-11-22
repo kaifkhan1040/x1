@@ -370,6 +370,8 @@ def setup_location(request):
     return render(request, 'landload/location_setup.html', {'form': form})
 @login_required(login_url='/')
 def listing(request):
+    data=LandlordProfile.objects.filter(landlord=request.user).first()
+    symbol = get_symbol(data.currency)
     query = request.GET.get('q', '')
     property = Property.objects.filter(landload=request.user,is_active=True).order_by('-id')
     # print('pro------------------------------------>',property)
@@ -389,6 +391,7 @@ def listing(request):
         'current_month':today.month,
         'current_year':today.year,
         'filter_years':range(2022, start_year + 1),
+        'symbol':symbol
     })
 
 @login_required(login_url='/')
@@ -409,6 +412,10 @@ def submit_step(request, step):
             if formidtemp:
                 prodata=Property.objects.filter(id=formidtemp).first()
                 if prodata:
+                    # Existing listing rental type controls are disabled in the UI,
+                    # so browsers omit them from POST. Preserve the stored value.
+                    if not post_data.get('rental_type'):
+                        post_data['rental_type'] = prodata.rental_type
                     form = PropertyForm(post_data,instance=prodata)
                 
                 

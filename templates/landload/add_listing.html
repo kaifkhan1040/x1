@@ -51,6 +51,20 @@
           {% endif %}
         </ol>
       </nav>
+      <div class="btn-group">
+              <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                More
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{% url 'landload:listing_dashboard' id=property_obj.custom_id %}">Overview</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0);">Tenants</a></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Tickets</span></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Tasks</span></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Logs</span></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Notes</span></li>
+                <li><span class="dropdown-item disabled" aria-disabled="true">Dues</span></li>
+              </ul>
+            </div>
     </div>
                                     
                 
@@ -77,7 +91,7 @@
                               <span class="bs-stepper-box">2</span>
                               <span class="bs-stepper-label">
                                 <span class="bs-stepper-title">Step 2</span>
-                                <span class="bs-stepper-subtitle">Financials</span>
+                                <span class="bs-stepper-subtitle">Room Details</span>
                               </span>
                             </button>
                           </div>
@@ -143,6 +157,9 @@
                     </div>
                   {% endfor %}
                 </div>
+                {% if property_obj.rental_type %}
+                  <input type="hidden" name="rental_type" value="{{ property_obj.rental_type }}">
+                {% endif %}
               </div>
               </div>
               <div class="row mb-2">
@@ -237,7 +254,7 @@
             <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
             <span class="align-middle d-sm-inline-block d-none">Previous</span>
           </button>
-          <button class="btn btn-primary btn-next" {% if not more_fun %}onclick="submitForm(2)"{% endif %}>
+          <button class="btn btn-primary {% if more_fun %}btn-next{% endif %}" {% if not more_fun %}type="button" onclick="submitForm(2)"{% endif %}>
             <span class="align-middle d-sm-inline-block d-none">Next</span>
             <i data-feather="arrow-right" class="align-middle ml-sm-25 ml-0"></i>
           </button>
@@ -862,16 +879,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 <script>
+let listingStepper;
+
+document.addEventListener('DOMContentLoaded', function () {
+    const wizard = document.querySelector('.horizontal-wizard-example');
+    if (wizard) listingStepper = new Stepper(wizard);
+});
+
 function submitForm(step) {
     const form = document.getElementById(`form-step-${step}`);
-    if (!form.reportValidity()) return;
+    if (!form || !form.reportValidity()) return;
     const formData = new FormData(form);
+    const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]')?.value
+        || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    const nextButton = form.parentElement.querySelector('.d-flex button:last-child');
+    if (nextButton) nextButton.disabled = true;
 
     const submitUrl = "{% url 'landload:submit_step' step='1' %}".replace('/1/', `/${step}/`);
     fetch(submitUrl, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-CSRFToken': csrfToken,
         },
         body: formData
     })
@@ -889,15 +917,24 @@ function submitForm(step) {
             // so returning from step 3 shows the user's entries.
             if (String(step) === '1' && Array.isArray(data.rooms)) {
               generateRoomFields(data.rooms, '₹');
-              new Stepper(document.querySelector('.horizontal-wizard-example')).next();
+              listingStepper?.next();
+            } else if (String(step) === '2') {
+              listingStepper?.next();
             } else if (String(step) === '1') {
               console.error('Step 1 was saved without a room list:', data);
             }
         } else {
-            console.error(`Step ${step} was not saved:`, data.errors || data);
+            const details = data.errors ? JSON.stringify(data.errors) : 'Please check the entered values and try again.';
+            alert(`Step ${step} could not be saved. ${details}`);
         }
     })
-    .catch(error => console.error(`Unable to save step ${step}:`, error));
+    .catch(error => {
+        console.error(`Unable to save step ${step}:`, error);
+        alert(`Unable to save this step. Please try again.`);
+    })
+    .finally(() => {
+        if (nextButton) nextButton.disabled = false;
+    });
 }
 </script>
 {% comment %} <script>

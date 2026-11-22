@@ -95,7 +95,7 @@
     </div>
              <div class="card">
                 <div class="card-datatable table-responsive pt-0">
-                  <table class="datatables-basic table" data-current-month="{{ current_month }}" data-current-year="{{ current_year }}" data-filter-years="{% for year in filter_years %}{{ year }}{% if not forloop.last %},{% endif %}{% endfor %}">
+                  <table class="datatables-basic table" data-current-month="{{ current_month }}" data-current-year="{{ current_year }}" data-currency-symbol="{{ symbol }}" data-filter-years="{% for year in filter_years %}{{ year }}{% if not forloop.last %},{% endif %}{% endfor %}">
                     <thead>
                       <tr>
                         {% comment %} <th></th> {% endcomment %}
