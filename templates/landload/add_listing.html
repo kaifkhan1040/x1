@@ -51,6 +51,7 @@
           {% endif %}
         </ol>
       </nav>
+      {% if property_obj %}
       <div class="btn-group">
               <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 More
@@ -65,6 +66,7 @@
                 <li><span class="dropdown-item disabled" aria-disabled="true">Dues</span></li>
               </ul>
             </div>
+            {% endif %}
     </div>
                                     
                 
@@ -218,6 +220,10 @@
                 <div class="form-group col-md-3" id="num-flat-group" style="display: none;">
                 <label for="username">Number of Flat</label>
                     {{form.number_of_flat}}
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="property-status">Status</label>
+                  {{form.property_status}}
                 </div>
             </div>
             <div class="row mb-2">

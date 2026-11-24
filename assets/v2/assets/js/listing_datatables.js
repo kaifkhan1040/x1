@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
           { data: 'profit', render: renderCurrency },
           { data: 'dues' },
           { data: 'loss', render: renderCurrency },
+          { data: 'property_status' },
           // { data: null }
       ],
       columnDefs: [
@@ -164,6 +165,18 @@ document.addEventListener('DOMContentLoaded', function (e) {
             `;
           }
         },
+        {
+          targets: -1,
+          render: function (data, type) {
+            if (type !== 'display') return data;
+            const styles = {
+              Active: 'bg-label-success',
+              Inactive: 'bg-label-secondary',
+              Dissolved: 'bg-label-danger'
+            };
+            return `<span class="badge ${styles[data] || 'bg-label-secondary'}">${data || 'Inactive'}</span>`;
+          }
+        },
         // {
         //   // Actions
         //   targets: -1,
@@ -210,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                       text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-printer me-1"></i>Print</span>`,
                       className: 'dropdown-item',
                       exportOptions: {
-                        columns: [3, 4, 5, 6, 7],
+                        columns: [3, 4, 5, 6, 7, 9],
                         format: {
                           body: function (inner, coldex, rowdex) {
                             // DataTables may pass a DOM node instead of an HTML string.
@@ -266,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                       text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file-text me-1"></i>Csv</span>`,
                       className: 'dropdown-item',
                       exportOptions: {
-                        columns: [3, 4, 5, 6, 7],
+                        columns: [3, 4, 5, 6, 7, 9],
                         format: {
                           body: function (inner, coldex, rowdex) {
                             if (inner.length <= 0) return inner;
@@ -304,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                       text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file-description me-1"></i>Pdf</span>`,
                       className: 'dropdown-item',
                       exportOptions: {
-                        columns: [3, 4, 5, 6, 7],
+                        columns: [3, 4, 5, 6, 7, 9],
                         format: {
                           body: function (inner, coldex, rowdex) {
                             if (inner.length <= 0) return inner;
@@ -341,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                       text: `<i class="icon-base ti tabler-copy me-1"></i>Copy`,
                       className: 'dropdown-item',
                       exportOptions: {
-                        columns: [3, 4, 5, 6, 7],
+                        columns: [3, 4, 5, 6, 7, 9],
                         format: {
                           body: function (inner, coldex, rowdex) {
                             if (inner.length <= 0) return inner;

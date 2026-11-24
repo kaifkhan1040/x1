@@ -7,6 +7,11 @@ import pytz
 
 class Property(models.Model):
     ROOM_CHOICES = [(str(i), i) for i in range(1, 11)]
+    PROPERTY_STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('Inactive', 'Inactive'),
+        ('Dissolved', 'Dissolved'),
+    ]
 
 
     custom_id = models.CharField(max_length=10, unique=True, blank=True)
@@ -23,6 +28,7 @@ class Property(models.Model):
     start_date = models.DateField()
     end_date = models.DateField(null=True,blank=True)
     status =models.BooleanField(default=True)
+    property_status = models.CharField(max_length=10, choices=PROPERTY_STATUS_CHOICES, default='Active')
     prop_thumbnail = models.ImageField(upload_to='property_thumbnails/', blank=True, null=True)
     landload = models.ForeignKey(CustomUser,on_delete=models.CASCADE,blank=True,null=True)
     rental_type= models.CharField(max_length=25,choices=(('Single Ownership','Single Ownership'),('Multi Ownership','Multi Ownership' )),blank=False)
@@ -192,6 +198,11 @@ class LandloadDoucment(models.Model):
 
 
 class Tenant(models.Model):
+    TENANT_STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('Inactive', 'Inactive'),
+        ('Moved out', 'Moved out'),
+    ]
     RESIDENCE_STATUS = [
         ('Citizen', 'Citizen'),
         ('EU Settled', 'EU Settled'),
@@ -213,6 +224,7 @@ class Tenant(models.Model):
     bank_statement=models.FileField(upload_to='tenant/bank_statement',blank=True,null=True)
     custom_id = models.CharField(max_length=10, unique=True, blank=True)
     is_active = models.BooleanField(default=True)
+    tenant_status = models.CharField(max_length=10, choices=TENANT_STATUS_CHOICES, default='Active')
     residence_status = models.CharField(max_length=50, choices=RESIDENCE_STATUS)
     visa_type = models.CharField(max_length=100, blank=True, null=True)
     visa_from = models.DateField(blank=True, null=True)

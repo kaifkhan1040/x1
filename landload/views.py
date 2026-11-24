@@ -373,7 +373,7 @@ def listing(request):
     data=LandlordProfile.objects.filter(landlord=request.user).first()
     symbol = get_symbol(data.currency)
     query = request.GET.get('q', '')
-    property = Property.objects.filter(landload=request.user,is_active=True).order_by('-id')
+    property = Property.objects.filter(landload=request.user).order_by('-id')
     # print('pro------------------------------------>',property)
     if query:
         property = property.filter(
@@ -607,21 +607,15 @@ def listing_view(request,id):
 def listing_dashboard(request,id):
     form2=FinancialBreakdownReadOnlyform()
     property_obj = get_object_or_404(Property, custom_id=id)
-    all_rooms = property_obj.room_set.all().count()
-    # print('*'*100,all_rooms)
-# Occupied rooms (rooms that have at least one tenant)
+    all_rooms = Rooms.objects.filter(property=property_obj).count()
+    # Occupied rooms must have a current active tenant.
     occupied_rooms = Rooms.objects.filter(
         property=property_obj,
-        tenant__isnull=False   # reverse lookup via Tenant.room
+        tenant__is_active=True
     ).distinct()
 
-    # Empty rooms (rooms without any tenant)
-    empty_rooms = Rooms.objects.filter(
-        property=property_obj
-    ).exclude(
-        id__in=occupied_rooms
-    )
-    # print('occ:',occupied_rooms.count(),'emp:',empty_rooms.count())
+    occupied_count = occupied_rooms.count()
+    empty_count = max(all_rooms - occupied_count, 0)
     # property_obj2 = get_object_or_404(FinancialBreakdown, property=property_obj.id)
     property_obj2 = FinancialBreakdown.objects.filter(property__custom_id=id).first()
     property_obj3 = PropertyImage.objects.filter(property__custom_id=id).first()
@@ -634,14 +628,33 @@ def listing_dashboard(request,id):
     chart_data = {
         "values": [0, 0],
     }
-    occupied_vs_advertised=[occupied_rooms.count(),empty_rooms.count()]
+    occupied_vs_advertised=[occupied_count,empty_count]
     payment=Payment.objects.filter(landload=request.user,property__custom_id=id)
     expense=Expenses.objects.filter(landload=request.user,property__custom_id=id)
+    income = payment.aggregate(total=Sum('amount'))['total'] or 0
+    total_expenses = expense.aggregate(total=Sum('amount'))['total'] or 0
+    net_profit = income - total_expenses
+    active_dues = Payment.objects.filter(
+        landload=request.user,
+        property=property_obj,
+        is_active=True,
+    )
+    total_dues = active_dues.aggregate(total=Sum('amount'))['total'] or 0
+    longest_due = active_dues.order_by('paid_date', 'id').first()
+    highest_due = active_dues.order_by('-amount', 'paid_date').first()
+    landlord_profile = LandlordProfile.objects.filter(landlord=request.user).first()
+    try:
+        symbol = get_symbol(landlord_profile.currency) if landlord_profile else ''
+    except Exception:
+        symbol = ''
 
     return render(request,'landload/view_listing_dashboad.html',{'form':form,'form2':form2,'is_listing':True,
                                                        'property_id':property_obj.id,"chart_data": json.dumps(chart_data),'property_obj':property_obj,'more_fun':True,
                                                        'property_obj2':property_obj2,'form3':form3,'occupied_vs_advertised':occupied_vs_advertised,
-                                                       'total_room':all_rooms,'payment':payment,'expense':expense })
+                                                       'total_room':all_rooms,'payment':payment,'expense':expense,
+                                                       'income':income,'total_expenses':total_expenses,'net_profit':net_profit,'symbol':symbol,
+                                                       'total_dues':total_dues,'longest_due':longest_due,'highest_due':highest_due,
+                                                       'occupied_count':occupied_count,'empty_count':empty_count })
 
 @login_required(login_url='/')
 def listing_update(request,id):
@@ -805,15 +818,16 @@ def room(request,id):
 
 @login_required(login_url='/')
 def deactivate_property(request,pk):
-    obj=Property.objects.get(id=pk)
+    obj=get_object_or_404(Property, id=pk, landload=request.user)
     obj.is_active=False
+    obj.property_status='Inactive'
     obj.save()
     return JsonResponse(True,safe=False)
 
 @login_required(login_url='/')
 def tenant(request):
     query = request.GET.get('q', '')
-    tenant = Tenant.objects.filter(landload=request.user,is_active=True)
+    tenant = Tenant.objects.filter(landload=request.user)
    
     if query:
         tenant = tenant.filter(
@@ -842,7 +856,7 @@ def listing_list(request):
         year, month = today.year, today.month
 
     data = []
-    tenant_qs  = Property.objects.filter(landload=request.user,is_active=True, created_at__date__gte=f'{year:04d}-{month:02d}-01').order_by('-id')
+    tenant_qs  = Property.objects.filter(landload=request.user).order_by('-id')
     payment_totals = dict(
         Payment.objects.filter(
             landload=request.user, is_active=True,
@@ -868,6 +882,7 @@ def listing_list(request):
             'profit':round(earning - expenses, 2),
             'dues': "---",
             'loss': "---",
+            'property_status': obj.property_status,
         })
 
     return JsonResponse({'data': data}) 
@@ -896,7 +911,7 @@ def payment_list(request):
 def tenant_list(request):
     data = []
     today = localdate()
-    tenant = Tenant.objects.filter(landload=request.user, is_active=True).select_related('user', 'property')
+    tenant = Tenant.objects.filter(landload=request.user).select_related('user', 'property')
     rent_payments = Payment.objects.filter(
         landload=request.user,
         is_active=True,
@@ -913,7 +928,7 @@ def tenant_list(request):
         payment_name = full_name.casefold()
         paid_amount = 0
         rent_due = False
-        if obj.rent > 0 and obj.property and (not obj.move_in_date or obj.move_in_date <= today):
+        if obj.tenant_status == 'Active' and obj.rent > 0 and obj.property and (not obj.move_in_date or obj.move_in_date <= today):
             try:
                 collection_frequency = obj.property.financials.collect_rent
             except FinancialBreakdown.DoesNotExist:
@@ -945,6 +960,7 @@ def tenant_list(request):
             'last_payment': "",  
             'move_in_date': obj.move_in_date.strftime('%d %b %Y') if obj.move_in_date else '',
             'rent_due': rent_due,
+            'tenant_status': obj.tenant_status,
             
         })
 
@@ -1068,12 +1084,12 @@ def tenant_dashboard(request,id):
 
 @login_required(login_url='/')
 def tenant_update(request,id):
-    property = Property.objects.filter(landload=request.user,is_active=True)
+    property = Property.objects.filter(landload=request.user)
     tenant_obj = get_object_or_404(Tenant, pk=id)
     if request.method == 'POST':
         post_data = request.POST.copy()
         post_data['landload']=request.user
-        post_data['is_active']=True
+        post_data['is_active'] = post_data.get('tenant_status', tenant_obj.tenant_status) == 'Active'
         post_data['user']=tenant_obj.user
         first_name=request.POST.get('first_name')
         middle_name=request.POST.get('middle_name')
@@ -1106,8 +1122,9 @@ def tenant_update(request,id):
 
 @login_required(login_url='/')
 def deactivate_tenant(request,pk):
-    obj=Tenant.objects.get(id=pk)
+    obj=get_object_or_404(Tenant, id=pk, landload=request.user)
     obj.is_active=False
+    obj.tenant_status='Inactive'
     obj.save()
     return JsonResponse(True,safe=False)
 

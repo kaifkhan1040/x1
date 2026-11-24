@@ -17,6 +17,7 @@ class PropertyForm(ModelForm):
         self.fields['city'].widget.attrs.update({'class': 'form-control valid'})
         self.fields['postcode'].widget.attrs.update({'class': 'form-control valid'})
         self.fields['property_type'].widget.attrs.update({'class': 'form-select valid'})
+        self.fields['property_status'].widget.attrs.update({'class': 'form-select valid'})
         self.fields['number_of_flat'].widget.attrs.update({'class': 'form-select valid','required':True})
         self.fields['created_at'].widget.attrs.update({'class': 'form-select valid','required':False})
         self.fields['cost'].widget.attrs.update({'class': 'form-control valid'})
@@ -29,6 +30,17 @@ class PropertyForm(ModelForm):
     choice for choice in self.fields['rental_type'].choices if choice[0] != ''
 ]
         # self.fields['rental_type'].widget.attrs.update({'class': 'form-control valid'})
+
+    def clean_property_status(self):
+        return self.cleaned_data.get('property_status') or getattr(self.instance, 'property_status', 'Active')
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.is_active = instance.property_status == 'Active'
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
         
         
     class Meta:
@@ -162,6 +174,18 @@ class TenantForm(ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+        self.fields['tenant_status'].widget.attrs.update({'class': 'form-select'})
+
+    def clean_tenant_status(self):
+        return self.cleaned_data.get('tenant_status') or getattr(self.instance, 'tenant_status', 'Active')
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.is_active = instance.tenant_status == 'Active'
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
 
     class Meta:
             model = Tenant
@@ -225,13 +249,22 @@ class TenantInviteForm(ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+        self.fields['tenant_status'].widget.attrs.update({'class': 'form-select'})
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.is_active = instance.tenant_status == 'Active'
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter tenant email'})
     )
     class Meta:
             model = Tenant
-            fields = ['property','room','rent','deposit','email']
+            fields = ['property','room','rent','deposit','email','tenant_status']
 
 
 class TenantInviteReadOnlyForm(TenantForm):
