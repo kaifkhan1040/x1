@@ -32,9 +32,16 @@ document.addEventListener('DOMContentLoaded', function (e) {
   let dt_basic;
 
   if (dt_basic_table) {
+    const tenantFilters = document.querySelector('.tenant-filters');
+    const currencySymbol = dt_basic_table.dataset.currencySymbol || '';
+    const renderCurrency = function (value, type) {
+      if (type !== 'display' || value === null || value === undefined || value === '') return value;
+      const amount = Number(value);
+      return Number.isFinite(amount) ? `${currencySymbol}${amount.toFixed(2)}` : value;
+    };
     let tableTitle = document.createElement('h5');
-    tableTitle.classList.add('card-title', 'mb-0', 'text-md-start', 'text-center', 'pb-md-0', 'pb-6');
-    tableTitle.innerHTML = 'Tenants';
+    tableTitle.classList.add('card-title', 'mb-0', 'text-md-start', 'text-center', 'pb-0');
+    // tableTitle.innerHTML = 'Tenants';
     dt_basic = new DataTable(dt_basic_table, {
       ajax: {
                     url: '/landlord/tenant_list',
@@ -66,18 +73,42 @@ document.addEventListener('DOMContentLoaded', function (e) {
         }
     },
     {
-        data: 'custom_id',
-        render: function(data, type, full, meta) {
-            return '<a href="/landlord/tenant-dashboard/' + full.id + '">' + data + '</a>';
+        data: 'sr',
+        render: function (data, type, full, meta) {
+          return meta.settings._iDisplayStart + meta.row + 1;
         }
     },
-    { data: 'full_name' },
-    { data: 'property' },
-    { data: 'rent' },
-    { data: 'total_dues' },
-    { data: 'last_payment' },
-    { data: 'move_in_date' },
-    { data: 'tenant_status' }
+    {
+        data: 'full_name',
+        render: function (data, type, full) {
+          if (type !== 'display') return data;
+          const name = String(data || '—').replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+          })[char]);
+          return `<a href="/landlord/tenant-dashboard/${full.id}/">${name}</a>`;
+        }
+    },
+    { data: 'room', defaultContent: '' },
+    { data: 'property', defaultContent: '' },
+    { data: 'rent', render: renderCurrency },
+    { data: 'total_dues', render: renderCurrency },
+    {
+        data: null,
+        orderable: false,
+        searchable: false,
+        render: function (data, type, full) {
+          if (type !== 'display') return '';
+          return `<div class="dropdown">
+            <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Tenant actions">
+              <i class="icon-base ti tabler-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/landlord/tenant-dashboard/${full.id}/">View profile</a></li>
+              <li><a class="dropdown-item" href="/landlord/tenant-update/${full.id}/">Edit tenant</a></li>
+            </ul>
+          </div>`;
+        }
+    }
       ],
       columnDefs: [
         {
@@ -118,54 +149,18 @@ document.addEventListener('DOMContentLoaded', function (e) {
     //     },
         {
           responsivePriority: 1,
-          targets: 4
-        },
-        {
-          // Label
-          targets: -2,
-          render: function (data, type, full, meta) {
-            const statusNumber = full.status;
-            const statuses = {
-              1: { title: 'Current', class: 'bg-label-primary' },
-              2: { title: 'Professional', class: 'bg-label-success' },
-              3: { title: 'Rejected', class: 'bg-label-danger' },
-              4: { title: 'Resigned', class: 'bg-label-warning' },
-              5: { title: 'Applied', class: 'bg-label-info' }
-            };
-
-            if (typeof statuses[statusNumber] === 'undefined') {
-              return data;
-            }
-
-            return `
-              <span class="badge ${statuses[statusNumber].class}">
-                ${statuses[statusNumber].title}
-              </span>
-            `;
-          }
-        },
-        {
-          targets: -1,
-          render: function (data, type) {
-            if (type !== 'display') return data;
-            const styles = {
-              Active: 'bg-label-success',
-              Inactive: 'bg-label-secondary',
-              'Moved out': 'bg-label-warning'
-            };
-            return `<span class="badge ${styles[data] || 'bg-label-secondary'}">${data || 'Inactive'}</span>`;
-          }
+          targets: 3
         }
       ],
       select: {
         style: 'multi',
         selector: 'td:nth-child(2)'
       },
-      order: [[2, 'desc']],
+      order: [[7, 'desc']],
       layout: {
         top2Start: {
           rowClass: 'row card-header flex-column flex-md-row border-bottom mx-0 px-3',
-          features: [tableTitle]
+          features: tenantFilters ? [tableTitle, tenantFilters] : [tableTitle]
         },
         top2End: {
           features: [
@@ -173,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
               buttons: [
                 {
                   extend: 'collection',
-                  className: 'btn btn-label-primary dropdown-toggle me-4',
+                  className: 'btn btn-label-primary dropdown-toggle',
                   text: '<span class="d-flex align-items-center gap-2"><i class="icon-base ti tabler-upload icon-xs me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span></span>',
                   buttons: [
                     {
@@ -181,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                       text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-printer me-1"></i>Print</span>`,
                       className: 'dropdown-item',
                       exportOptions: {
-                        columns: [3, 4, 5, 6, 7, 9],
+                        columns: [2, 3, 4, 5, 6, 7],
                         format: {
                           body: function (inner, coldex, rowdex) {
                             if (inner.length <= 0) return inner;
@@ -233,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                       text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file-text me-1"></i>Csv</span>`,
                       className: 'dropdown-item',
                       exportOptions: {
-                        columns: [3, 4, 5, 6, 7, 9],
+                        columns: [2, 3, 4, 5, 6, 7],
                         format: {
                           body: function (inner, coldex, rowdex) {
                             if (inner.length <= 0) return inner;
@@ -270,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                       text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file-spreadsheet me-1"></i>Excel</span>`,
                       className: 'dropdown-item',
                       exportOptions: {
-                        columns: [3, 4, 5, 6, 7, 9],
+                        columns: [2, 3, 4, 5, 6, 7],
                         format: {
                           body: function (inner, coldex, rowdex) {
                             if (inner.length <= 0) return inner;
@@ -307,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                       text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file-description me-1"></i>Pdf</span>`,
                       className: 'dropdown-item',
                       exportOptions: {
-                        columns: [3, 4, 5, 6, 7, 9],
+                        columns: [2, 3, 4, 5, 6, 7],
                         format: {
                           body: function (inner, coldex, rowdex) {
                             if (inner.length <= 0) return inner;
@@ -344,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                       text: `<i class="icon-base ti tabler-copy me-1"></i>Copy`,
                       className: 'dropdown-item',
                       exportOptions: {
-                        columns: [3, 4, 5, 6, 7, 9],
+                        columns: [2, 3, 4, 5, 6, 7],
                         format: {
                           body: function (inner, coldex, rowdex) {
                             if (inner.length <= 0) return inner;
@@ -446,13 +441,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
         }
       }
     });
-
-    // Move the existing filter section below the Tenants title and action buttons.
-    const tenantFilters = document.querySelector('.tenant-filters');
-    const tenantHeader = dt_basic_table.closest('.card-datatable')?.querySelector('.card-header');
-    if (tenantFilters && tenantHeader) {
-      tenantHeader.after(tenantFilters);
-    }
 
     const propertyInputs = Array.from(document.querySelectorAll('.property-filter-checkbox'));
     const propertyLabel = document.getElementById('propertyFilterLabel');

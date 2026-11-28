@@ -3,7 +3,109 @@
 {% block style %}
 
 <style>
-    .tenant-property-menu { max-height: 18rem; overflow-y: auto; }
+    .tenant-card .dt-layout-row.card-header {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        padding: .875rem 1rem;
+    }
+    .tenant-card .dt-layout-row.card-header > .dt-layout-start {
+        display: flex;
+        flex: 1 1 auto;
+        align-items: center;
+        min-width: 0;
+        width: auto;
+    }
+    .tenant-card .dt-layout-row.card-header > .dt-layout-end {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        width: auto;
+        margin-left: auto;
+    }
+    .tenant-card .dt-layout-end .dt-buttons {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: .5rem;
+        margin: 0;
+    }
+    .tenant-card .dt-layout-end .dt-buttons .btn { margin: 0 !important; white-space: nowrap; }
+    .tenant-filters {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 0;
+    }
+    .tenant-filters .row {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: .75rem;
+        margin: 0;
+    }
+    .tenant-filters .row > div { padding: 0; width: auto; }
+    .tenant-filters .row > div:first-child { flex: 0 1 10rem; min-width: 8rem; }
+    .tenant-filters .row > div:nth-child(2) { flex: 0 0 9rem; }
+    .tenant-filters .row > div:last-child { flex: 0 1 15rem; margin-left: auto; }
+    .tenant-filters .form-label {
+        margin-bottom: .35rem;
+        color: var(--bs-secondary-color);
+        font-size: .8125rem;
+        font-weight: 500;
+    }
+    .tenant-filters .form-control,
+    .tenant-filters .form-select,
+    .tenant-property-filter > .btn {
+        height: 2.5rem;
+    }
+    .tenant-property-filter > .btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .tenant-property-menu {
+        width: max-content;
+        min-width: min(18rem, calc(100vw - 2rem));
+        max-width: min(28rem, calc(100vw - 2rem));
+        max-height: min(24rem, calc(100vh - 2rem));
+        overflow-x: hidden;
+        overflow-y: auto;
+        white-space: normal;
+    }
+    .tenant-property-menu .form-check {
+        display: flex;
+        align-items: flex-start;
+        gap: .5rem;
+        padding-left: 0;
+    }
+    .tenant-property-menu .form-check-input {
+        flex: 0 0 auto;
+        margin: .25rem 0 0;
+    }
+    .tenant-property-menu .form-check-label {
+        min-width: 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+    .tenant-filters .form-control,
+    .tenant-filters .form-select {
+        font-size: .875rem;
+    }
+    .tenant-filters .form-label { display: none; }
+    .tenant-filters #tenantNameSearch { width: 100%; }
+    @media (max-width: 767.98px) {
+        .tenant-card .dt-layout-row.card-header { flex-wrap: wrap; gap: .75rem; padding: .75rem; }
+        .tenant-card .dt-layout-row.card-header > .dt-layout-start { flex: 1 1 100%; }
+        .tenant-card .dt-layout-row.card-header > .dt-layout-end { width: 100%; margin-left: 0; }
+        .tenant-card .dt-layout-end .dt-buttons { width: 100%; }
+        .tenant-card .dt-layout-end .dt-buttons .btn { flex: 1 1 auto; justify-content: center; }
+        .tenant-filters { flex-basis: 100%; }
+        .tenant-filters .row { flex-wrap: wrap; gap: .5rem; }
+        .tenant-filters .row > div:first-child,
+        .tenant-filters .row > div:nth-child(2) { flex: 1 1 calc(50% - .25rem); min-width: 0; }
+        .tenant-filters .row > div:last-child { flex: 1 1 100%; margin-left: 0; }
+    }
 </style>
 
     <!-- BEGIN: Vendor CSS-->
@@ -13,12 +115,10 @@
     <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/rowGroup.bootstrap5.min.css' %}">
     <!-- END: Vendor CSS-->
-    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/core/menu/menu-types/vertical-menu.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
     <!-- END: Page CSS-->
 
     <!-- BEGIN: Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
     <!-- END: Custom CSS-->
     
 {% endblock style %}
@@ -38,10 +138,10 @@
         </div>
                 
                     <!-- list and filter start -->
-                    <div class="card">
-                        <div class="card-body border-bottom tenant-filters">
-                            <div class="row g-1 align-items-end">
-                                <div class="col-12 col-md-5 col-lg-2">
+                    <div class="card tenant-card">
+                        <div class="tenant-filters">
+                            <div class="row align-items-end">
+                                <div class="col-12 col-md-5 col-xl-3">
                                     <label class="form-label" for="propertyFilterToggle">Property</label>
                                     <div class="dropdown tenant-property-filter">
                                         <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="propertyFilterToggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -64,7 +164,7 @@
                                         {% comment %} <div class="form-text mt-50">Select one or more properties.</div> {% endcomment %}
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-3 col-lg-3">
+                                <div class="col-12 col-md-3 col-xl-2">
                                     <label class="form-label" for="rentDueFilter">Rent status</label>
                                     <select class="form-select" id="rentDueFilter" disabled>
                                         <option value="all">All tenants</option>
@@ -73,8 +173,7 @@
                                     {% comment %} <div class="form-text mt-50">Rent Due is available after selecting a property.</div> {% endcomment %}
 
                                 </div>
-                                <div class="col-12 col-md-4 col-lg-5"></div>
-                                <div class="col-12 col-md-4 col-lg-2">
+                                <div class="col-12 col-md-4 col-xl-3 ms-xl-auto">
                                     <label class="form-label" for="tenantNameSearch">Search by tenant name</label>
                                     <input class="form-control" type="search" id="tenantNameSearch" placeholder="Enter tenant name" autocomplete="off">
                                 </div>
@@ -82,7 +181,7 @@
                             
                         </div>
                         <div class="card-datatable table-responsive pt-0">
-                            <table class="datatables-basic table">
+                            <table class="datatables-basic table" data-currency-symbol="{{ symbol|default:'' }}">
                     <thead>
                                   {% comment %} <tr>
                                     <td colspan="6" >All Tenants</td>  
@@ -110,15 +209,13 @@
                                         
                                         <th></th>
                                         <th></th>
-                                        <th>Id</th>
+                                        <th>Sr</th>
                                         <th>Full Name</th>
+                                        <th>Room</th>
                                         <th>Property</th>
                                         <th>Rent</th>
                                         <th>Total Dues</th>
-                                        <th>Last Payment</th>
-                                        <th>Move in date</th>
-                                        <th>Status</th>
-                                        {% comment %} <th>Action</th> {% endcomment %}
+                                        <th>Actions</th>
                                         {% comment %} <th>Collection</th> {% endcomment %}
                                     </tr>
                                 </thead>

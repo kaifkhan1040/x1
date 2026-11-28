@@ -2,7 +2,7 @@ import calendar
 from django.shortcuts import render,get_object_or_404,redirect
 from django.urls import reverse
 from .models import Property,Rooms,Tenant,TenentProfileVerify,Payment,FinancialBreakdown,\
-    FinancialOtherModel,PropertyImage,Expenses,EmailSettings,Country,LandlordProfile,LandloadDoucment
+    FinancialOtherModel,PropertyImage,PropertyDocument,TenantDocument,Expenses,EmailSettings,Country,LandlordProfile,LandloadDoucment
 from .forms import PropertyForm,PropertyReadOnlyForm,RoomsForm,TenantForm,TenantReadOnlyForm,TenantInviteForm,PaymentForm,\
     PaymentReadOnlyForm,FinancialBreakdownform,MultiImageForm,FinancialBreakdownReadOnlyform,MultiImageReadOnlyForm,ExpensesForm,\
     ExpensesReadOnlyForm,TenantStep1Form,EmailSettingsForm,LandlordProfileForm,IdProffForm
@@ -25,12 +25,11 @@ from users.forms import SetLocationForm
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 import pytz
-from django.db.models.functions import Cast
 from django.utils.timezone import now, localdate
+from django.utils.dateparse import parse_date
 import datetime
 from django.db.models.functions import ExtractMonth
 from django.db.models import Sum
-from django.db.models import Sum,IntegerField
 
 def get_symbol(currency_code):
     try:
@@ -44,7 +43,7 @@ def property_earning_report(request,year,pro_id):
     monthly_exp = [0] * 12
 # query payments grouped by month
     payments = (
-        Payment.objects.filter(paid_date__year=year,property=pro_id)
+        Payment.objects.filter(landload=request.user, is_active=True, paid_date__year=year,property=pro_id)
         .annotate(month=ExtractMonth("paid_date"))
         .values("month")
         .annotate(total=Sum("amount"))
@@ -54,7 +53,7 @@ def property_earning_report(request,year,pro_id):
     for p in payments:
         monthly_totals[p["month"] - 1] = p["total"]
     exp = (
-        Expenses.objects.filter(paid_date__year=year,property=pro_id)
+        Expenses.objects.filter(landload=request.user, is_active=True, paid_date__year=year,property=pro_id)
         .annotate(month=ExtractMonth("paid_date"))
         .values("month")
         .annotate(total=Sum("amount"))
@@ -79,7 +78,7 @@ def earning_report(request,year):
     monthly_exp = [0] * 12
 # query payments grouped by month
     payments = (
-        Payment.objects.filter(paid_date__year=year)
+        Payment.objects.filter(landload=request.user, is_active=True, paid_date__year=year)
         .annotate(month=ExtractMonth("paid_date"))
         .values("month")
         .annotate(total=Sum("amount"))
@@ -89,7 +88,7 @@ def earning_report(request,year):
     for p in payments:
         monthly_totals[p["month"] - 1] = p["total"]
     exp = (
-        Expenses.objects.filter(paid_date__year=year)
+        Expenses.objects.filter(landload=request.user, is_active=True, paid_date__year=year)
         .annotate(month=ExtractMonth("paid_date"))
         .values("month")
         .annotate(total=Sum("amount"))
@@ -124,22 +123,28 @@ def monthly_profit_comparison_by_property(request):
     properties_data_loss=[]
 
     # Get all properties for this landlord
-    properties =properties = Property.objects.filter(
-        id__in=Payment.objects.filter(landload=request.user).values_list('property', flat=True).distinct(),
-        landload=request.user  # in case Property also has landload field
+    finance_property_ids = set(
+        Payment.objects.filter(landload=request.user, is_active=True)
+        .values_list('property_id', flat=True).distinct()
+    ) | set(
+        Expenses.objects.filter(landload=request.user, is_active=True)
+        .values_list('property_id', flat=True).distinct()
     )
+    properties = Property.objects.filter(landload=request.user, id__in=finance_property_ids)
     # print('properties',properties)
     for prop_id in properties:
         # This month totals
         this_month_payments = Payment.objects.filter(
             property_id=prop_id,
             landload=request.user,
+            is_active=True,
             paid_date__range=[this_month_start, this_month_end]
         ).aggregate(total=Sum('amount'))['total'] or 0
 
         this_month_expenses = Expenses.objects.filter(
             property_id=prop_id,
             landload=request.user,
+            is_active=True,
             paid_date__range=[this_month_start, this_month_end]
         ).aggregate(total=Sum('amount'))['total'] or 0
 
@@ -149,12 +154,14 @@ def monthly_profit_comparison_by_property(request):
         last_month_payments = Payment.objects.filter(
             property_id=prop_id,
             landload=request.user,
+            is_active=True,
             paid_date__range=[last_month_start, last_month_end]
         ).aggregate(total=Sum('amount'))['total'] or 0
 
         last_month_expenses = Expenses.objects.filter(
             property_id=prop_id,
             landload=request.user,
+            is_active=True,
             paid_date__range=[last_month_start, last_month_end]
         ).aggregate(total=Sum('amount'))['total'] or 0
 
@@ -213,12 +220,35 @@ def monthly_profit_comparison_by_property(request):
 # Create your views here.
 def index(request):
     data=LandlordProfile.objects.filter(landlord=request.user).first()
-    total_earnings = Payment.objects.filter(landload=request.user).aggregate(total=Sum('amount'))['total'] or 0
-    total_expenses = Expenses.objects.filter(landload=request.user).aggregate(total=Sum('amount'))['total'] or 0
-    profit = total_earnings-total_expenses
+    payments_by_property = dict(
+        Payment.objects.filter(landload=request.user, is_active=True)
+        .values('property_id').annotate(total=Sum('amount'))
+        .values_list('property_id', 'total')
+    )
+    expenses_by_property = dict(
+        Expenses.objects.filter(landload=request.user, is_active=True)
+        .values('property_id').annotate(total=Sum('amount'))
+        .values_list('property_id', 'total')
+    )
+    total_earnings = sum(payments_by_property.values())
+    total_expenses = sum(expenses_by_property.values())
+    profit = total_earnings - total_expenses
+    property_ids = set(payments_by_property) | set(expenses_by_property)
+    total_loss = sum(
+        max(expenses_by_property.get(property_id, 0) - payments_by_property.get(property_id, 0), 0)
+        for property_id in property_ids
+    )
     listing=Property.objects.filter(landload=request.user)
-    payment=Payment.objects.filter(landload=request.user)
-    expense=Expenses.objects.filter(landload=request.user)
+    payment=Payment.objects.filter(landload=request.user, is_active=True)
+    expense=Expenses.objects.filter(landload=request.user, is_active=True)
+    landlord_dues = Payment.objects.filter(
+        landload=request.user,
+        property__landload=request.user,
+        is_active=True,
+    )
+    total_dues = landlord_dues.aggregate(total=Sum('amount'))['total'] or 0
+    longest_due = landlord_dues.order_by('paid_date', 'id').first()
+    highest_due = landlord_dues.order_by('-amount', 'paid_date', 'id').first()
     # print(request.user.country)
     profit_by_property,loss_by_property=monthly_profit_comparison_by_property(request)
     # print(profit_by_property,'loss',loss_by_property)
@@ -231,21 +261,32 @@ def index(request):
     is_locked=data.is_locked if data else True
     if is_locked:
         return redirect('landload:onboading')
-    tenants_with_properties = Tenant.objects.filter(
-                                    landload=request.user,
-                                    room__isnull=False
-                                ).count()
-    total_rooms = Rooms.objects.filter(
-                            property__landload=request.user
-                        ).aggregate(
-                            total=Sum(Cast('room_count', IntegerField()))
-                        )['total'] or 0
-    empty=total_rooms-tenants_with_properties
+    active_properties = Property.objects.filter(
+        landload=request.user,
+        is_active=True,
+        property_status='Active',
+    )
+    multi_ownership_rooms = Rooms.objects.filter(
+        property__in=active_properties.filter(rental_type='Multi Ownership')
+    )
+    single_ownership_properties = active_properties.filter(rental_type='Single Ownership')
+    total_rooms = multi_ownership_rooms.count() + single_ownership_properties.count()
+    occupied_multi_rooms = multi_ownership_rooms.filter(
+        tenant__is_active=True,
+        tenant__tenant_status='Active',
+    ).distinct().count()
+    occupied_single_properties = single_ownership_properties.filter(
+        room_set__tenant__is_active=True,
+        room_set__tenant__tenant_status='Active',
+    ).distinct().count()
+    occupied_rooms = occupied_multi_rooms + occupied_single_properties
+    empty = max(total_rooms - occupied_rooms, 0)
     chart_data = {
-        "values": [tenants_with_properties, empty],
+        "values": [occupied_rooms, empty],
     }
     return render(request,'landload/index.html',{'is_dashboard':True,'total_earnings':total_earnings,'total_expenses':total_expenses,
-                                                 "profit":profit,'symbol':symbol,'listing':total_rooms,'occupied':tenants_with_properties,
+                                                 'profit':profit,'total_loss':total_loss,'symbol':symbol,'listing':total_rooms,'occupied':occupied_rooms,
+                                                 'total_dues':total_dues,'longest_due':longest_due,'highest_due':highest_due,
                                                  'empty':empty,"chart_data": json.dumps(chart_data),'payment':payment,'expense':expense,
                                                  'profit_by_property':profit_by_property,'loss_by_property':loss_by_property})
 
@@ -398,7 +439,7 @@ def listing(request):
 def submit_step(request, step):
     if request.method == 'POST':
         post_data = request.POST.copy()
-        # print(post_data)
+        print('@'*1000,post_data)
         post_data['landload']=request.user
         post_data['is_active']=True
         post_data['status']=True
@@ -416,6 +457,10 @@ def submit_step(request, step):
                     # so browsers omit them from POST. Preserve the stored value.
                     if not post_data.get('rental_type'):
                         post_data['rental_type'] = prodata.rental_type
+                    if not post_data.get('number_of_flat'):
+                        post_data['number_of_flat']=prodata.number_of_flat
+                    # if not post_data.get('custom_id'):
+                    #     post_data.get['custom_id']=prodata.custom_id
                     form = PropertyForm(post_data,instance=prodata)
                 
                 
@@ -446,6 +491,17 @@ def submit_step(request, step):
            
 
             return JsonResponse({'success': False})
+
+        elif step == '3':
+            formid = request.POST.get('formid2')
+            property_obj = get_object_or_404(Property, id=formid, landload=request.user)
+            save_listing_photos(request, property_obj)
+            photo_context = photo_upload_context(property_obj)
+            return JsonResponse({
+                'success': True,
+                'formid': property_obj.id,
+                'photo_rows': photo_context['photo_rows_json'],
+            })
 
        
 
@@ -500,15 +556,14 @@ def listing_add(request):
     if request.method == "POST":
         formid = request.POST.get('formid2') 
         # print('form id',formid)
-        property_obj=get_object_or_404(Property, id=formid)
+        property_obj=get_object_or_404(Property, id=formid, landload=request.user)
         form = MultiImageForm(request.POST, request.FILES)
-
-        
             # property_instance = Property.objects.create(name="Sample Property")
 
         save_listing_photos(request, property_obj)
-   
+        save_listing_documents(request, property_obj)
 
+        messages.success(request, 'Property documents saved successfully.')
         return redirect('landload:listing') 
         
         # post_data = request.POST.copy()
@@ -559,6 +614,31 @@ def save_listing_photos(request, property_obj):
                 )
 
 
+def save_listing_documents(request, property_obj):
+    deleted_ids = request.POST.getlist('delete_document_ids')
+    if deleted_ids:
+        PropertyDocument.objects.filter(property=property_obj, id__in=deleted_ids).delete()
+
+    for key, document_id in zip(request.POST.getlist('document_key'), request.POST.getlist('document_id')):
+        name = (request.POST.get(f'document_name_{key}') or '').strip()
+        if not name:
+            continue
+
+        document = PropertyDocument.objects.filter(property=property_obj, id=document_id).first() if document_id else None
+        uploaded_file = request.FILES.get(f'document_file_{key}')
+        if not document and not uploaded_file:
+            continue
+        if not document:
+            document = PropertyDocument(property=property_obj)
+
+        document.name = name
+        document.expiry_date = parse_date(request.POST.get(f'document_expiry_{key}') or '')
+        document.reminder_date = parse_date(request.POST.get(f'document_reminder_{key}') or '')
+        if uploaded_file:
+            document.upload_file = uploaded_file
+        document.save()
+
+
 def photo_upload_context(property_obj):
     rooms = Rooms.objects.filter(property=property_obj).order_by('id')
     rows = {'common': []}
@@ -589,6 +669,7 @@ def listing_view(request,id):
     return render(request,'landload/add_listing.html',{'form':form,'form2':form2,'is_listing':True,
                                                        'property_id':property_obj.id,'property_obj':property_obj,'more_fun':True,
                                                        'property_obj2':property_obj2,'form3':form3,'symbol':symbol,
+                                                       'property_documents': PropertyDocument.objects.filter(property=property_obj).order_by('id'),
                                                        'rooms_json': [
                                                            {
                                                                'id': room.id,
@@ -658,7 +739,7 @@ def listing_dashboard(request,id):
 
 @login_required(login_url='/')
 def listing_update(request,id):
-    property_obj = get_object_or_404(Property, pk=id)
+    property_obj = get_object_or_404(Property, pk=id, landload=request.user)
     outside_images = PropertyImage.objects.filter(property=property_obj, field_type='outside')
     parking_images = PropertyImage.objects.filter(property=property_obj, field_type='parking')
     garage_images = PropertyImage.objects.filter(property=property_obj, field_type='garage')
@@ -696,6 +777,7 @@ def listing_update(request,id):
             # property_instance = Property.objects.create(name="Sample Property")
 
         save_listing_photos(request, property_obj)
+        save_listing_documents(request, property_obj)
    
             
 
@@ -723,6 +805,7 @@ def listing_update(request,id):
                                                         'common_area_images_json': common_area_image_urls,
                                                         'residence_images_json': residence_image_urls,
                                                         'symbol':symbol,
+                                                        'property_documents': PropertyDocument.objects.filter(property=property_obj).order_by('id'),
                                                         'rooms_json': [
                                                             {
                                                                 'id': room.id,
@@ -836,9 +919,12 @@ def tenant(request):
             Q(property__short_name__icontains=query) 
         )
     properties = Property.objects.filter(landload=request.user, is_active=True).order_by('property_name')
+    landlord_profile = LandlordProfile.objects.filter(landlord=request.user).first()
+    currency_symbol = get_symbol(landlord_profile.currency) if landlord_profile and landlord_profile.currency else ''
     return render(request,'landload/tenant_list.html',{
         'tenant': tenant,
         'properties': properties,
+        'symbol': currency_symbol,
         'search_field': True,
         'is_tenant': True,
     })
@@ -911,7 +997,7 @@ def payment_list(request):
 def tenant_list(request):
     data = []
     today = localdate()
-    tenant = Tenant.objects.filter(landload=request.user).select_related('user', 'property')
+    tenant = Tenant.objects.filter(landload=request.user).select_related('user', 'property', 'room')
     rent_payments = Payment.objects.filter(
         landload=request.user,
         is_active=True,
@@ -926,6 +1012,8 @@ def tenant_list(request):
     for obj in tenant:
         full_name = f'{obj.user.first_name} {obj.user.last_name}'.strip() if obj.user else ''
         payment_name = full_name.casefold()
+        tenant_payments = payments_by_tenant.get((obj.property_id, payment_name), [])
+        latest_payment = max(tenant_payments, key=lambda payment: payment[0], default=None)
         paid_amount = 0
         rent_due = False
         if obj.tenant_status == 'Active' and obj.rent > 0 and obj.property and (not obj.move_in_date or obj.move_in_date <= today):
@@ -944,7 +1032,7 @@ def tenant_list(request):
 
             if today >= period_start:
                 paid_amount = sum(
-                    amount for paid_date, amount in payments_by_tenant.get((obj.property_id, payment_name), [])
+                    amount for paid_date, amount in tenant_payments
                     if paid_date >= period_start
                 )
                 rent_due = paid_amount + 0.009 < obj.rent
@@ -952,12 +1040,14 @@ def tenant_list(request):
         data.append({
             'id':obj.id,
             'custom_id': obj.custom_id,
+            'sr': len(data) + 1,
             'full_name': full_name,
+            'room': obj.room.room_code if obj.room else '',
             'property': obj.property.property_name if obj.property else '',
             'property_id': obj.property_id,
             'rent': obj.rent,
             'total_dues': round(max(obj.rent - paid_amount, 0), 2) if rent_due else 0,
-            'last_payment': "",  
+            'last_payment': latest_payment[1] if latest_payment else '',
             'move_in_date': obj.move_in_date.strftime('%d %b %Y') if obj.move_in_date else '',
             'rent_due': rent_due,
             'tenant_status': obj.tenant_status,
@@ -1002,44 +1092,91 @@ def tenant_add(request):
 @login_required(login_url='/')
 def tenant_documents(request, tenant_id):
     tenant_obj = get_object_or_404(Tenant, pk=tenant_id, landload=request.user, is_active=True)
+    legacy_fields = {'id_proof': 'ID proof', 'photo': 'Photo', 'bank_statement': 'Bank statement'}
+    for field_name, label in legacy_fields.items():
+        saved_file = getattr(tenant_obj, field_name)
+        if saved_file and not TenantDocument.objects.filter(tenant=tenant_obj, legacy_field=field_name).exists():
+            TenantDocument.objects.create(
+                tenant=tenant_obj,
+                name=label,
+                legacy_field=field_name,
+                upload_file=saved_file.name,
+            )
+
     form = ManagerTenantDocumentsForm(request.POST or None, request.FILES or None, instance=tenant_obj)
     if request.method == 'POST' and form.is_valid():
-        form.save()
+        with transaction.atomic():
+            form.save()
+            save_tenant_documents(request, tenant_obj)
         if request.POST.get('action') == 'finish':
             messages.success(request, 'Tenant added successfully.')
             return redirect('landload:tenant')
-        messages.success(request, 'Documents saved. You can view or download them below.')
+        messages.success(request, 'Documents saved successfully.')
         return redirect('landload:tenant_documents', tenant_id=tenant_obj.id)
 
-    document_fields = [('id_proof', 'ID proof'), ('photo', 'Photo'), ('bank_statement', 'Bank statement')]
-    saved_documents = []
-    for field_name, label in document_fields:
-        document = getattr(tenant_obj, field_name)
-        if document:
-            content_type = mimetypes.guess_type(document.name)[0] or ''
-            document_url = reverse(
-                'landload:tenant_document_file',
-                kwargs={'tenant_id': tenant_obj.id, 'field_name': field_name},
-            )
-            saved_documents.append({
-                'label': label,
-                'url': document_url,
-                'download_url': f'{document_url}?download=1',
-                'is_image': content_type.startswith('image/'),
-            })
+    tenant_documents_list = list(TenantDocument.objects.filter(tenant=tenant_obj).order_by('id'))
+    for document in tenant_documents_list:
+        document.file_url = reverse(
+            'landload:tenant_document_file',
+            kwargs={'tenant_id': tenant_obj.id, 'field_name': f'document-{document.id}'},
+        )
 
     return render(request, 'landload/tenant_wizard.html', {
         'form': form, 'tenant_obj': tenant_obj, 'step': 2, 'is_tenant': True,
-        'saved_documents': saved_documents,
+        'tenant_documents': tenant_documents_list,
     })
+
+
+def save_tenant_documents(request, tenant_obj):
+    legacy_names = {'id proof': 'id_proof', 'photo': 'photo', 'bank statement': 'bank_statement'}
+
+    deleted_ids = request.POST.getlist('delete_document_ids')
+    for document in TenantDocument.objects.filter(tenant=tenant_obj, id__in=deleted_ids):
+        if document.legacy_field:
+            setattr(tenant_obj, document.legacy_field, None)
+            tenant_obj.save(update_fields=[document.legacy_field])
+        document.delete()
+
+    keys = request.POST.getlist('document_key')
+    document_ids = request.POST.getlist('document_id')
+    for key, document_id in zip(keys, document_ids):
+        name = (request.POST.get(f'document_name_{key}') or '').strip()
+        if not name:
+            continue
+        document = TenantDocument.objects.filter(tenant=tenant_obj, id=document_id).first() if document_id else None
+        uploaded_file = request.FILES.get(f'document_file_{key}')
+        if not document and not uploaded_file:
+            continue
+        if not document:
+            document = TenantDocument(tenant=tenant_obj)
+            document.legacy_field = legacy_names.get(name.casefold(), '')
+
+        document.name = name
+        document.expiry_date = parse_date(request.POST.get(f'document_expiry_{key}') or '')
+        document.reminder_date = parse_date(request.POST.get(f'document_reminder_{key}') or '')
+        if uploaded_file:
+            document.upload_file = uploaded_file
+        document.save()
+
+        if document.legacy_field:
+            setattr(tenant_obj, document.legacy_field, document.upload_file.name)
+            tenant_obj.save(update_fields=[document.legacy_field])
 
 
 @login_required(login_url='/')
 def tenant_document_file(request, tenant_id, field_name):
     tenant_obj = get_object_or_404(Tenant, pk=tenant_id, landload=request.user, is_active=True)
-    if field_name not in {'id_proof', 'photo', 'bank_statement'}:
+    if field_name.startswith('document-'):
+        try:
+            document_record_id = int(field_name.removeprefix('document-'))
+        except ValueError:
+            raise Http404
+        document_record = get_object_or_404(TenantDocument, pk=document_record_id, tenant=tenant_obj)
+        document = document_record.upload_file
+    elif field_name in {'id_proof', 'photo', 'bank_statement'}:
+        document = getattr(tenant_obj, field_name)
+    else:
         raise Http404
-    document = getattr(tenant_obj, field_name)
     if not document:
         raise Http404
     try:

@@ -7,8 +7,9 @@
 <style>
   .tenant-wizard .step-trigger { white-space: nowrap; text-align: left; }
   .tenant-wizard .bs-stepper-box { min-width: 2.5rem; text-align: center; }
-  .document-card { height: 100%; border: 1px solid #ebe9f1; border-radius: .5rem; padding: 1rem; }
-  .document-preview { width: 100%; max-height: 220px; object-fit: contain; background: #f8f8f8; border-radius: .4rem; }
+  .tenant-documents-table { min-width: 52rem; }
+  .tenant-documents-table .document-file-input { min-width: 14rem; }
+  .tenant-documents-table .document-name-input { min-width: 11rem; }
   .tenant-wizard .step-trigger { cursor: default; }
   .tenant-wizard .step-trigger:hover { background: transparent; }
 </style>
@@ -56,7 +57,7 @@
           {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
           <div class="row g-2">
             {% for field in form %}
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-3">
               <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="text-danger"> *</span>{% endif %}</label>
               {{ field }}
               {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
@@ -76,38 +77,37 @@
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
-          <div class="row g-2">
-            {% for field in form %}
-            <div class="col-12 col-md-6">
-              <label class="form-label" for="{{ field.id_for_label }}">{% if field.name == 'id_proof' %}ID proof{% elif field.name == 'right_to_rent_code' %}Right to Rent share code{% elif field.name == 'photo' %}Photo{% else %}Bank statement{% endif %}</label>
-              {{ field }}
-              {% for error in field.errors %}<div class="text-danger small mt-25">{{ error }}</div>{% endfor %}
+          <div class="row mb-2">
+            <div class="col-12 col-md-6 col-lg-4">
+              <label class="form-label" for="{{ form.right_to_rent_code.id_for_label }}">Right to Rent share code</label>
+              {{ form.right_to_rent_code }}
+              {% for error in form.right_to_rent_code.errors %}<div class="text-danger small mt-25">{{ error }}</div>{% endfor %}
             </div>
-            {% endfor %}
           </div>
-
-          <h5 class="mt-2 mb-1">Saved documents</h5>
-          <div class="row g-1">
-            {% for document in saved_documents %}
-              <div class="col-12 col-md-4">
-                <div class="document-card">
-                  <div class="fw-bold mb-1">{{ document.label }}</div>
-                  {% if document.is_image %}<img class="document-preview mb-1" src="{{ document.url }}" alt="{{ document.label }} preview" loading="lazy">{% endif %}
-                  <div class="d-flex flex-wrap gap-1">
-                    <a class="btn btn-sm btn-outline-primary" href="{{ document.url }}" target="_blank" rel="noopener">View</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="{{ document.download_url }}">Download</a>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-            {% if tenant_obj.right_to_rent_code %}
-            <div class="col-12 col-md-4"><div class="document-card"><div class="fw-bold mb-1">Right to Rent share code</div><div class="text-break">{{ tenant_obj.right_to_rent_code }}</div></div></div>
-            {% endif %}
-            {% if not saved_documents and not tenant_obj.right_to_rent_code %}
-            <div class="col-12"><p class="text-muted mb-0">No documents saved yet.</p></div>
-            {% endif %}
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <div><h5 class="mb-0">Tenant documents</h5><small class="text-muted">Add document details, dates, and files.</small></div>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="add-tenant-document"><i data-feather="plus" class="me-50"></i>Add document</button>
           </div>
-
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle tenant-documents-table mb-0">
+              <thead><tr><th>Sr.</th><th>Name</th><th>Expiry Date</th><th>Reminder Date</th><th>Upload File</th><th>Actions</th></tr></thead>
+              <tbody id="tenant-documents-body">
+                {% for document in tenant_documents %}
+                <tr data-document-row data-document-id="{{ document.id }}">
+                  <td><span class="document-row-number">{{ forloop.counter }}</span><input type="hidden" name="document_id" value="{{ document.id }}"><input type="hidden" name="document_key" value="{{ document.id }}"></td>
+                  <td><input class="form-control document-name-input" type="text" name="document_name_{{ document.id }}" value="{{ document.name }}" required></td>
+                  <td><input class="form-control" type="date" name="document_expiry_{{ document.id }}" value="{{ document.expiry_date|date:'Y-m-d' }}"></td>
+                  <td><input class="form-control" type="date" name="document_reminder_{{ document.id }}" value="{{ document.reminder_date|date:'Y-m-d' }}"></td>
+                  <td><input class="form-control form-control-sm document-file-input" type="file" name="document_file_{{ document.id }}"></td>
+                  <td class="text-nowrap">
+                    <button type="button" class="btn btn-sm btn-outline-primary preview-document-file" data-saved-file-url="{{ document.file_url }}" data-saved-file-name="{{ document.upload_file.name }}" aria-label="Preview document"><i class="icon-base ti tabler-eye"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-document-row" aria-label="Remove document"><i class="icon-base ti tabler-x"></i></button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
           <div class="d-flex flex-column flex-sm-row justify-content-between gap-1 mt-2">
             <a class="btn btn-outline-secondary" href="{% url 'landload:tenant' %}"><i data-feather="x" class="align-middle me-sm-25 me-0"></i><span class="align-middle d-sm-inline-block d-none">Finish later</span></a>
             <div class="d-flex flex-column flex-sm-row gap-1">
@@ -122,6 +122,83 @@
     </div>
   </section>
 </div>
+<div class="modal fade" id="tenant-document-preview-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="tenant-document-preview-title">Document preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+    <div class="modal-body text-center"><img id="tenant-document-preview-image" class="img-fluid rounded" alt="Document preview" style="max-height:70vh;"></div>
+  </div></div>
+</div>
+{% if step == 2 %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.querySelector('#tenant-documents form');
+  const body = document.getElementById('tenant-documents-body');
+  const addButton = document.getElementById('add-tenant-document');
+  if (!form || !body) return;
+  let nextKey = 0;
+  let activePreviewUrl = null;
+  const previewModal = document.getElementById('tenant-document-preview-modal');
+  previewModal?.addEventListener('hidden.bs.modal', function () {
+    if (activePreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(activePreviewUrl);
+    activePreviewUrl = null;
+    document.getElementById('tenant-document-preview-image').removeAttribute('src');
+  });
+
+  function renumberRows() {
+    body.querySelectorAll('[data-document-row]').forEach((row, index) => {
+      row.querySelector('.document-row-number').textContent = index + 1;
+    });
+  }
+  function addRow() {
+    const key = `new-${nextKey++}`;
+    const row = document.createElement('tr');
+    row.dataset.documentRow = '';
+    row.innerHTML = `<td><span class="document-row-number"></span><input type="hidden" name="document_id" value=""><input type="hidden" name="document_key" value="${key}"></td>
+      <td><input class="form-control document-name-input" type="text" name="document_name_${key}" placeholder="Document name" required></td>
+      <td><input class="form-control" type="date" name="document_expiry_${key}"></td>
+      <td><input class="form-control" type="date" name="document_reminder_${key}"></td>
+      <td><input class="form-control form-control-sm document-file-input" type="file" name="document_file_${key}" required></td>
+      <td class="text-nowrap"><button type="button" class="btn btn-sm btn-outline-primary preview-document-file" aria-label="Preview document" disabled><i class="icon-base ti tabler-eye"></i></button> <button type="button" class="btn btn-sm btn-outline-danger remove-document-row" aria-label="Remove document"><i class="icon-base ti tabler-x"></i></button></td>`;
+    body.appendChild(row);
+    renumberRows();
+  }
+  addButton?.addEventListener('click', addRow);
+  body.addEventListener('change', function (event) {
+    const input = event.target.closest('.document-file-input');
+    if (!input) return;
+    const preview = input.closest('[data-document-row]')?.querySelector('.preview-document-file');
+    if (preview) preview.disabled = !input.files?.length && !preview.dataset.savedFileUrl;
+  });
+  body.addEventListener('click', function (event) {
+    const preview = event.target.closest('.preview-document-file');
+    if (preview && !preview.disabled) {
+      const row = preview.closest('[data-document-row]');
+      const file = row.querySelector('.document-file-input')?.files?.[0];
+      const url = file ? URL.createObjectURL(file) : preview.dataset.savedFileUrl;
+      activePreviewUrl = url;
+      const name = file?.name || preview.dataset.savedFileName || url;
+      const image = file ? file.type.startsWith('image/') : /\.(png|jpe?g|gif|webp|bmp|svg|avif)(?:[?#]|$)/i.test(name);
+      if (!image) { window.open(url, '_blank', 'noopener'); return; }
+      document.getElementById('tenant-document-preview-image').src = url;
+      document.getElementById('tenant-document-preview-title').textContent = name.split(/[\\/]/).pop() || 'Document preview';
+      if (window.bootstrap?.Modal) window.bootstrap.Modal.getOrCreateInstance(previewModal).show();
+      else window.open(url, '_blank', 'noopener');
+      return;
+    }
+    const remove = event.target.closest('.remove-document-row');
+    if (!remove) return;
+    const row = remove.closest('[data-document-row]');
+    if (row.dataset.documentId) {
+      const input = document.createElement('input');
+      input.type = 'hidden'; input.name = 'delete_document_ids'; input.value = row.dataset.documentId;
+      form.appendChild(input);
+    }
+    row.remove();
+    renumberRows();
+  });
+});
+</script>
+{% endif %}
 {% if step == 1 %}
 <script>
 (() => {

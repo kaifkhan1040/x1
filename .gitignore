@@ -31,6 +31,9 @@ env/
 # Migrations (optional, if you want to ignore them)
 **/migrations/
 !**/migrations/__init__.py
+!landload/migrations/
+!landload/migrations/0004_propertydocument.py
+!landload/migrations/0005_tenantdocument.py
 
 # Pytest
 .pytest_cache/

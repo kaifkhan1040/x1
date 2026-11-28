@@ -112,12 +112,11 @@
                             </button>
                           </div>
 
-                           {% comment %} <div class="line d-none d-md-block">
+                          <div class="line d-none d-md-block">
                             <i data-feather="chevron-right" class="font-medium-2"></i>
                           </div>
 
-                          <!-- Step 4 -->
-                          <div class="step" data-target="#address-step">
+                          <div class="step" data-target="#documents-step">
                             <button type="button" class="step-trigger">
                               <span class="bs-stepper-box">4</span>
                               <span class="bs-stepper-label">
@@ -125,7 +124,7 @@
                                 <span class="bs-stepper-subtitle">Documents</span>
                               </span>
                             </button>
-                          </div> {% endcomment %}
+                          </div>
                           
                         </div>
 
@@ -236,7 +235,7 @@
         <div class="d-flex justify-content-between mt-1">
           <button class="btn btn-outline-secondary btn-prev" disabled>
             <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
-            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+            <span class="align-middle d-sm-inline-block d-none">Back</span>
           </button>
           <button class="btn btn-primary {% if more_fun %}btn-next{% endif %}" {% if not more_fun %}type="button" onclick="submitForm(1)"{% endif %}>
             <span class="align-middle d-sm-inline-block d-none">Next</span>
@@ -258,7 +257,7 @@
         <div class="d-flex justify-content-between">
           <button class="btn btn-primary btn-prev">
             <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
-            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+            <span class="align-middle d-sm-inline-block d-none">Back</span>
           </button>
           <button class="btn btn-primary {% if more_fun %}btn-next{% endif %}" {% if not more_fun %}type="button" onclick="submitForm(2)"{% endif %}>
             <span class="align-middle d-sm-inline-block d-none">Next</span>
@@ -294,7 +293,7 @@
             const photoRoomsData = JSON.parse(document.getElementById('photo-rooms-json').textContent);
             const photoFilesByRow = new Map();
 
-            function renderPhotoRows(rooms) {
+            function renderPhotoRows(rooms, savedRows = photoRowsData) {
               const tbody = document.getElementById('photo-rows');
               if (!tbody) return;
               const roomList = Array.isArray(rooms) ? rooms : [];
@@ -354,7 +353,7 @@
                     previews.appendChild(image);
                   });
                 });
-                (photoRowsData[row.key] || []).forEach(url => {
+                (savedRows[row.key] || []).forEach(url => {
                   const image = document.createElement('img');
                   image.src = url;
                   image.alt = `${row.label} photo`;
@@ -399,10 +398,71 @@
         <div class="d-flex justify-content-between">
           <button class="btn btn-primary btn-prev">
             <i data-feather="arrow-left" class="align-middle mr-sm-25 mr-0"></i>
-            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+            <span class="align-middle d-sm-inline-block d-none">Back</span>
           </button>
-          <button type="button" onclick='funsubmit()' class="btn btn-success" {% if more_fun %}disabled{% endif %}>Submit</button>
+          <button type="button" class="btn btn-primary" onclick="submitForm(3)">
+            <span class="align-middle d-sm-inline-block d-none">Next</span>
+            <i data-feather="arrow-right" class="align-middle ms-sm-25 ms-0"></i>
+          </button>
         </div>
+      </div>
+
+      <div id="documents-step" class="content">
+        <form method="post" id="form-step-4" enctype="multipart/form-data"
+              action="{% if property_id %}{% url 'landload:listing_update' id=property_id %}{% else %}{% url 'landload:listing_add' %}{% endif %}">
+          {% csrf_token %}
+          <input type="hidden" name="formid2" value="{% if property_id %}{{ property_id }}{% endif %}">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <div>
+              <h5 class="mb-0">Property documents</h5>
+              <small class="text-muted">Add document details and upload the related file.</small>
+            </div>
+            {% if not more_fun %}
+            <button type="button" class="btn btn-outline-primary btn-sm" id="add-property-document">
+              <i data-feather="plus" class="me-50"></i>Add document
+            </button>
+            {% endif %}
+          </div>
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle mb-0" id="property-documents-table">
+              <thead>
+                <tr>
+                  <th scope="col">Sr.</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Expiry Date</th>
+                  <th scope="col">Reminder Date</th>
+                  <th scope="col">Upload File</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="property-documents-body">
+                {% for document in property_documents %}
+                <tr data-document-row data-document-id="{{ document.id }}">
+                  <td><span class="document-row-number">{{ forloop.counter }}</span><input type="hidden" name="document_id" value="{{ document.id }}"><input type="hidden" name="document_key" value="{{ document.id }}"></td>
+                  <td><input class="form-control" type="text" name="document_name_{{ document.id }}" value="{{ document.name }}" required {% if more_fun %}disabled{% endif %}></td>
+                  <td><input class="form-control" type="date" name="document_expiry_{{ document.id }}" value="{{ document.expiry_date|date:'Y-m-d' }}" {% if more_fun %}disabled{% endif %}></td>
+                  <td><input class="form-control" type="date" name="document_reminder_{{ document.id }}" value="{{ document.reminder_date|date:'Y-m-d' }}" {% if more_fun %}disabled{% endif %}></td>
+                  <td>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      <input class="form-control form-control-sm document-file-input" type="file" name="document_file_{{ document.id }}" {% if more_fun %}disabled{% endif %}>
+                    </div>
+                  </td>
+                  <td class="text-nowrap">
+                    <button type="button" class="btn btn-sm btn-outline-primary preview-document-file" data-saved-file-url="{{ document.upload_file.url }}" data-saved-file-name="{{ document.upload_file.name }}" aria-label="Preview document" {% if not document.upload_file %}disabled{% endif %}><i class="icon-base ti tabler-eye"></i></button>
+                    {% if not more_fun %}<button type="button" class="btn btn-sm btn-outline-danger remove-document-row" aria-label="Remove document"><i class="icon-base ti tabler-x"></i></button>{% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="d-flex justify-content-between mt-2">
+            <button type="button" class="btn btn-outline-secondary btn-prev">
+              <i data-feather="arrow-left" class="align-middle me-sm-25 me-0"></i><span class="align-middle">Back</span>
+            </button>
+            <button type="submit" class="btn btn-success" id="save-property-documents" {% if more_fun %}disabled aria-disabled="true"{% endif %}>Save and Finish</button>
+          </div>
+        </form>
       </div>
   
     </div>
@@ -426,13 +486,101 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="property-document-preview-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="property-document-preview-title">Document preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="property-document-preview-image" class="img-fluid rounded" alt="Document preview" style="max-height:70vh;">
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script>
-  function funsubmit(){
-    form=document.getElementById('form-step-3')
-    form.submit()
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    const tableBody = document.getElementById('property-documents-body');
+    const addButton = document.getElementById('add-property-document');
+    const documentForm = document.getElementById('form-step-4');
+    if (!tableBody || !documentForm) return;
+
+    let nextDocumentKey = 0;
+    let activeDocumentPreviewUrl = null;
+    const previewModal = document.getElementById('property-document-preview-modal');
+    previewModal?.addEventListener('hidden.bs.modal', function () {
+      if (activeDocumentPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(activeDocumentPreviewUrl);
+      activeDocumentPreviewUrl = null;
+      document.getElementById('property-document-preview-image').removeAttribute('src');
+    });
+    function renumberDocumentRows() {
+      tableBody.querySelectorAll('[data-document-row]').forEach((row, index) => {
+        row.querySelector('.document-row-number').textContent = index + 1;
+      });
+    }
+
+    function addDocumentRow() {
+      const key = `new-${nextDocumentKey++}`;
+      const row = document.createElement('tr');
+      row.dataset.documentRow = '';
+      row.innerHTML = `
+        <td><span class="document-row-number"></span><input type="hidden" name="document_id" value=""><input type="hidden" name="document_key" value="${key}"></td>
+        <td><input class="form-control" type="text" name="document_name_${key}" required placeholder="Document name"></td>
+        <td><input class="form-control" type="date" name="document_expiry_${key}"></td>
+        <td><input class="form-control" type="date" name="document_reminder_${key}"></td>
+        <td><input class="form-control form-control-sm document-file-input" type="file" name="document_file_${key}" required></td>
+        <td class="text-nowrap"><button type="button" class="btn btn-sm btn-outline-primary preview-document-file" aria-label="Preview document" disabled><i class="icon-base ti tabler-eye"></i></button> <button type="button" class="btn btn-sm btn-outline-danger remove-document-row" aria-label="Remove document"><i class="icon-base ti tabler-x"></i></button></td>`;
+      tableBody.appendChild(row);
+      renumberDocumentRows();
+    }
+
+    if (addButton) addButton.addEventListener('click', addDocumentRow);
+    tableBody.addEventListener('change', function (event) {
+      const fileInput = event.target.closest('.document-file-input');
+      if (!fileInput) return;
+      const previewButton = fileInput.closest('[data-document-row]')?.querySelector('.preview-document-file');
+      if (previewButton) previewButton.disabled = !fileInput.files?.length && !previewButton.dataset.savedFileUrl;
+    });
+    tableBody.addEventListener('click', function (event) {
+      const previewButton = event.target.closest('.preview-document-file');
+      if (previewButton && !previewButton.disabled) {
+        const row = previewButton.closest('[data-document-row]');
+        const selectedFile = row.querySelector('.document-file-input')?.files?.[0];
+        const fileUrl = selectedFile ? URL.createObjectURL(selectedFile) : previewButton.dataset.savedFileUrl;
+        activeDocumentPreviewUrl = fileUrl;
+        const fileName = selectedFile?.name || previewButton.dataset.savedFileName || fileUrl;
+        const isImage = selectedFile ? selectedFile.type.startsWith('image/') : /\.(png|jpe?g|gif|webp|bmp|svg|avif)(?:[?#]|$)/i.test(fileName);
+        if (!isImage) {
+          window.open(fileUrl, '_blank', 'noopener');
+          return;
+        }
+        const modalElement = document.getElementById('property-document-preview-modal');
+        document.getElementById('property-document-preview-image').src = fileUrl;
+        document.getElementById('property-document-preview-title').textContent = fileName.split(/[\\/]/).pop() || 'Document preview';
+        if (window.bootstrap?.Modal) window.bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        else window.open(fileUrl, '_blank', 'noopener');
+        return;
+      }
+      const removeButton = event.target.closest('.remove-document-row');
+      if (!removeButton) return;
+      const row = removeButton.closest('[data-document-row]');
+      const documentId = row.dataset.documentId;
+      if (documentId) {
+        const deletedId = document.createElement('input');
+        deletedId.type = 'hidden';
+        deletedId.name = 'delete_document_ids';
+        deletedId.value = documentId;
+        documentForm.appendChild(deletedId);
+      }
+      row.remove();
+      renumberDocumentRows();
+    });
+
+  });
+
 </script>
 
                 {% comment %} <!-- users edit start -->
@@ -618,7 +766,6 @@
        <!-- BEGIN: Page JS-->
        <script href="{% static 'app-assets/js/scripts/pages/app-user-edit.js' %}"></script>
        <script href="{% static 'app-assets/js/scripts/components/components-navs.js' %}"></script>
-       <script src="{% static 'app-assets/js/scripts/forms/form-wizard.min.js' %}"></script>
         <script src="{% static 'app-assets/js/scripts/forms/form-repeater.min.js' %}"></script>
          <script src="{% static 'app-assets/js/scripts/customizer.min.js' %}"></script>
          <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
@@ -889,7 +1036,21 @@ let listingStepper;
 
 document.addEventListener('DOMContentLoaded', function () {
     const wizard = document.querySelector('.horizontal-wizard-example');
-    if (wizard) listingStepper = new Stepper(wizard);
+    if (!wizard) return;
+    listingStepper = new Stepper(wizard);
+
+    wizard.querySelectorAll('.btn-prev').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            listingStepper.previous();
+        });
+    });
+    wizard.querySelectorAll('.btn-next').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            listingStepper.next();
+        });
+    });
 });
 
 function submitForm(step) {
@@ -917,14 +1078,24 @@ function submitForm(step) {
         if (data.success) {
             const formIdInput = document.querySelector('#form-step-2 input[name="formid"]');
             const photoFormIdInput = document.querySelector('#form-step-3 input[name="formid2"]');
+            const documentFormIdInput = document.querySelector('#form-step-4 input[name="formid2"]');
             if (formIdInput) formIdInput.value = data.formid;
             if (photoFormIdInput) photoFormIdInput.value = data.formid;
+            if (documentFormIdInput) documentFormIdInput.value = data.formid;
             // Step 1 creates the room rows. Keep them intact after saving step 2
             // so returning from step 3 shows the user's entries.
             if (String(step) === '1' && Array.isArray(data.rooms)) {
               generateRoomFields(data.rooms, '₹');
               listingStepper?.next();
             } else if (String(step) === '2') {
+              listingStepper?.next();
+            } else if (String(step) === '3') {
+              if (data.photo_rows && typeof data.photo_rows === 'object') {
+                photoFilesByRow.clear();
+                Object.keys(photoRowsData).forEach(key => delete photoRowsData[key]);
+                Object.assign(photoRowsData, data.photo_rows);
+                renderPhotoRows(photoRoomsData, photoRowsData);
+              }
               listingStepper?.next();
             } else if (String(step) === '1') {
               console.error('Step 1 was saved without a room list:', data);

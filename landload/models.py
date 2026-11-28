@@ -113,6 +113,18 @@ class PropertyImage(models.Model):
     caption = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+
+class PropertyDocument(models.Model):
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='documents')
+    name = models.CharField(max_length=255)
+    expiry_date = models.DateField(null=True, blank=True)
+    reminder_date = models.DateField(null=True, blank=True)
+    upload_file = models.FileField(upload_to='property_documents/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
 class Rooms(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='room_set')    
     type_of_room = models.CharField(max_length=20,choices=[('Single','Single'),('Double','Double'),('Triple','Triple'),('Studio','Studio')])
@@ -272,6 +284,19 @@ class Tenant(models.Model):
                     next_number += 1
 
         super().save(*args, **kwargs)
+
+
+class TenantDocument(models.Model):
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='documents')
+    name = models.CharField(max_length=255)
+    expiry_date = models.DateField(null=True, blank=True)
+    reminder_date = models.DateField(null=True, blank=True)
+    upload_file = models.FileField(upload_to='tenant/documents/')
+    legacy_field = models.CharField(max_length=30, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
 
 class DocumentOthers(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='bankother')

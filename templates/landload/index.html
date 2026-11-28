@@ -87,23 +87,23 @@
                         <h4 class="mb-0">REVENUE</h4>
                       </div>
                         <div class=" d-flex justify-content-center justify-content-between">
-                            <span class="text-heading fw-medium">Net Revenue</span>
-                            <small class="text-body-secondary">{{symbol|safe}} {{profit}}</small>
+                            <span class="text-heading fw-medium">Net Profit</span>
+                            <small class="text-body-secondary">{{symbol|safe}} {{profit|floatformat:2}}</small>
                         </div>
 
                         <div class=" d-flex justify-content-between">
-                            <span class="text-heading fw-medium">Earnings</span>
-                            <small class="text-body-secondary">{{symbol|safe}} {{total_earnings}}</small>
+                            <span class="text-heading fw-medium">Income</span>
+                            <small class="text-body-secondary">{{symbol|safe}} {{total_earnings|floatformat:2}}</small>
                         </div>
 
-                        <div class=" d-flex justify-content-between">
+                        {% comment %} <div class=" d-flex justify-content-between">
                             <span class="text-heading fw-medium">Expenses</span>
-                            <small class="text-body-secondary">{{symbol|safe}} {{total_expenses}}</small>
-                        </div>
+                            <small class="text-body-secondary">{{symbol|safe}} {{total_expenses|floatformat:2}}</small>
+                        </div> {% endcomment %}
 
                         <div class="d-flex justify-content-between">
-                            <span class="text-heading fw-medium">Losses</span>
-                            <small class="text-body-secondary">{{symbol|safe}} 00</small>
+                            <span class="text-heading fw-medium">Loss</span>
+                            <small class="text-body-secondary">{{symbol|safe}} {{total_loss|floatformat:2}}</small>
                         </div>
                     </div>
                   </div>
@@ -122,17 +122,21 @@
                       
                       <div class=" d-flex justify-content-between">
                             <span class="text-heading fw-medium">Total Dues</span>
-                            <small class="text-body-secondary">{{symbol|safe}} 00</small>
+                            <small class="text-body-secondary">{{symbol|safe}} {{total_dues|floatformat:2}}</small>
                         </div>
 
                         <div class=" d-flex justify-content-between">
-                            <span class="text-heading fw-medium">Longest</span>
-                            <small class="text-body-secondary">pending</small>
+                            <span class="text-heading fw-medium">Longest Due</span>
+                            <small class="text-body-secondary">
+                              {% if longest_due %}{{longest_due.tenant_name|truncatechars:12}} · {{longest_due.paid_date|date:"d M Y"}}{% else %}—{% endif %}
+                            </small>
                         </div>
 
                         <div class=" d-flex justify-content-between">
-                            <span class="text-heading fw-medium">Highest</span>
-                            <small class="text-body-secondary">pending</small>
+                            <span class="text-heading fw-medium">Highest Due</span>
+                            <small class="text-body-secondary">
+                              {% if highest_due %}{{symbol|safe}} {{highest_due.amount|floatformat:2}}{% else %}—{% endif %}
+                            </small>
                         </div>
 
                        
@@ -168,7 +172,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-3 col-sm-6">
+                {% comment %} <div class="col-lg-3 col-sm-6">
                   <div class="card card-border-shadow-info h-100">
                     <div class="card-body">
                       <div class="d-flex align-items-center mb-2">
@@ -199,7 +203,7 @@
                         </div>
                     </div>
                   </div>
-                </div>
+                </div> {% endcomment %}
 
 
                 <div class="col-xxl-8 col-12">
